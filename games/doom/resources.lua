@@ -942,4 +942,8 @@ function DOOM.all_done()
   else
     gui.wad_insert_file("data/endoom/ENDOOM.bin", "ENDOOM")
   end
+
+  gui.wad_merge_sections("games/doom/data/invisible_wall.wad")
+  gui.wad_merge_sections("games/doom/data/lift_flat.wad")
+  gui.wad_merge_sections("games/doom/data/vine_dude.wad")
 end

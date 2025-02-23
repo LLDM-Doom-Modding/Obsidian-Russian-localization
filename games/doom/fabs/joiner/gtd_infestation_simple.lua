@@ -26,7 +26,7 @@ PREFABS.Joiner_infestation_caveout =
   tex_MIDVINE2 =
   {
     MIDVINE2 = 1,
-    ZZWOLF10 = 10 -- invisibility tex
+    O_INVIST = 10 -- invisibility tex
   },
 }
 
@@ -54,6 +54,6 @@ PREFABS.Joiner_natural_caveout =
   tex_MIDVINE2 =
   {
     MIDVINE2 = 1,
-    ZZWOLF10 = 10 -- invisibility tex
+    O_INVIST = 10 -- invisibility tex
   },
 }
