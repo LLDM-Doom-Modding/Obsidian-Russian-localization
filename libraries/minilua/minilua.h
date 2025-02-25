@@ -6338,32 +6338,27 @@ typedef struct LG {
 */
 #if !defined(luai_makeseed)
 
-// OBSIDIAN: Return fixed seed. Original function is below and commented out
-static unsigned int luai_makeseed (lua_State *L) {
-  return 0x0B51D1A + 'N';
-}
-
-//#include <time.h>
+#include <time.h>
 
 /*
 ** Compute an initial seed with some level of randomness.
 ** Rely on Address Space Layout Randomization (if present) and
 ** current time.
 */
-//#define addbuff(b,p,e) \
+#define addbuff(b,p,e) \
   { size_t t = cast_sizet(e); \
     memcpy(b + p, &t, sizeof(t)); p += sizeof(t); }
 
-//static unsigned int luai_makeseed (lua_State *L) {
-//  char buff[3 * sizeof(size_t)];
-//  unsigned int h = cast_uint(time(NULL));
-//  int p = 0;
-//  addbuff(buff, p, L);  /* heap variable */
-//  addbuff(buff, p, &h);  /* local variable */
-//  addbuff(buff, p, &lua_newstate);  /* public function */
-//  lua_assert(p == sizeof(buff));
-//  return luaS_hash(buff, p, h);
-//}
+static unsigned int luai_makeseed (lua_State *L) {
+  char buff[3 * sizeof(size_t)];
+  unsigned int h = cast_uint(time(NULL));
+  int p = 0;
+  addbuff(buff, p, L);  /* heap variable */
+  addbuff(buff, p, &h);  /* local variable */
+  addbuff(buff, p, &lua_newstate);  /* public function */
+  lua_assert(p == sizeof(buff));
+  return luaS_hash(buff, p, h);
+}
 
 #endif
 

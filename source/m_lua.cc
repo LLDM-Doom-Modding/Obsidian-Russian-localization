@@ -658,11 +658,6 @@ extern int CSG_add_brush(lua_State *L);
 extern int CSG_add_entity(lua_State *L);
 extern int CSG_trace_ray(lua_State *L);
 
-extern int WF_wolf_block(lua_State *L);
-extern int WF_wolf_read(lua_State *L);
-extern int v094_begin_wolf_level(lua_State *L);
-extern int v094_end_wolf_level(lua_State *L);
-
 namespace Doom
 {
 extern int wad_name_gfx(lua_State *L);
@@ -759,12 +754,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"add_brush", CSG_add_brush},
     {"add_entity", CSG_add_entity},
     {"trace_ray", CSG_trace_ray},
-
-    // Wolf-3D functions
-    {"wolf_block", WF_wolf_block},
-    {"wolf_read", WF_wolf_read},
-    {"v094_begin_wolf_level", v094_begin_wolf_level},
-    {"v094_end_wolf_level", v094_end_wolf_level},
 
     // Doom/Heretic/Hexen functions
     {"wad_name_gfx", Doom::wad_name_gfx},

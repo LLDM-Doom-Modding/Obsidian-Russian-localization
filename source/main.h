@@ -186,7 +186,6 @@ extern game_interface_c *game_object;
 /* interface for each game format */
 
 game_interface_c *Doom_GameObject();
-game_interface_c *Wolf_GameObject();
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

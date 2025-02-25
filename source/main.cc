@@ -356,10 +356,6 @@ bool Build_Cool_Shit()
         {
             game_object = Doom_GameObject();
         }
-        else if (StringCompare(format, "wolf3d") == 0)
-        {
-            game_object = Wolf_GameObject();
-        }
         else
         {
             FatalError("ERROR: unknown format: '%s'\n", format.c_str());
@@ -371,30 +367,7 @@ bool Build_Cool_Shit()
     const uint32_t start_time = TimeGetMillies();
     bool           was_ok     = false;
     // this will ask for output filename (among other things)
-    if (StringCompare(format, "wolf3d") == 0)
-    {
-        std::string current_game = ob_get_param("game");
-        if (StringCompare(current_game, "wolf") == 0)
-        {
-            was_ok = game_object->Start("WL6");
-        }
-        else if (StringCompare(current_game, "spear") == 0)
-        {
-            was_ok = game_object->Start("SOD");
-        }
-        else if (StringCompare(current_game, "noah") == 0)
-        {
-            was_ok = game_object->Start("N3D");
-        }
-        else if (StringCompare(current_game, "obc") == 0)
-        {
-            was_ok = game_object->Start("BC");
-        }
-    }
-    else
-    {
-        was_ok = game_object->Start(def_filename.c_str());
-    }
+    was_ok = game_object->Start(def_filename.c_str());
 
     if (was_ok)
     {
