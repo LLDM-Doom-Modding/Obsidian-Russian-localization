@@ -21,8 +21,6 @@
 
 NOAH = { }
 
-gui.import("factory")
-
 -- These empty tables are needed not to throw errors in obsidian.lua
 
 NOAH.PARAMETERS = { }
@@ -35,7 +33,7 @@ NOAH.ROOMS = { }
 
 ------------------------------------------------------------
 
-OB_GAMES["noah"] =
+UNFINISHED["noah"] =
 {
 	label = _("Noah's Ark 3D"),
 	priority = 46,

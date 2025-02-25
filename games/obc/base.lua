@@ -21,8 +21,6 @@
 
 OBC = { }
 
-gui.import("factory")
-
 -- These empty tables are needed not to throw errors in obsidian.lua
 
 OBC.PARAMETERS = { }
@@ -35,7 +33,7 @@ OBC.ROOMS = { }
 
 ------------------------------------------------------------
 
-OB_GAMES["obc"] =
+UNFINISHED["obc"] =
 {
 	label = _("Op. Body Count"),
 	priority = 25,

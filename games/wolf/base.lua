@@ -21,7 +21,6 @@
 
 WOLF = { }
 
-gui.import("factory")
 gui.import("x_spear")
 
 -- These empty tables are needed not to throw errors in obsidian.lua
@@ -36,7 +35,7 @@ WOLF.ROOMS = { }
 
 ------------------------------------------------------------
 
-OB_GAMES["wolf"] =
+UNFINISHED["wolf"] =
 {
 	label = _("Wolfenstein 3D"),
 	priority = 48,

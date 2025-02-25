@@ -60,8 +60,6 @@ gui.import("dialogues.lua")
 
 gui.set_import_dir("")
 
-gui.import("094/oblige_v094.lua")
-
 function ob_ref_table(op, t)
   if not gui.___REFS then
     gui.___REFS = {}
@@ -2291,7 +2289,7 @@ function ob_build_cool_shit()
   -- Hijack here if Wolf3D is selected
 
   if OB_CONFIG.engine == "idtech_0" then
-    local result = v094_build_wolf3d_shit()
+    --local result = v094_build_wolf3d_shit()
     ob_clean_up()
     return result
   end
