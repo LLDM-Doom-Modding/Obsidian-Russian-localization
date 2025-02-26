@@ -221,11 +221,11 @@ function JOKEWAD_MODULE.get_levels(self)
 
   module_param_up(self)
 
-  if PARAM.bool_fireblu_mode == 1 then
+  if OB_CONFIG.bool_fireblu_mode == 1 then
     JOKEWAD_MODULE.go_fireblue()
   end
 
-  if PARAM.bool_pandemic_mode == 1 then
+  if OB_CONFIG.bool_pandemic_mode == 1 then
     SCRIPTS.tissue_doc = 1
   end
 
@@ -233,7 +233,7 @@ end
 
 function JOKEWAD_MODULE.end_level(self, LEVEL)
 
-  if PARAM.bool_pandemic_mode == 1 then
+  if OB_CONFIG.bool_pandemic_mode == 1 then
     JOKEWAD_MODULE.add_tissues(LEVEL)
   end
 
@@ -417,7 +417,7 @@ end
 
 function JOKEWAD_MODULE.all_done()
 
-  if PARAM.bool_pandemic_mode == 1 then
+  if OB_CONFIG.bool_pandemic_mode == 1 then
     local dir = "games/doom/data/"
     gui.wad_merge_sections(dir .. "events.wad")
 

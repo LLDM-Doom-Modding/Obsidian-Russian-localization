@@ -744,7 +744,7 @@ function Cave_liquid_pools__OLD()
         local f_brush = Cave_brush(area, x, y)
         local c_brush = Cave_brush(area, x, y)
 
-        if PARAM.deep_liquids then
+        if OB_CONFIG.deep_liquids then
           brushlib.add_top(f_brush, f_h-128)
           brushlib.set_mat(f_brush, f_mat, f_mat)
 
@@ -2691,7 +2691,7 @@ function Cave_decide_properties(R, area, LEVEL)
   area.step_mode = "walkway"
 
   -- MSSP: Steppy caves are back, baby!
-  if rand.odds(style_sel("steepness", 0, 25, 50, 75)) or (PARAM.steppy_caves and PARAM.steppy_caves == "always") then
+  if rand.odds(style_sel("steepness", 0, 25, 50, 75)) or (OB_CONFIG.steppy_caves and OB_CONFIG.steppy_caves == "always") then
     if rand.odds(50) then
       area.step_mode = "up"
     else
@@ -2699,7 +2699,7 @@ function Cave_decide_properties(R, area, LEVEL)
     end
   end
 
-  if PARAM.steppy_caves and PARAM.steppy_caves == "no" then
+  if OB_CONFIG.steppy_caves and OB_CONFIG.steppy_caves == "no" then
     area.step_mode = "walkway"
   end
 

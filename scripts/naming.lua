@@ -2531,7 +2531,7 @@ end
 
 
 function namelib.choose_one(DEF, max_len)
-  if PARAM.bool_whole_names_only and PARAM.bool_whole_names_only ~= 0 then
+  if OB_CONFIG.bool_whole_names_only and OB_CONFIG.bool_whole_names_only ~= 0 then
     return rand.key_by_probs(DEF.lexicon.s)
   end
 

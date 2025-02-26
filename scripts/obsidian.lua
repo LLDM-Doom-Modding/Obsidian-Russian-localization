@@ -379,7 +379,7 @@ function ob_match_level_theme(LEVEL, T, override)
   if T.theme == "any" then return true end
 
   -- if match theme toggle is disabled, everything qualifies
-  if PARAM.bool_fab_match_theme == 0 then return true end
+  if OB_CONFIG.bool_fab_match_theme == 0 then return true end
 
   local level_theme_name = LEVEL.theme_name
   if override then
@@ -470,7 +470,7 @@ function ob_match_feature(T)
   -- require ALL specified features to be available
 
   for _,name in pairs(feat_tab) do
-    local param = PARAM[name]
+    local param = OB_CONFIG[name]
 
     if param == nil or param == false then
       return false
@@ -704,11 +704,9 @@ function ob_set_mod_option(name, option, value)
 
   -- this can only happen while parsing the CONFIG.TXT file
   -- (containing some no-longer-used value).
-  if not opt.valuator then 
-    if not opt.avail_choices[value] then
-      warning("invalid choice: %s (for option %s.%s)\n", value, name, option)
-      return
-    end
+  if not opt.avail_choices[value] then
+    warning("invalid choice: %s (for option %s.%s)\n", value, name, option)
+    return
   end
 
   opt.value = value
@@ -1279,42 +1277,27 @@ function ob_init()
             assert(opt.url)
             goto skipoption
           end
-          if not opt.valuator then
-            assert(opt.choices)
-          end
+          
+          assert(opt.choices)
                   
-          if opt.valuator then
-            if opt.valuator == "slider" then
-              if not opt.default then
-                opt.default = (opt.min + opt.max) / 2
-              end
-              opt.value = opt.default
-            elseif opt.valuator == "button" then
-              if not opt.default then
-                opt.default = 0
-              end
-              opt.value = opt.default
+          -- select a default value
+          if not opt.default then
+            if table.has_elem(opt.choices, "default") then opt.default = "default"
+            elseif table.has_elem(opt.choices, "normal")  then opt.default = "normal"
+            elseif table.has_elem(opt.choices, "medium")  then opt.default = "medium"
+            elseif table.has_elem(opt.choices, "mixed")   then opt.default = "mixed"
+            else   opt.default = opt.choices[1]
             end
-          else
-            -- select a default value
-            if not opt.default then
-              if table.has_elem(opt.choices, "default") then opt.default = "default"
-              elseif table.has_elem(opt.choices, "normal")  then opt.default = "normal"
-              elseif table.has_elem(opt.choices, "medium")  then opt.default = "medium"
-              elseif table.has_elem(opt.choices, "mixed")   then opt.default = "mixed"
-              else   opt.default = opt.choices[1]
-              end
-            end
-            opt.avail_choices = {}
-
-            for i = 1,#opt.choices,2 do
-              local id    = opt.choices[i]
-              local label = opt.choices[i+1]
-
-              opt.avail_choices[id] = 1
-            end
-            opt.value = opt.default
           end
+          opt.avail_choices = {}
+
+          for i = 1,#opt.choices,2 do
+            local id    = opt.choices[i]
+            local label = opt.choices[i+1]
+
+            opt.avail_choices[id] = 1
+          end
+          opt.value = opt.default
           ::skipoption::
         end -- for opt
       end
@@ -1364,9 +1347,7 @@ function ob_get_param(parameter)
 
   local param
 
-  if PARAM[parameter] then
-    param = PARAM[parameter]
-  elseif OB_CONFIG[parameter] then
+  if OB_CONFIG[parameter] then
     param = OB_CONFIG[parameter]
   else
     print("MISSING PARAMETER: " .. parameter)
@@ -1781,9 +1762,9 @@ function ob_build_setup()
   end
 
 
-  PARAM = assert(GAME.PARAMETERS)
+  local game_params = assert(GAME.PARAMETERS)
 
-  table.merge_missing(PARAM, GLOBAL_PARAMETERS)
+  table.merge_missing(game_params, GLOBAL_PARAMETERS)
 
   -- load all the prefab definitions
   if not ob_match_game({game = {wolf=1,spear=1,noah=1,obc=1}}) then
@@ -1805,8 +1786,8 @@ function ob_build_setup()
     gui.property("sub_format", GAME.sub_format)
   end
 
-  gui.property("spot_low_h",  PARAM.spot_low_h)
-  gui.property("spot_high_h", PARAM.spot_high_h)
+  gui.property("spot_low_h",  GLOBAL_PARAMETERS.spot_low_h)
+  gui.property("spot_high_h", GLOBAL_PARAMETERS.spot_high_h)
 end
 
 
@@ -1818,9 +1799,6 @@ function ob_clean_up()
   for _,k in pairs (THEME) do
     THEME[k] = nil
   end
-  for _,k in pairs (PARAM) do
-    PARAM[k] = nil
-  end
   for _,k in pairs (STYLE) do
     STYLE[k] = nil
   end
@@ -1829,7 +1807,6 @@ function ob_clean_up()
   end
   GAME   = nil
   THEME  = nil
-  PARAM  = nil
   STYLE  = nil
   SCRIPTS = nil
   EPISODE = nil
@@ -1847,7 +1824,6 @@ function ob_clean_up()
   collectgarbage("collect")
   GAME   = {}
   THEME  = {}
-  PARAM  = {}
   STYLE  = {}
   SCRIPTS = {}
   SEEN_ROOM_THEMES = {}
@@ -1856,366 +1832,6 @@ function ob_clean_up()
     gui.fsky_free()
   end
   AMBIENT_SOUND_DEFS = {}
-end
-
-local function ob_get_module_refs()
-  local module_refs = {}
-  for _,v in pairs(OB_MODULES) do
-    local option_refs = {}
-    for _,vv in pairs(v.options) do
-      if not string.match(vv.name, "header_") and not string.match(vv.name, "url_") then
-        option_refs[vv.name] = {}
-        if not vv.tooltip then
-          option_refs[vv.name].tooltip = "No help yet written for this option!"
-        else
-          option_refs[vv.name].tooltip = gui.gettext(vv.tooltip)
-        end
-        if not v.engine then
-          option_refs[vv.name].engine = {}
-          table.add_unique(option_refs[vv.name].engine, "ALL")
-        else
-          if type(v.engine) == "string" then
-            option_refs[vv.name].engine = {}
-            table.add_unique(option_refs[vv.name].engine, v.engine)
-          else
-            option_refs[vv.name].engine = {}
-            for engine,_ in pairs(v.engine) do
-              table.add_unique(option_refs[vv.name].engine, engine)
-            end
-          end
-        end
-        if not v.game then
-          option_refs[vv.name].game = {}
-          table.add_unique(option_refs[vv.name].game, "ALL")
-        else
-          if type(v.game) == "string" then
-            option_refs[vv.name].game = {}
-            table.add_unique(option_refs[vv.name].game, v.game)
-          else
-            option_refs[vv.name].game = {}
-            for game,_ in pairs(v.game) do
-              table.add_unique(option_refs[vv.name].game, game)
-            end
-          end
-        end
-        if not v.port then
-          option_refs[vv.name].port = {}
-          table.add_unique(option_refs[vv.name].port, "ALL")
-        else
-          if type(v.port) == "string" then
-            option_refs[vv.name].port = {}
-            table.add_unique(option_refs[vv.name].port, v.port)
-          else
-            option_refs[vv.name].port = {}
-            for port,_ in pairs(v.port) do
-              table.add_unique(option_refs[vv.name].port, port)
-            end
-          end
-        end
-        if not vv.valuator then
-          option_refs[vv.name].choices = {}
-          for num,choice in pairs(vv.choices) do
-            if num % 2 == 1 then
-              table.add_unique(option_refs[vv.name].choices, choice)
-            end
-          end
-        else
-          if vv.valuator == "slider" then
-            option_refs[vv.name].slider = {}
-            option_refs[vv.name].slider.min = vv.min
-            option_refs[vv.name].slider.max = vv.max
-            option_refs[vv.name].slider.default = vv.default
-            if vv.nan then
-              option_refs[vv.name].slider.nan = vv.nan
-            end
-          else
-            option_refs[vv.name].button = {}
-            option_refs[vv.name].button.default = vv.default
-          end
-        end
-      end
-    end
-    module_refs[v.name] = option_refs
-  end
-  module_refs["main_build_settings"] = {
-    engine = {
-      tooltip = _("Choose which engine to build maps for:\n  id Tech 0: Wolfenstein 3D and similar games\n  id Tech 1: Doom and similar games\n"),
-      engine = {_("ALL")},
-      game = {_("ALL")},
-      port = {_("ALL")},
-      choices = {
-        "idtech_0",
-        "idtech_1",
-      },
-      default = "idtech_1",
-    },
-    game = {
-      tooltip = _("Choose which game to build maps for."),
-      engine = {_("ALL")},
-      game = {_("ALL")},
-      port = {_("ALL")},
-      choices = {
-        "chex1",
-        "doom1",
-        "doom2",
-        "ultdoom",
-        "tnt",
-        "plutonia",
-        "hacx",
-        "harmony",
-        "heretic",
-        "rekkr",
-        "strife",
-        "wolf3d",
-        "spear",
-        "noah",
-        "obc",
-      },
-      default = "doom2",
-    },
-    port = {
-      tooltip = _("Choose which port to build maps for.\n  Vanilla is the only option for id Tech 0; the remaining options are for id Tech 1.\n"),
-      engine = {_("ALL")},
-      game = {_("ALL")},
-      port = {_("ALL")},
-      choices = {
-        "vanilla",
-        "limit_enforcing",
-        "boom",
-        "zdoom",
-        "edge",
-      },
-      default = "boom",
-    },
-    length = {
-      tooltip = _("Choose how many levels to create."),
-      engine = {_("ALL")},
-      game = {_("ALL")},
-      port = {_("ALL")},
-      choices = {
-        "single",
-        "few",
-        "episode",
-        "game",
-      },
-      default = "game",
-    },
-    theme = {
-      tooltip = _("The following values are game-specific:\n  Ultimate Doom/Doom 1: deimos,flesh\n  Ultimate Doom/Doom 1/Doom 2/TNT/Plutonia: tech,urban,hell\n  TNT: egypt\n  HacX: hacx_urban\n  Heretic: city,maw,dome,ossuary,demense\n\n  Note: This setting currently does nothing for id Tech 0 games!\n"),
-      engine = {_("ALL")},
-      game = {_("ALL")},
-      port = {_("ALL")},
-      choices = {
-        "original",
-        "epi",
-        "jumble",
-        "bit_mixed",
-        "psycho",
-        "tech",
-        "urban",
-        "hell",
-        "deimos",
-        "flesh",
-        "egypt",
-        "hacx_urban",
-        "city",
-        "maw",
-        "dome",
-        "ossuary",
-        "demense"
-      },
-      default = "original",
-    },
-  }
-  return module_refs
-end
-
-function ob_print_reference()
-  local module_refs = ob_get_module_refs()
-  local sorted_entries = table.keys_sorted(module_refs)
-  for _,module_entry in ipairs(sorted_entries) do
-    gui.console_print("\n[[ " .. module_entry .. " ]]\n")
-    gui.ref_print("\n[[ " .. module_entry .. " ]]\n")
-    for name,option in pairs(module_refs[module_entry]) do
-      gui.console_print("\n" .. gui.gettext("option: ") .. name .. "\n")
-      gui.ref_print("\n" .. gui.gettext("option: ") .. name .. "\n")
-      gui.console_print(gui.gettext("comment: ") .. option.tooltip .. "\n")
-      gui.ref_print(gui.gettext("comment: ") .. option.tooltip .. "\n")
-      gui.console_print(gui.gettext("engine: "))
-      gui.ref_print(gui.gettext("engine: "))
-      for _,engine in pairs(option.engine) do
-        gui.console_print(engine .. " ")
-        gui.ref_print(engine .. " ")
-      end
-      gui.console_print("\n")
-      gui.ref_print("\n")
-      gui.console_print(gui.gettext("game: "))
-      gui.ref_print(gui.gettext("game: "))
-      for _,game in pairs(option.game) do
-        gui.console_print(game .. " ")
-        gui.ref_print(game .. " ")
-      end
-      gui.console_print("\n")
-      gui.ref_print("\n")
-      gui.console_print(gui.gettext("port: "))
-      gui.ref_print(gui.gettext("port: "))
-      for _,port in pairs(option.port) do
-        gui.console_print(port .. " ")
-        gui.ref_print(port .. " ")
-      end
-      if (option.slider) then
-        gui.console_print("\n" .. gui.gettext("values: ") .. option.slider.min .. "-" .. option.slider.max)
-        gui.ref_print("\n" .. gui.gettext("values: ") .. option.slider.min .. "-" .. option.slider.max)
-        if option.slider.nan then
-          gui.console_print("," .. option.slider.nan)
-          gui.ref_print("," .. option.slider.nan)
-        end
-        gui.console_print("\n" .. gui.gettext("default: ") .. option.slider.default)
-        gui.ref_print("\n" .. gui.gettext("default: ") .. option.slider.default)
-      elseif (option.button) then
-        gui.console_print("\n" .. gui.gettext("values: ")
-         .. "0/1\n" .. gui.gettext("default: ") .. option.button.default)
-        gui.ref_print("\n" .. gui.gettext("values: ")
-        .. "0/1\n" .. gui.gettext("default: ") .. option.button.default)
-      else
-        gui.console_print("\n" .. gui.gettext("values: "))
-        gui.ref_print("\n" .. gui.gettext("values: "))
-        for num,choice in ipairs(option.choices) do
-          if num ~= #option.choices then
-            gui.console_print(choice .. ",")
-            gui.ref_print(choice .. ",")
-          else
-            gui.console_print(choice)
-            gui.ref_print(choice)
-          end
-        end
-      end
-      gui.console_print("\n")
-      gui.ref_print("\n")
-    end
-  end
-end
-
-local function split_commas(inputstr)
-  local t = {}
-  for str in string.gmatch(inputstr, "([^,]+)") do
-    table.insert(t, str)
-  end
-  return t
-end
-
-function ob_print_reference_json()
-  local module_refs = ob_get_module_refs()
-  local sorted_entries = table.keys_sorted(module_refs)
-  gui.console_print("{\n")
-  for i,module_entry in ipairs(sorted_entries) do
-    gui.console_print("  \"" .. module_entry .. "\": {\n")
-    local first = true
-    for name,option in pairs(module_refs[module_entry]) do
-      if not first then
-        gui.console_print(",\n")
-      else
-        gui.console_print("\n")
-        first = false
-      end
-      gui.console_print("    \"" .. name .. "\": {\n")
-      local tooltip = option.tooltip
-      tooltip = tooltip:gsub("\n", "\\n")
-      gui.console_print("      \"" .. gui.gettext("tooltip") .. "\": \"" .. tooltip .. "\",\n")
-      gui.console_print("      \"" .. gui.gettext("engine") .. "\": ")
-      if #option.engine == 1 and option.engine[1] == "ALL" then
-        gui.console_print("\"" .. gui.gettext("ALL") .. "\",\n")
-      else
-        gui.console_print("[")
-        for j,engine in pairs(option.engine) do
-          if j ~= #option.engine then
-            gui.console_print("\"" .. engine .. "\", ")
-          else
-            gui.console_print("\"" .. engine .. "\"")
-          end
-        end
-        gui.console_print("],\n")
-      end
-      gui.console_print("    \"" .. gui.gettext("game") .. "\": ")
-      if #option.game == 1 and option.game[1] == gui.gettext("ALL") then
-        gui.console_print("\"" .. gui.gettext("ALL") .. "\",\n")
-      else
-        gui.console_print("[")
-        for j,game in pairs(option.game) do
-          if j ~= #option.game then
-            gui.console_print("\"" .. game .. "\", ")
-          else
-            gui.console_print("\"" .. game .. "\"")
-          end
-        end
-        gui.console_print("],\n")
-      end
-      gui.console_print("    \"" .. gui.gettext("port") .. "\": ")
-      if #option.port == 1 and option.port[1] == gui.gettext("ALL") then
-        gui.console_print("\"" .. gui.gettext("ALL") .. "\",\n")
-      else
-        gui.console_print("[")
-        for j,port in pairs(option.port) do
-          if j ~= #option.port then
-            gui.console_print("\"" .. port .. "\", ")
-          else
-            gui.console_print("\"" .. port .. "\"")
-          end
-        end
-        gui.console_print("],\n")
-      end
-      if (option.slider) then
-        gui.console_print("    \"" .. gui.gettext("type") .. "\": \"" ..
-          gui.gettext("slider") .. "\",\n")
-        gui.console_print("    \"" .. gui.gettext("values") .. "\": {\n")
-        gui.console_print("      \"" .. gui.gettext("min") .. "\": " .. option.slider.min .. ",\n")
-        gui.console_print("      \"" .. gui.gettext("max") .. "\": " .. option.slider.max .. ",\n")
-        local default = option.slider.default
-        if tonumber(default) == nil then
-          default = "\"" .. default .. "\""
-        end
-        gui.console_print("      \"" .. gui.gettext("default") .. "\": " .. default)
-        if option.slider.nan then
-          local nans = split_commas(option.slider.nan)
-          gui.console_print(",\n      \"nan\": [\n")
-          for i,nan in ipairs(nans) do
-            gui.console_print("        \"" .. nan .. "\"")
-            if i ~= #nans then
-              gui.console_print(",")
-            end
-            gui.console_print("\n")
-          end
-          gui.console_print("      ]")
-        end
-        gui.console_print("\n")
-        gui.console_print("    }")
-      elseif (option.button) then
-        gui.console_print("    \"" .. gui.gettext("type") .. "\": \"" ..
-          gui.gettext("boolean") .. "\",\n")
-        gui.console_print("    \"" .. gui.gettext("default") .. "\": " .. option.button.default .. "\n")
-      else
-        gui.console_print("    \"" .. gui.gettext("type") .. "\": \"" ..
-          gui.gettext("choice") .. "\",\n")
-        gui.console_print("    \"" .. gui.gettext("values") .. "\": [\n")
-        for num,choice in ipairs(option.choices) do
-          gui.console_print("      \"" .. choice .. "\"")
-          if num ~= #option.choices then
-            gui.console_print(",")
-          end
-          gui.console_print("\n")
-        end
-        gui.console_print("    ]")
-      end
-      gui.console_print("\n")
-      gui.console_print("  }")
-    end
-    gui.console_print("  }")
-    if i ~= #sorted_entries then
-      gui.console_print(",")
-    end
-    gui.console_print("\n")
-  end
-  gui.console_print("}\n")
 end
 
 local PROFILING = false
@@ -2250,7 +1866,7 @@ function ob_build_cool_shit()
     end
     ob_invoke_hook("slump_setup")
     ob_invoke_hook("setup")
-    assert(PARAM.slump_config)
+    assert(OB_CONFIG.slump_config)
     return "ok" 
   end -- Skip the rest if using Vanilla Doom/SLUMP
 

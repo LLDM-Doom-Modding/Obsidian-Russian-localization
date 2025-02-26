@@ -5130,42 +5130,6 @@ ULTDOOM.EPISODES =
   },
 }
 
-
-ULTDOOM.PREBUILT_LEVELS =
-{
-  E1M8 =
-  {
-    { prob=50,  file="games/doom/data/boss1/anomaly1.wad", map="E1M8" },
-    { prob=50,  file="games/doom/data/boss1/anomaly2.wad", map="E1M8" },
-    { prob=100, file="games/doom/data/boss1/anomaly3.wad", map="E1M8" },
-    { prob=50,  file="games/doom/data/boss1/ult_anomaly.wad",  map="E1M8" },
-    { prob=100, file="games/doom/data/boss1/ult_anomaly2.wad", map="E1M8" },
-  },
-
-  E2M8 =
-  {
-    { prob=40,  file="games/doom/data/boss1/tower1.wad", map="E2M8" },
-    { prob=60,  file="games/doom/data/boss1/tower2.wad", map="E2M8" },
-    { prob=100, file="games/doom/data/boss1/ult_tower.wad", map="E2M8" },
-  },
-
-  E3M8 =
-  {
-    { prob=50,  file="games/doom/data/boss1/dis1.wad", map="E3M8" },
-    { prob=100, file="games/doom/data/boss1/ult_dis.wad", map="E3M8" },
-  },
-
-  E4M6 =
-  {
-    { prob=50, file="games/doom/data/boss1/tower1.wad", map="E2M8" },
-  },
-
-  E4M8 =
-  {
-    { prob=50, file="games/doom/data/boss1/dis1.wad", map="E3M8" },
-  },
-}
-
 function ULTDOOM.get_levels()
   local EP_MAX  = sel(OB_CONFIG.game   == "ultdoom", 4, 3)
   local EP_NUM  = sel(OB_CONFIG.length == "game", EP_MAX, 1)
@@ -5221,105 +5185,81 @@ function ULTDOOM.get_levels()
         LEV.is_secret = true
       end
 
-      -- prebuilt levels
-      if PARAM.bool_prebuilt_levels == 1 then
-        LEV.prebuilt = GAME.PREBUILT_LEVELS[LEV.name]
+      --handling for the Final Only option
+      if OB_CONFIG.gotcha_frequency == "final" then
+        if OB_CONFIG.length == "single" then
+          if current_map == 1 then LEV.is_procedural_gotcha = true end
+        elseif OB_CONFIG.length == "few" then
+          if current_map == 4 then LEV.is_procedural_gotcha = true end
+        elseif OB_CONFIG.length == "episode" then
+          if current_map == 8 then LEV.is_procedural_gotcha = true end
+        elseif OB_CONFIG.length == "game" then
+          if current_map == 35 then LEV.is_procedural_gotcha = true end
+        end
       end
 
-      if LEV.prebuilt then
-        LEV.name_class = LEV.prebuilt.name_class or "BOSS"
-      end
-
-      -- procedural gotcha management code
-
-      -- Prebuilts are to exist over procedural gotchas
-      -- this means procedural gotchas will not override
-      -- Icon of Sin for example if prebuilts are still on
-      if not LEV.prebuilt then
-
-        --handling for the Final Only option
-        if PARAM.gotcha_frequency == "final" then
-          if OB_CONFIG.length == "single" then
-            if current_map == 1 then LEV.is_procedural_gotcha = true end
-          elseif OB_CONFIG.length == "few" then
-            if current_map == 4 then LEV.is_procedural_gotcha = true end
-          elseif OB_CONFIG.length == "episode" then
-            if current_map == 8 then LEV.is_procedural_gotcha = true end
-          elseif OB_CONFIG.length == "game" then
-            if current_map == 35 then LEV.is_procedural_gotcha = true end
-          end
-        end
-  
-        if PARAM.gotcha_frequency == "epi" then
-          if current_map == ep_index * 9 - 1 then
-            LEV.is_procedural_gotcha = true
-          end
-        end
-        if PARAM.gotcha_frequency == "2epi" then
-          if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 5 then
-            LEV.is_procedural_gotcha = true
-          end
-        end
-        if PARAM.gotcha_frequency == "3epi" then
-          if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 4 or current_map == ep_index * 9 - 7 then
-            LEV.is_procedural_gotcha = true
-          end
-        end
-        if PARAM.gotcha_frequency == "4epi" then
-          if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 3 or current_map == ep_index * 9 - 5 or current_map == ep_index * 9 - 7 then
-            LEV.is_procedural_gotcha = true
-          end
-        end
-  
-        --5% of maps after map 4,
-        if PARAM.gotcha_frequency == "5p" then
-          if current_map > 4 and current_map % 9 ~= 0 then
-            if rand.odds(5) then LEV.is_procedural_gotcha = true end
-          end
-        end
-  
-        -- 10% of maps after map 4,
-        if PARAM.gotcha_frequency == "10p" then
-          if current_map > 4 and current_map % 9 ~= 0 then
-            if rand.odds(10) then LEV.is_procedural_gotcha = true end
-          end
-        end
-  
-        -- for masochists... or debug testing
-        if PARAM.gotcha_frequency == "all" then
+      if OB_CONFIG.gotcha_frequency == "epi" then
+        if current_map == ep_index * 9 - 1 then
           LEV.is_procedural_gotcha = true
         end
+      end
+      if OB_CONFIG.gotcha_frequency == "2epi" then
+        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 5 then
+          LEV.is_procedural_gotcha = true
+        end
+      end
+      if OB_CONFIG.gotcha_frequency == "3epi" then
+        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 4 or current_map == ep_index * 9 - 7 then
+          LEV.is_procedural_gotcha = true
+        end
+      end
+      if OB_CONFIG.gotcha_frequency == "4epi" then
+        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 3 or current_map == ep_index * 9 - 5 or current_map == ep_index * 9 - 7 then
+          LEV.is_procedural_gotcha = true
+        end
+      end
+
+      --5% of maps after map 4,
+      if OB_CONFIG.gotcha_frequency == "5p" then
+        if current_map > 4 and current_map % 9 ~= 0 then
+          if rand.odds(5) then LEV.is_procedural_gotcha = true end
+        end
+      end
+
+      -- 10% of maps after map 4,
+      if OB_CONFIG.gotcha_frequency == "10p" then
+        if current_map > 4 and current_map % 9 ~= 0 then
+          if rand.odds(10) then LEV.is_procedural_gotcha = true end
+        end
+      end
+
+      -- for masochists... or debug testing
+      if OB_CONFIG.gotcha_frequency == "all" then
+        LEV.is_procedural_gotcha = true
       end
   
       -- handling for street mode
       -- actual handling for urban percentages are done
-      if PARAM.float_streets_mode then
-        if not LEV.is_procedural_gotcha or not LEV.prebuilt then
-          if rand.odds(PARAM.float_streets_mode) then
+      if OB_CONFIG.float_streets_mode then
+        if not LEV.is_procedural_gotcha then
+          if rand.odds(OB_CONFIG.float_streets_mode) then
             LEV.has_streets = true
           end
         end
       end
   
-      if not LEV.prebuilt then
-        -- nature mode
-        if PARAM.float_nature_mode then
-          if rand.odds(PARAM.float_nature_mode) then
-            if LEV.has_streets then
-              if rand.odds(50) then
-                LEV.has_streets = false
-                LEV.is_nature = true
-              end
-            else
+      -- nature mode
+      if OB_CONFIG.float_nature_mode then
+        if rand.odds(OB_CONFIG.float_nature_mode) then
+          if LEV.has_streets then
+            if rand.odds(50) then
+              LEV.has_streets = false
               LEV.is_nature = true
             end
+          else
+            LEV.is_nature = true
           end
         end
-  
-      end
-
-      if MAP_NUM == 1 or map == 3 then
-        LEV.demo_lump = string.format("DEMO%d", ep_index)
       end
 
       current_map = current_map + 1
@@ -5345,7 +5285,7 @@ end
 function ULTDOOM.slump_setup()
   if ob_match_game({game = {doom1=1, ultdoom=1}}) then
     if OB_CONFIG.theme == "default" then
-      PARAM.slump_config = ULTDOOM.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = ULTDOOM.THEMES.DEFAULTS.slump_config
     elseif OB_CONFIG.theme == "jumble" then
       local possible_configs = {}
       for _,tab in pairs(ULTDOOM.THEMES) do
@@ -5353,11 +5293,11 @@ function ULTDOOM.slump_setup()
           table.insert(possible_configs, tab.slump_config)
         end
       end
-      PARAM.slump_config = rand.pick(possible_configs)
+      OB_CONFIG.slump_config = rand.pick(possible_configs)
     elseif ULTDOOM.THEMES[OB_CONFIG.theme].slump_config then
-      PARAM.slump_config = ULTDOOM.THEMES[OB_CONFIG.theme].slump_config
+      OB_CONFIG.slump_config = ULTDOOM.THEMES[OB_CONFIG.theme].slump_config
     else
-      PARAM.slump_config = ULTDOOM.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = ULTDOOM.THEMES.DEFAULTS.slump_config
     end
   end
 end

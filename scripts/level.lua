@@ -51,7 +51,6 @@
     game_along  -- how far along in the whole game: 0.0 --> 1.0,
 
     is_secret   -- true if level is a secret level
-    prebuilt    -- true if level will is prebuilt (not generated)
 
     is_procedural_gotcha -- true if this level is a special Procedural Gotcha arena
     is_nature   -- true if this level is entirely parks and caves
@@ -147,7 +146,7 @@ function Level_determine_map_size(LEV)
   -- Since we have other sizes and Auto-Detail, we can have these bigger sizes
   -- now. -Reisal, July 9th, 2019,
   
-  local ob_size = PARAM.float_size
+  local ob_size = OB_CONFIG.level_size
 
   local W, H
 
@@ -170,11 +169,9 @@ function Level_determine_map_size(LEV)
   -- there is no real "progression" when making a single level.
   -- hence use the average size instead.
   if OB_CONFIG.length == "single" then
-    if ob_size == gui.gettext("Episodic") or 
-    ob_size == gui.gettext("Progressive") then
-      ob_size = (PARAM.float_level_lower_bound
-      + PARAM.float_level_upper_bound) / 2
-      or 36
+    if ob_size == "epi" or ob_size == "prog" then
+      ob_size = (tonumber(OB_CONFIG.level_size_lower_bound) + 
+        tonumber(OB_CONFIG.level_size_upper_bound)) / 2
     end
   end
 
@@ -182,45 +179,28 @@ function Level_determine_map_size(LEV)
 
   -- Readjusted probabilities once again, added "Micro" size as suggested by activity
   -- in the Discord server. -Reisal, June 30th, 2019,
-  if ob_size == gui.gettext("Mix It Up") then
+  if ob_size == "mixed" then
 
-    local result_skew = 1.0
-    local low = PARAM.float_level_lower_bound or 10
-    local high = PARAM.float_level_upper_bound or 75
-
-    if OB_CONFIG.level_size_bias then
-      if OB_CONFIG.level_size_bias == "small" then
-        result_skew = .80
-      elseif OB_CONFIG.level_size_bias == "large" then
-        result_skew = 1.20
-      end
-    end
-
-    ob_size = math.clamp(low, math.floor(rand.irange(low, high) * result_skew), high)
+    local low = tonumber(OB_CONFIG.level_size_lower_bound)
+    local high = tonumber(OB_CONFIG.level_size_upper_bound)
+    ob_size = math.clamp(low, math.floor(rand.irange(low, high)), high)
+    
   end
 
-  if ob_size == gui.gettext("Episodic") or 
-  ob_size == gui.gettext("Progressive") then
+  if ob_size == "epi" or ob_size == "prog" then
 
     -- Progressive --
 
-    local ramp_factor = 0.66
-
-    if OB_CONFIG.level_size_ramp_factor then
-      ramp_factor = tonumber(OB_CONFIG.level_size_ramp_factor)
-    end
+    local ramp_factor = tonumber(OB_CONFIG.level_size_ramp_factor)
 
     local along = LEV.game_along ^ ramp_factor
 
-    if ob_size == gui.gettext("Episodic") then along = LEV.ep_along end
+    if ob_size == "epi" then along = LEV.ep_along end
 
     along = math.clamp(0, along, 1)
 
-    -- Level Control fine tune for Prog/Epi
-
-    -- default when Level Control is off: ramp from "small" --> "large",
-    local def_small = PARAM.float_level_lower_bound or 30
-    local def_large = PARAM.float_level_upper_bound - def_small or 42
+    local def_small = tonumber(OB_CONFIG.level_size_lower_bound)
+    local def_large = tonumber(OB_CONFIG.level_size_upper_bound)
 
     -- this basically ramps up
     W = math.floor(def_small + along * def_large)
@@ -228,7 +208,7 @@ function Level_determine_map_size(LEV)
 
     -- Single Size --
 
-    W = ob_size
+    W = tonumber(ob_size)
   end
 
   ::customsize::
@@ -236,6 +216,8 @@ function Level_determine_map_size(LEV)
   if not W then
     error("Invalid value for size : " .. tostring(ob_size))
   end
+
+  W = math.round(W)
 
   -- Try to prevent grower failures with Micro levels
   if LEV.is_nature then
@@ -257,10 +239,10 @@ function Episode_determine_map_sizes()
 
     if LEV.is_procedural_gotcha == true then
       W = 26 -- defualt for proc gotchas
-      if PARAM.gotcha_map_size then
-        W = PROC_GOTCHA_MAP_SIZES[PARAM.gotcha_map_size]
+      if OB_CONFIG.gotcha_map_size then
+        W = PROC_GOTCHA_MAP_SIZES[OB_CONFIG.gotcha_map_size]
       end
-      if PARAM.bool_boss_gen == 1 then W = 16 end
+      if OB_CONFIG.bool_boss_gen == 1 then W = 16 end
       H = W
     end
 
@@ -276,33 +258,33 @@ function Episode_determine_map_sizes()
     LEV.size_consistency = "normal"
     local mix_type = "normal"
     
-    if PARAM.room_size_multiplier then
-      if PARAM.room_size_multiplier ~= "vanilla"
-      and PARAM.room_size_multiplier ~= "mixed" then
-        LEV.size_multiplier = tonumber(PARAM.room_size_multiplier)
+    if OB_CONFIG.room_size_multiplier then
+      if OB_CONFIG.room_size_multiplier ~= "vanilla"
+      and OB_CONFIG.room_size_multiplier ~= "mixed" then
+        LEV.size_multiplier = tonumber(OB_CONFIG.room_size_multiplier)
       end
     end
 
-    if PARAM.room_area_multiplier then
-      if PARAM.room_area_multiplier ~= "vanilla"
-      and PARAM.room_area_multiplier ~= "mixed" then
-        LEV.area_multiplier = tonumber(PARAM.room_area_multiplier)
+    if OB_CONFIG.room_area_multiplier then
+      if OB_CONFIG.room_area_multiplier ~= "vanilla"
+      and OB_CONFIG.room_area_multiplier ~= "mixed" then
+        LEV.area_multiplier = tonumber(OB_CONFIG.room_area_multiplier)
       end
     end
 
-    if PARAM.room_size_mix_type and PARAM.room_size_multiplier == "mixed" then
-      LEV.size_multiplier = rand.key_by_probs(ROOM_SIZE_MULTIPLIER_MIXED_PROBS[PARAM.room_size_mix_type])
+    if OB_CONFIG.room_size_mix_type and OB_CONFIG.room_size_multiplier == "mixed" then
+      LEV.size_multiplier = rand.key_by_probs(ROOM_SIZE_MULTIPLIER_MIXED_PROBS[OB_CONFIG.room_size_mix_type])
     end
 
-    if PARAM.room_area_mix_type and PARAM.room_area_multiplier == "mixed" then
-      LEV.area_multiplier = rand.key_by_probs(ROOM_AREA_MULTIPLIER_MIXED_PROBS[PARAM.room_area_mix_type])
+    if OB_CONFIG.room_area_mix_type and OB_CONFIG.room_area_multiplier == "mixed" then
+      LEV.area_multiplier = rand.key_by_probs(ROOM_AREA_MULTIPLIER_MIXED_PROBS[OB_CONFIG.room_area_mix_type])
     end
 
-    if PARAM.room_size_consistency then
-      if PARAM.room_size_consistency == "mixed" then
+    if OB_CONFIG.room_size_consistency then
+      if OB_CONFIG.room_size_consistency == "mixed" then
         LEV.size_consistency = rand.key_by_probs(SIZE_CONSISTENCY_MIXED_PROBS)
       else
-        LEV.size_consistency = PARAM.room_size_consistency
+        LEV.size_consistency = OB_CONFIG.room_size_consistency
       end
     end
 
@@ -423,7 +405,7 @@ function Episode_plan_monsters()
 
   local function calc_monster_level(LEV)
   
-    local mon_strength = PARAM.float_strength
+    local mon_strength = tonumber(OB_CONFIG.mons_strength)
     
     if mon_strength == 12 then
       LEV.monster_level = mon_strength
@@ -432,10 +414,10 @@ function Episode_plan_monsters()
 
     local mon_along = LEV.game_along
 
-    local ramp_up = PARAM.float_ramp_up or 1
+    local ramp_up = OB_CONFIG.mons_strength_ramp_up
 
     -- this is for Doom 1 / Ultimate Doom / Heretic
-    if PARAM.episodic_monsters or ramp_up == gui.gettext("Episodic") then
+    if OB_CONFIG.episodic_monsters or ramp_up == gui.gettext("Episodic") then
       mon_along = (LEV.ep_along + LEV.game_along) / 2
     end
 
@@ -459,8 +441,8 @@ function Episode_plan_monsters()
 
     local factor
 
-    if ramp_up ~= gui.gettext("Episodic") then
-      factor = ramp_up
+    if ramp_up ~= "epi" then
+      factor = tonumber(ramp_up)
     else
       factor = 1.0
     end
@@ -470,7 +452,7 @@ function Episode_plan_monsters()
     -- New adjustments for Monster Strength slider...may need to tune
     mon_along = mon_along + (mon_strength / 10)
 
-    mon_along = 1.0 + (PARAM.mon_along_factor or 8.0) * mon_along
+    mon_along = 1.0 + (OB_CONFIG.mon_along_factor or 8.0) * mon_along
 
     -- add some randomness
     mon_along = mon_along + 0.7 * (gui.random() ^ 2)
@@ -478,20 +460,20 @@ function Episode_plan_monsters()
     if LEV.is_procedural_gotcha then
       local gotcha_strength = 2
 
-      if PARAM.bool_boss_gen == 1 then
-        if PARAM.boss_gen_reinforce == "weaker" then
+      if OB_CONFIG.bool_boss_gen == 1 then
+        if OB_CONFIG.boss_gen_reinforce == "weaker" then
           gotcha_strength = math.max(8, mon_along * 0.9) * -1
-        elseif PARAM.boss_gen_reinforce == "default" then
+        elseif OB_CONFIG.boss_gen_reinforce == "default" then
           gotcha_strength = math.max(4, mon_along * 0.75) * -1
-        elseif PARAM.boss_gen_reinforce == "harder" then
+        elseif OB_CONFIG.boss_gen_reinforce == "harder" then
           gotcha_strength = math.max(2, mon_along * 0.5) * -1
-        elseif PARAM.boss_gen_reinforce == "tougher" then
+        elseif OB_CONFIG.boss_gen_reinforce == "tougher" then
           gotcha_strength = 2
-        elseif PARAM.boss_gen_reinforce == "nightmare" then
+        elseif OB_CONFIG.boss_gen_reinforce == "nightmare" then
           gotcha_strength = 16
         end
-      elseif PARAM.float_gotcha_strength then
-        gotcha_strength = PARAM.float_gotcha_strength
+      elseif OB_CONFIG.float_gotcha_strength then
+        gotcha_strength = OB_CONFIG.float_gotcha_strength
       end
 
       LEV.monster_level = mon_along + gotcha_strength
@@ -513,7 +495,7 @@ function Episode_plan_monsters()
     if not info.theme then return true end
 
     -- anything goes in CRAZY mode
-    if PARAM.float_strength == 12 then return true end
+    if OB_CONFIG.mons_strength == "12" then return true end
 
     return info.theme == LEV.theme_name
   end
@@ -542,7 +524,7 @@ function Episode_plan_monsters()
     for _,LEV in pairs(GAME.levels) do
       LEV.new_monsters = {}
 
-      if not (LEV.prebuilt or LEV.is_secret) then
+      if not LEV.is_secret then
         for mon,info in pairs(GAME.MONSTERS) do
           if not seen_monsters[mon] and is_monster_usable(LEV, mon, info) then
             table.insert(LEV.new_monsters, mon)
@@ -604,7 +586,7 @@ function Episode_plan_monsters()
 
     for name,_ in pairs(LEV.seen_monsters) do
       local info = GAME.MONSTERS[name]
-      if not info.boss_type or PARAM.float_strength == 12 or LEV.is_procedural_gotcha then
+      if not info.boss_type or OB_CONFIG.mons_strength == "12" or LEV.is_procedural_gotcha then
         LEV.global_pal[name] = 1
       elseif info.boss_type and OB_CONFIG.bossesnormal ~= "no" then
         if info.boss_type == "minor" then
@@ -618,7 +600,7 @@ function Episode_plan_monsters()
         end
       end
 
-      if PARAM.bool_enemy_drops and PARAM.bool_enemy_drops == true then
+      if OB_CONFIG.enemy_drops == "yes" then
         if LEV.global_pal[name].give then
           LEV.global_pal[name].give = nil
         end
@@ -680,10 +662,10 @@ function Episode_plan_monsters()
 
     for name,info in pairs(GAME.MONSTERS) do
       if LEV.theme.monster_prefs and LEV.theme.monster_prefs[name] and LEV.theme.monster_prefs[name] == 0 then goto skipboss end
-      if LEV.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then
+      if LEV.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then
         local bprob = 80
-        if PARAM.boss_gen_typelimit ~= "nolimit" then
-          local boss_diff = PARAM.boss_gen_diff
+        if OB_CONFIG.boss_gen_typelimit ~= "nolimit" then
+          local boss_diff = OB_CONFIG.boss_gen_diff
           local lolevel
           local hilevel
           if boss_diff == "easier" then
@@ -710,14 +692,14 @@ function Episode_plan_monsters()
               hilevel = math.min(9,hilevel+1)
             end
           end
-          if PARAM.boss_gen_typelimit == "softlimit" then
+          if OB_CONFIG.boss_gen_typelimit == "softlimit" then
             if info.level < lolevel then
               bprob = bprob/(lolevel-info.level+1)
             end
             if info.level > hilevel then
               bprob = bprob/(info.level-hilevel+1)
             end
-            elseif PARAM.boss_gen_typelimit == "hardlimit" then
+            elseif OB_CONFIG.boss_gen_typelimit == "hardlimit" then
             if info.level < lolevel then
               bprob = 0
             end
@@ -727,7 +709,7 @@ function Episode_plan_monsters()
           end
         end
         if info.attack == "hitscan" then
-          local hitred = PARAM.boss_gen_hitscan
+          local hitred = OB_CONFIG.boss_gen_hitscan
           if hitred == "less" then
             bprob = bprob/2
           elseif hitred == "muchless" then
@@ -736,7 +718,7 @@ function Episode_plan_monsters()
             bprob = 0
           end
         end
-        if PARAM.bool_boss_gen_types == 1 and info.prob == 0 then
+        if OB_CONFIG.bool_boss_gen_types == 1 and info.prob == 0 then
           bprob = 0
         end
         tab[name] = bprob
@@ -965,7 +947,7 @@ function Episode_plan_monsters()
     -- ensure first encounter with a boss only uses a single one
     count = math.min(count, 1 + (used_bosses[mon] or 0))
 
-    if LEV.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then
+    if LEV.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then
       count = 1
     end
 
@@ -1045,21 +1027,20 @@ function Episode_plan_monsters()
 
       LEV.boss_quotas = { minor=0, nasty=0, tough=0 }
 
-      if LEV.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then
+      if LEV.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then
         create_fight(LEV, "tough", 1)
         goto continue
       end
 
-      if LEV.prebuilt  then goto continue end
       if LEV.is_secret then goto continue end
 
-      if PARAM.float_strength == 12 then goto continue end
+      if OB_CONFIG.mons_strength == "12" then goto continue end
       if OB_CONFIG.bosses   == "none"  then goto continue end
 
       pick_boss_quotas(LEV)
 
       -- hax for procedural gotchas
-      if LEV.is_procedural_gotcha and PARAM.bool_gotcha_boss_fight == 1 then
+      if LEV.is_procedural_gotcha and OB_CONFIG.bool_gotcha_boss_fight == 1 then
         if LEV.game_along <= 0.33 then
           if LEV.boss_quotas.minor < 1 then LEV.boss_quotas.minor = 1 end
         elseif LEV.game_along > 0.33 and LEV.game_along <= 0.66 then
@@ -1193,13 +1174,13 @@ function Episode_plan_weapons()
     end
 
     -- more as game progresses
-    if PARAM.bool_pistol_starts == 1 then
+    if OB_CONFIG.pistol_starts == "yes" then
       quota = quota + math.clamp(0, LEV.game_along, 0.5) * 3.1
     else
       quota = quota + math.clamp(0, LEV.game_along, 0.5) * 6.1
     end
 
-    quota = quota * (PARAM.weapon_factor or 1)
+    quota = quota * (OB_CONFIG.weapon_factor or 1)
     quota = math.floor(quota)
 
     if quota < 1 then quota = 1 end
@@ -1210,10 +1191,6 @@ function Episode_plan_weapons()
     then
       quota = 2
     end
-
-    if PARAM.bool_scale_items_with_map_size and PARAM.bool_scale_items_with_map_size == 1 then
-      quota = math.min(1, math.round(quota * (1 + (LEV.map_W / 75))))
-    end    
 
     LEV.weapon_quota = quota
   end
@@ -1230,7 +1207,6 @@ function Episode_plan_weapons()
       lev_idx = lev_idx + 1
 
       if LEV.is_secret then goto continue end
-      if LEV.prebuilt  then goto continue end
 
       if LEV then return LEV end
       ::continue::
@@ -1297,7 +1273,6 @@ function Episode_plan_weapons()
 
 
   local function summarize_weapons_on_map(LEV)
-    if LEV.prebuilt  then return "#" end
     if LEV.is_secret then return "#" end
 
     if table.empty(LEV.new_weapons) then return "-" end
@@ -1561,7 +1536,6 @@ function Episode_plan_weapons()
     for _,LEV in pairs(GAME.levels) do
       LEV.new_weapons = {}
 
-      if LEV.prebuilt  then goto continue end
       if LEV.is_secret then goto continue end
 
       table.insert(level_list, LEV)
@@ -1702,7 +1676,7 @@ function Episode_plan_weapons()
 
     -- prefer simpler weapons for start rooms
     -- [ except in crazy monsters mode, player may need a bigger weapon! ]
-    if is_start and PARAM.float_strength < 12 or LEV.is_procedural_gotcha ~= "true" then
+    if is_start and tonumber(OB_CONFIG.mons_strength) < 12 or LEV.is_procedural_gotcha ~= "true" then
       if level <= 2 then prob = prob * 4 end
       if level == 3 then prob = prob * 2 end
 
@@ -1881,9 +1855,6 @@ end
 function Level_choose_themes()
   local theme_tab = {}
 
-  local do_mostly = false
-  local do_less = false
-
   local function collect_mixed_themes()
     for name,info in pairs(OB_THEMES) do
       if info.valid and info.mixed_prob then
@@ -1937,53 +1908,6 @@ function Level_choose_themes()
     gui.printf("Theme for level %s = %s\n", LEV.name, LEV.theme_name)
   end
 
-
-  local function decide_mixins(EPI, main_theme, mixins, mode)
-    if not theme_tab[main_theme] then
-      --error("Broken code handling mostly_xxx themes")
-    end
-
-    local new_tab = table.copy(theme_tab)
-
-    new_tab[main_theme] = nil
-
-    if table.empty(new_tab) then return end
-
-    if mode == "mostly" then
-      local pos = rand.pick({ 3,4,4,5,5,6 })
-
-      while pos <= #EPI.levels do
-        local LEV = EPI.levels[pos]
-
-        mixins[LEV.name] = rand.key_by_probs(new_tab)
-
-        pos = pos + rand.pick({ 3,4,4,5,5 })
-      end
-    elseif mode == "less" then
-      local pos = 1
-      local countdown = rand.irange( 0,3 )
-      local prev_theme = rand.key_by_probs(new_tab)
-      new_tab[prev_theme] = new_tab[prev_theme] / 10
-
-      while pos <= #EPI.levels do
-        local LEV = EPI.levels[pos]
-
-        if countdown > 0 then
-          mixins[LEV.name] = prev_theme
-          countdown = countdown - 1
-        elseif countdown <= 0 then
-          mixins[LEV.name] = main_theme
-          countdown = rand.pick({ 2,3,3,4,4,5 })
-          prev_theme = rand.key_by_probs(new_tab)
-          new_tab[prev_theme] = new_tab[prev_theme] / 10
-        end
-
-        pos = pos + 1
-      end
-    end
-  end
-
-
   local function grow_episode_list(list)
     if #list == 1 then
       table.insert(list, list[1])
@@ -2034,18 +1958,8 @@ function Level_choose_themes()
 
 
   local function set_an_episode(EPI, name)
-    local mixins = {}
-
-    if do_mostly then
-      decide_mixins(EPI, name, mixins, "mostly")
-    end
-
-    if do_less then
-      decide_mixins(EPI, name, mixins, "less")
-    end
-
     for _,LEV in pairs(EPI.levels) do
-      set_a_theme(LEV, mixins[LEV.name] or name)
+      set_a_theme(LEV, name)
     end
   end
 
@@ -2142,21 +2056,6 @@ function Level_choose_themes()
 
   local theme = OB_CONFIG.theme
 
-  -- extract the part after the "mostly_" or "less_" prefix
-  local mostly_theme = string.match(theme, "mostly_(%w+)")
-
-
-  if mostly_theme then
-    do_mostly = true
-    theme = mostly_theme
-  end
-
-  if OB_CONFIG.mixin_type == "mostly" then
-    do_mostly = true
-  elseif OB_CONFIG.mixin_type == "less" then
-    do_less = true
-  end
-
   -- As Original : follow the original game
   if theme == "original" then
     set_original_themes()
@@ -2236,10 +2135,10 @@ function Level_do_styles(LEVEL)
     STYLE.symmetry = "more"
     STYLE.teleporters = "none"
 
-    if PARAM.bool_boss_gen == 1 then
-      if PARAM.boss_gen_steepness then
+    if OB_CONFIG.bool_boss_gen == 1 then
+      if OB_CONFIG.boss_gen_steepness then
 
-        if PARAM.boss_gen_steepness == "mixed" then
+        if OB_CONFIG.boss_gen_steepness == "mixed" then
           STYLE.steepness = rand.key_by_probs(
             {
               none = 5,
@@ -2250,7 +2149,7 @@ function Level_do_styles(LEVEL)
             }
           )
         else
-          STYLE.steepness = PARAM.boss_gen_steepness
+          STYLE.steepness = OB_CONFIG.boss_gen_steepness
         end
 
       end
@@ -2323,19 +2222,21 @@ function Level_choose_darkness(LEVEL)
 
   -- NOTE: this style is only set via the Level Control module
   -- MSSP: This can now be overriden (ignored) by the Sky Generator option.
-  if STYLE.darkness and PARAM.bool_influence_map_darkness == 0 then
+  if STYLE.darkness then
     prob = style_sel("darkness", 0, 15, 35, 100) -- 0, 15, 35, 97,
     --prob = style_sel("darkness", 0, 10, 30, 90) --Original
   end
 
-  LEVEL.sky_light  = math.floor(rand.pick(SKY_LIGHT_NORMAL) * PARAM.float_overall_lighting_mult)
+  local light_mult = tonumber(OB_CONFIG.overall_lighting_mult)
+
+  LEVEL.sky_light  = math.floor(rand.pick(SKY_LIGHT_NORMAL) * light_mult)
   LEVEL.sky_shadow = 32
 
   if rand.odds(prob) then
     gui.printf("Level is dark.\n")
 
     LEVEL.is_dark = true
-    LEVEL.sky_light = math.floor(rand.pick(SKY_LIGHT_DARK) * PARAM.float_overall_lighting_mult)
+    LEVEL.sky_light = math.floor(rand.pick(SKY_LIGHT_DARK) * light_mult)
     LEVEL.sky_shadow = 32
   end
 
@@ -2350,11 +2251,11 @@ function Level_choose_darkness(LEVEL)
     end
   end
 
-  LEVEL.sky_light = math.clamp(PARAM.wad_minimum_brightness or 0, 
-    LEVEL.sky_light, PARAM.wad_maximum_brightness or 255)
+  LEVEL.sky_light = math.clamp(OB_CONFIG.wad_minimum_brightness or 0, 
+    LEVEL.sky_light, OB_CONFIG.wad_maximum_brightness or 255)
 
-    if (LEVEL.sky_light - LEVEL.sky_shadow) <= (PARAM.wad_minimum_brightness or 0) then
-    LEVEL.sky_shadow = LEVEL.sky_light - (PARAM.wad_minimum_brightness or 0)
+    if (LEVEL.sky_light - LEVEL.sky_shadow) <= (OB_CONFIG.wad_minimum_brightness or 0) then
+    LEVEL.sky_shadow = LEVEL.sky_light - (OB_CONFIG.wad_minimum_brightness or 0)
   end
 end
 
@@ -2362,7 +2263,7 @@ end
 function Level_choose_misc(LEVEL)
   LEVEL.squareishness = rand.pick({ 0,25,50,75,90 })
 
-  LEVEL.room_height_style = PARAM.room_heights or "mixed"
+  LEVEL.room_height_style = OB_CONFIG.room_heights or "mixed"
 
   if rand.odds(style_sel("outdoors", 0, 33, 66, 100)) then
     LEVEL.has_outdoors = true
@@ -2380,15 +2281,15 @@ function Level_choose_misc(LEVEL)
     short = rand.pick({0.8, 0.9, 1, 1.1, 1.2})
   }
 
-  if PARAM.room_heights == "tall" then
+  if OB_CONFIG.room_heights == "tall" then
     LEVEL.room_height_style_tab["normal"] = LEVEL.room_height_style_tab["normal"] / 8
     LEVEL.room_height_style_tab["short"] = 0
-  elseif PARAM.room_heights == "short" then
+  elseif OB_CONFIG.room_heights == "short" then
     LEVEL.room_height_style_tab["tall"] = 0
     LEVEL.room_height_style_tab["normal"] = LEVEL.room_height_style_tab["normal"] / 8
-  elseif PARAM.room_heights == "tall-ish" then
+  elseif OB_CONFIG.room_heights == "tall-ish" then
     LEVEL.room_height_style_tab["short"] = 0
-  elseif PARAM.room_heights == "short-ish" then
+  elseif OB_CONFIG.room_heights == "short-ish" then
     LEVEL.room_height_style_tab["tall"] = 0
   end
 
@@ -2439,7 +2340,7 @@ function Level_choose_skybox(LEVEL)
       return PREFABS[rand.key_by_probs(THEME.skyboxes)]
 
     elseif mode == "generic" then
-      if PARAM.obsidian_resource_pack_active then
+      if OB_CONFIG.obsidian_resource_pack_active then
         return PREFABS["Skybox_hellish_city_EPIC"]
       else
         return PREFABS["Skybox_hellish_city"]
@@ -2537,9 +2438,9 @@ function Level_build_it(LEVEL, SEEDS)
 
   -- Can just uncomment and manuall set an ID to match if we really need this - Dasho
 
-  --[[if PARAM.float_build_levels then
-    if PARAM.float_build_levels ~= 0 then
-      if LEVEL.id ~= PARAM.float_build_levels then return "nope" end
+  --[[if OB_CONFIG.float_build_levels then
+    if OB_CONFIG.float_build_levels ~= 0 then
+      if LEVEL.id ~= OB_CONFIG.float_build_levels then return "nope" end
     end
   end]]--
 
@@ -2560,30 +2461,6 @@ function Level_build_it(LEVEL, SEEDS)
 
   Item_add_pickups(LEVEL)
     if gui.abort() then return "abort" end
-
-  return "ok"
-end
-
-
-function Level_handle_prebuilt(LEVEL)
-  -- randomly pick one
-  local probs = {}
-
-  for index,info in pairs(LEVEL.prebuilt) do
-    probs[index] = info.prob or 50
-  end
-
-  local info = LEVEL.prebuilt[rand.index_by_probs(probs)]
-
-  assert(info)
-  assert(info.file)
-  assert(info.map)
-
-  if GAME.format == "doom" then
-    gui.wad_transfer_map(info.file, info.map, LEVEL.name)
-  else
-    -- FIXME: support other games (Wolf3d, etc)
-  end
 
   return "ok"
 end
@@ -2640,39 +2517,6 @@ function Level_make_level(LEV)
 
   if GAME.THEMES.DEFAULTS then
     table.merge_missing(THEME, GAME.THEMES.DEFAULTS)
-  end
-
-  -- use a pre-built level ?
-
-  if LEVEL.prebuilt then
-    ob_invoke_hook_with_table("begin_level", LEVEL)
-
-    local pb_res = Level_handle_prebuilt(LEVEL)
-    if pb_res ~= "ok" then
-      for _,k in pairs (LEVEL) do
-        LEVEL[k] = nil
-      end
-      for _,k in pairs (SEEDS) do
-        SEEDS[k] = nil
-      end
-      LEVEL = nil
-      SEEDS = nil
-      collectgarbage("collect")
-      collectgarbage("collect")
-      return pb_res
-    end
-    ob_invoke_hook_with_table("end_level", LEVEL)
-    for _,k in pairs (LEVEL) do
-      LEVEL[k] = nil
-    end
-    for _,k in pairs (SEEDS) do
-      SEEDS[k] = nil
-    end
-    LEVEL = nil
-    SEEDS = nil
-    collectgarbage("collect")
-    collectgarbage("collect")
-    return "ok"
   end
 
   LEVEL.secondary_importants = {}
@@ -2800,8 +2644,8 @@ function Level_make_all()
 
   Episode_plan_game()
  
-  if PARAM.title_screen_source then
-    if PARAM.title_screen_source == "filename" then
+  if OB_CONFIG.title_screen_source then
+    if OB_CONFIG.title_screen_source == "filename" then
       local str = string.lower(OB_CONFIG.title)
       str = string.gsub(str, "%p", "")
       str = string.gsub(str, " ", "_")
@@ -2811,7 +2655,7 @@ function Level_make_all()
       if not string.match(gui.get_filename_base(), str) then
         GAME.title = gui.get_filename_base()
       end
-    elseif PARAM.title_screen_source == "randomwords" then
+    elseif OB_CONFIG.title_screen_source == "randomwords" then
       local function case_randomizer(random_word)
 
         local case_odds =
@@ -2856,7 +2700,7 @@ function Level_make_all()
     end
   end
 
-  if PARAM.bool_sub_titles and PARAM.bool_sub_titles == 1 then
+  if OB_CONFIG.bool_sub_titles and OB_CONFIG.bool_sub_titles == 1 then
     GAME.sub_title = nil
   end
 
@@ -2870,7 +2714,7 @@ function Level_make_all()
     for _,LEV in pairs(EPI.levels) do
       LEV.allowances = {}
 
-      if PARAM.float_historical_oblige_v2 and rand.odds(PARAM.float_historical_oblige_v2) then
+      if OB_CONFIG.float_historical_oblige_v2 and rand.odds(OB_CONFIG.float_historical_oblige_v2) then
         --LEV.description = Naming_grab_one(LEV.name_class)
         --if v094_create_LEVEL(GAME.FACTORY.all_levels[LEV.id], LEV.id, #GAME.levels) == "abort" then
           return "abort"

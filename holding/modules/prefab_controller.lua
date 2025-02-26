@@ -127,8 +127,8 @@ function PREFAB_CONTROL.fine_tune_filters()
 
   end
 
-  if PARAM.bool_jump_crouch == 0 then
-    if PARAM.obsidian_resource_pack_active then
+  if OB_CONFIG.bool_jump_crouch == 0 then
+    if OB_CONFIG.obsidian_resource_pack_active then
       if GAME.THEMES.hell and GAME.THEMES.hell.wide_halls then
         GAME.THEMES.hell.wide_halls.organs = 0
         GAME.THEMES.hell.wide_halls.conveyorh = 0
@@ -164,7 +164,7 @@ function PREFAB_CONTROL.fine_tune_filters()
     "deimos"
   }
 
-  if PARAM.bool_more_new_content == 1 then
+  if OB_CONFIG.bool_more_new_content == 1 then
     for WG,mult in pairs(new_fab_groups_multipliers) do
       for _,theme_name in pairs(themes) do
         if GAME.THEMES[theme_name] then
@@ -201,7 +201,7 @@ function PREFAB_CONTROL.fine_tune_filters()
 end
 
 function PREFAB_CONTROL.set_damaging_hallways()
-  if PARAM.pf_damaging_halls == "default" then return end
+  if OB_CONFIG.pf_damaging_halls == "default" then return end
 
   for name,fab in pairs(PREFABS) do
     if fab.group == "hellcata" then

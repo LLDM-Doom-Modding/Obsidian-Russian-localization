@@ -319,7 +319,7 @@ function ScriptMan_assemble_mapinfo_lump()
   if SCRIPTS.zs_eventhandlers then
     eventhandler_lines = eventhandler_lines .. SCRIPTS.zs_eventhandlers
   end
-  if PARAM.bool_boss_gen == 1 and PARAM.boss_count ~= -1 then
+  if OB_CONFIG.bool_boss_gen == 1 and OB_CONFIG.boss_count ~= -1 then
     eventhandler_lines = eventhandler_lines .. '"BossGenerator_Handler"'
   end
   eventhandler_lines = string.gsub(eventhandler_lines, ",$", "");
@@ -334,8 +334,8 @@ function ScriptMan_assemble_mapinfo_lump()
   end
 
   -- MAPINFO extras
-  if PARAM.bool_custom_quit_messages == 1 or PARAM.bool_heretic_quit_messages == 1 then
-    for _,line in pairs(PARAM.gameinfolump) do
+  if OB_CONFIG.bool_custom_quit_messages == 1 or OB_CONFIG.bool_heretic_quit_messages == 1 then
+    for _,line in pairs(OB_CONFIG.gameinfolump) do
       table.insert(mapinfo_lines,line)
     end
   end
@@ -392,8 +392,8 @@ end
 function ScriptMan_assemble_trnslate_lump()
   local trnslate_lines = ""
 
-  if PARAM.MARINETRNSLATE then
-    trnslate_lines = trnslate_lines .. PARAM.MARINETRNSLATE .. "\n"
+  if OB_CONFIG.MARINETRNSLATE then
+    trnslate_lines = trnslate_lines .. OB_CONFIG.MARINETRNSLATE .. "\n"
   end
 
   if trnslate_lines ~= "" then
@@ -405,11 +405,11 @@ end
 function ScriptMan_assemble_zscript_lump()
   local zscript_lines = ""
 
-  if PARAM.bool_boss_gen == 1 and PARAM.boss_count ~= -1 then
-    zscript_lines = zscript_lines .. PARAM.BOSSSCRIPT .. "\n"
+  if OB_CONFIG.bool_boss_gen == 1 and OB_CONFIG.boss_count ~= -1 then
+    zscript_lines = zscript_lines .. OB_CONFIG.BOSSSCRIPT .. "\n"
   end
 
-  if PARAM.custom_trees == "zs" then
+  if OB_CONFIG.custom_trees == "zs" then
     zscript_lines = zscript_lines ..
     OBS_RESOURCE_PACK_EPIC_TEXTURES.TEMPLATES.ZS_TREES .. "\n"
   end
@@ -427,11 +427,11 @@ end
 
 function ScriptMan_assemble_decorate_lump()
 
-  if PARAM.bool_dynamic_lights == 1 then -- TODO: Move these to respective modules.
+  if OB_CONFIG.bool_dynamic_lights == 1 then -- TODO: Move these to respective modules.
     SCRIPTS.decorate = ScriptMan_combine_script(SCRIPTS.decorate, GAME.RESOURCES.DYNAMIC_LIGHT_DECORATE)
   end
 
-  if PARAM.custom_trees == "decorate" then
+  if OB_CONFIG.custom_trees == "decorate" then
     SCRIPTS.decorate = ScriptMan_combine_script(SCRIPTS.decorate, OBS_RESOURCE_PACK_EPIC_TEXTURES.TEMPLATES.DEC_TREES)
   end
 
@@ -445,7 +445,7 @@ end
 function ScriptMan_assemble_sndinfo_lump()
   local sndinfo_lines = ""
 
-  if PARAM.ambient_sounds then
+  if OB_CONFIG.ambient_sounds then
     sndinfo_lines = sndinfo_lines ..
     SCRIPTS.SNDINFO .. "\n"
   end
@@ -467,17 +467,17 @@ end
 function ScriptMan_assemble_gldefs_lump()
   local gldefs_lines = ""
 
-  if PARAM.bool_dynamic_lights == 1 then
+  if OB_CONFIG.bool_dynamic_lights == 1 then
       gldefs_lines = gldefs_lines ..
       GAME.RESOURCES.DYNAMIC_LIGHT_GLDEFS
   end
 
-  if PARAM.bool_glowing_flats == 1 then
+  if OB_CONFIG.bool_glowing_flats == 1 then
       gldefs_lines = gldefs_lines ..
       GAME.RESOURCES.GLOWING_FLATS_GLDEFS
   end
 
-  if PARAM.bool_include_brightmaps == 1 then
+  if OB_CONFIG.bool_include_brightmaps == 1 then
     gldefs_lines = gldefs_lines ..
     EPIC_BRIGHTMAPS
   end
@@ -497,18 +497,18 @@ function ScriptMan_assemble_language_lump()
       "[enu default]\n",
   }
 
-  if PARAM.bool_boss_gen == 1 and PARAM.boss_count ~= -1 then
-    for _,line in pairs(PARAM.BOSSLANG) do
+  if OB_CONFIG.bool_boss_gen == 1 and OB_CONFIG.boss_count ~= -1 then
+    for _,line in pairs(OB_CONFIG.BOSSLANG) do
       table.insert(language_lines,line)
     end
   end
-  if PARAM.language_lump ~= nil then
-    for _,line in pairs(PARAM.language_lump) do
+  if OB_CONFIG.language_lump ~= nil then
+    for _,line in pairs(OB_CONFIG.language_lump) do
       table.insert(language_lines,line)
     end
   end
-  if PARAM.bool_quit_messages == 1 or PARAM.bool_heretic_quit_messages == 1 then
-    for _,line in pairs(PARAM.quit_messagelump) do
+  if OB_CONFIG.bool_quit_messages == 1 or OB_CONFIG.bool_heretic_quit_messages == 1 then
+    for _,line in pairs(OB_CONFIG.quit_messagelump) do
       table.insert(language_lines,line)
     end
   end
@@ -522,7 +522,7 @@ end
 function ScriptMan_assemble_acs_loader_lump()
   local acs_loader_lines = {}
 
-  if PARAM.custom_trees == "decorate" then
+  if OB_CONFIG.custom_trees == "decorate" then
     table.insert(acs_loader_lines, "ASSGRASS\n")
   end
   if SCRIPTS.tissue_doc then
@@ -537,7 +537,7 @@ end
 function ScriptMan_merge_acs_lumps()
   gui.wad_add_binary_lump("A_START",{})
 
-  if PARAM.custom_trees == "decorate" then
+  if OB_CONFIG.custom_trees == "decorate" then
     gui.wad_insert_file("modules/zdoom_internal_scripts/ASSGRASS.lmp", "ASSGRASS")
   end
   if SCRIPTS.tissue_doc then
@@ -551,7 +551,7 @@ function ScriptMan_assemble_textures_lump()
   local textures_lump_lines = {}
   local animdefs_lump_lines = {}
 
-  if PARAM.obsidian_resource_pack_active then
+  if OB_CONFIG.obsidian_resource_pack_active then
     table.insert(textures_lump_lines, EPIC_TEXTUREX_LUMP)
     gui.wad_add_text_lump("TEXTURES", textures_lump_lines)
   end

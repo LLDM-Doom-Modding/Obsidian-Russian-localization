@@ -2974,7 +2974,7 @@ HERETIC.ROOM_THEMES =
 function HERETIC.slump_setup()
   if ob_match_game({game = {heretic=1}}) then
     if OB_CONFIG.theme == "default" then
-      PARAM.slump_config = HERETIC.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = HERETIC.THEMES.DEFAULTS.slump_config
     elseif OB_CONFIG.theme == "jumble" then
       local possible_configs = {}
       for _,tab in pairs(HERETIC.THEMES) do
@@ -2982,11 +2982,11 @@ function HERETIC.slump_setup()
           table.insert(possible_configs, tab.slump_config)
         end
       end
-      PARAM.slump_config = rand.pick(possible_configs)
+      OB_CONFIG.slump_config = rand.pick(possible_configs)
     elseif HERETIC.THEMES[OB_CONFIG.theme].slump_config then
-      PARAM.slump_config = HERETIC.THEMES[OB_CONFIG.theme].slump_config
+      OB_CONFIG.slump_config = HERETIC.THEMES[OB_CONFIG.theme].slump_config
     else
-      PARAM.slump_config = HERETIC.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = HERETIC.THEMES.DEFAULTS.slump_config
     end
   end
 end

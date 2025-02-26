@@ -338,7 +338,7 @@ STRIFE.THEMES =
 function STRIFE.slump_setup()
   if ob_match_game({game = {strife=1}}) then
     if OB_CONFIG.theme == "default" then
-      PARAM.slump_config = STRIFE.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = STRIFE.THEMES.DEFAULTS.slump_config
     elseif OB_CONFIG.theme == "jumble" then
       local possible_configs = {}
       for _,tab in pairs(STRIFE.THEMES) do
@@ -346,11 +346,11 @@ function STRIFE.slump_setup()
           table.insert(possible_configs, tab.slump_config)
         end
       end
-      PARAM.slump_config = rand.pick(possible_configs)
+      OB_CONFIG.slump_config = rand.pick(possible_configs)
     elseif STRIFE.THEMES[OB_CONFIG.theme].slump_config then
-      PARAM.slump_config = STRIFE.THEMES[OB_CONFIG.theme].slump_config
+      OB_CONFIG.slump_config = STRIFE.THEMES[OB_CONFIG.theme].slump_config
     else
-      PARAM.slump_config = STRIFE.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = STRIFE.THEMES.DEFAULTS.slump_config
     end
   end
 end

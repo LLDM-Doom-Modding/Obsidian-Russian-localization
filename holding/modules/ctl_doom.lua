@@ -592,14 +592,14 @@ function CTL_DOOM.weapon_setup(self)
   end -- for opt
 
   -- specific instructions for the weapon_pref choices
-  if PARAM.weapon_prefs == "vanilla"
-  or PARAM.weapon_prefs == "none" then
+  if OB_CONFIG.weapon_prefs == "vanilla"
+  or OB_CONFIG.weapon_prefs == "none" then
     for _,mon in pairs(GAME.MONSTERS) do
       mon.weapon_prefs = nil
     end
   end
 
-  if PARAM.weapon_prefs == "vanilla" then
+  if OB_CONFIG.weapon_prefs == "vanilla" then
     GAME.MONSTERS["Cyberdemon"].weap_prefs = { bfg = 10.0 }
     GAME.MONSTERS["Spiderdemon"].weap_prefs = { bfg = 10.0 }
     GAME.MONSTERS["demon"].weap_prefs = { launch = 0.3 }

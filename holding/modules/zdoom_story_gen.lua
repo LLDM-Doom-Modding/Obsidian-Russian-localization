@@ -27,7 +27,7 @@ function ZStoryGen_format_story_chunk(story_strings, info, store)
       info.enemy_name = info.contributor_name
     end
 
-    if store and PARAM.bool_boss_gen == 1 then
+    if store and OB_CONFIG.bool_boss_gen == 1 then
       local mcevil
       if string.find(story_strings, "_RAND_ENEMY") and info.enemy_name then
         mcevil = info.enemy_name
@@ -36,8 +36,8 @@ function ZStoryGen_format_story_chunk(story_strings, info, store)
         elseif string.find(story_strings, "_LEVEL") then
           mcevil = mcevil .. " of " .. info.level_name
         end
-        if PARAM.epi_names[store] == nil then
-          PARAM.epi_names[store] = mcevil
+        if OB_CONFIG.epi_names[store] == nil then
+          OB_CONFIG.epi_names[store] = mcevil
         end
       end
     end
@@ -162,7 +162,7 @@ function ZStoryGen_init()
   local hooks = {}
   local conclusions = {}
   local x = 1
-  PARAM.language_lump = {}
+  OB_CONFIG.language_lump = {}
 
   while x <= #GAME.episodes do
     local story_id = ZStoryGen_fetch_story_chunk()
@@ -188,15 +188,15 @@ function ZStoryGen_init()
 
 
   -- create language lump
-  table.insert(PARAM.language_lump, "// The following stories are brought to you by\n")
-  table.insert(PARAM.language_lump, "// the ObAddon Story Generator!\n")
-  table.insert(PARAM.language_lump, "\n")
+  table.insert(OB_CONFIG.language_lump, "// The following stories are brought to you by\n")
+  table.insert(OB_CONFIG.language_lump, "// the ObAddon Story Generator!\n")
+  table.insert(OB_CONFIG.language_lump, "\n")
 
 
   -- attach game title and subtitle
-  table.insert(PARAM.language_lump, "GAME_TITLE = " .. "\"" .. GAME.title .. "\";\n\n")
+  table.insert(OB_CONFIG.language_lump, "GAME_TITLE = " .. "\"" .. GAME.title .. "\";\n\n")
   if GAME.sub_title then
-    table.insert(PARAM.language_lump, "GAME_SUB_TITLE = " .. "\"" .. GAME.sub_title .. "\";\n\n")
+    table.insert(OB_CONFIG.language_lump, "GAME_SUB_TITLE = " .. "\"" .. GAME.sub_title .. "\";\n\n")
   end
 
   x = 1
@@ -204,18 +204,18 @@ function ZStoryGen_init()
   while x <= #GAME.episodes do
 
     -- insert story start sequence
-    table.insert(PARAM.language_lump, "STORYSTART" .. x .. " =\n")
+    table.insert(OB_CONFIG.language_lump, "STORYSTART" .. x .. " =\n")
     for _,line in pairs(hooks[x]) do
-      table.insert(PARAM.language_lump, "  " .. line .. "\n")
+      table.insert(OB_CONFIG.language_lump, "  " .. line .. "\n")
     end
-    table.insert(PARAM.language_lump, "\n")
+    table.insert(OB_CONFIG.language_lump, "\n")
 
     -- insert story end sequences
-    table.insert(PARAM.language_lump, "STORYEND" .. x .. " =\n")
+    table.insert(OB_CONFIG.language_lump, "STORYEND" .. x .. " =\n")
     for _,line in pairs(conclusions[x]) do
-      table.insert(PARAM.language_lump, "  " .. line .. "\n")
+      table.insert(OB_CONFIG.language_lump, "  " .. line .. "\n")
     end
-    table.insert(PARAM.language_lump, "\n")
+    table.insert(OB_CONFIG.language_lump, "\n")
     x = x + 1
   end
 
@@ -224,30 +224,30 @@ function ZStoryGen_init()
   local secret_entry = ZStoryGen_format_story_chunk(rand.pick(GAME.STORIES.SECRET_TEXTS.secretnearby))
   local secret1 = ZStoryGen_format_story_chunk(rand.pick(GAME.STORIES.SECRET_TEXTS.secret1))
   local secret2 = ZStoryGen_format_story_chunk(rand.pick(GAME.STORIES.SECRET_TEXTS.secret2))
-  table.insert(PARAM.language_lump, "SECRETNEARBY =\n")
+  table.insert(OB_CONFIG.language_lump, "SECRETNEARBY =\n")
   for _,line in pairs(secret_entry) do
-    table.insert(PARAM.language_lump, "  " .. line .. "\n")
+    table.insert(OB_CONFIG.language_lump, "  " .. line .. "\n")
   end
-  table.insert(PARAM.language_lump, "\n")
-  table.insert(PARAM.language_lump, "SECRET1 =\n")
+  table.insert(OB_CONFIG.language_lump, "\n")
+  table.insert(OB_CONFIG.language_lump, "SECRET1 =\n")
   for _,line in pairs(secret1) do
-    table.insert(PARAM.language_lump, "  " .. line .. "\n")
+    table.insert(OB_CONFIG.language_lump, "  " .. line .. "\n")
   end
-  table.insert(PARAM.language_lump, "\n")
-  table.insert(PARAM.language_lump, "SECRET2 =\n")
+  table.insert(OB_CONFIG.language_lump, "\n")
+  table.insert(OB_CONFIG.language_lump, "SECRET2 =\n")
   for _,line in pairs(secret2) do
-    table.insert(PARAM.language_lump, "  " .. line .. "\n")
+    table.insert(OB_CONFIG.language_lump, "  " .. line .. "\n")
   end
 
 end
 
 function ZStoryGen_quitmessages()
-  PARAM.quit_messagelump = {
+  OB_CONFIG.quit_messagelump = {
   "\n",
   }
   -- custom quit message creation
-  PARAM.bool_quit_messages = 1
-  if PARAM.bool_quit_messages == 1 then
+  OB_CONFIG.bool_quit_messages = 1
+  if OB_CONFIG.bool_quit_messages == 1 then
     x = 1
     local info = ZStoryGen_create_characters_and_stuff()
 
@@ -262,10 +262,10 @@ function ZStoryGen_quitmessages()
 
     for _,line in pairs(GAME.STORIES.QUIT_MESSAGES) do
       line = ZStoryGen_format_story_chunk(line, info)
-      table.insert(PARAM.quit_messagelump, "\nQUITMSG" .. x .. " =\n")
+      table.insert(OB_CONFIG.quit_messagelump, "\nQUITMSG" .. x .. " =\n")
       x = x + 1
       for _,o_line in pairs(line) do
-        table.insert(PARAM.quit_messagelump, "  " .. o_line .. "\n")
+        table.insert(OB_CONFIG.quit_messagelump, "  " .. o_line .. "\n")
       end
     end
   end

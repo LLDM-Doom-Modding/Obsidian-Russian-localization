@@ -40,9 +40,9 @@
 -- LEVEL.liquid_usage = # ? (0-100)
 -- LEVEL.room_height_style
 -- LEVEL.has_outdoors = "true/false?"
--- PARAM.room_heights = "normal/short-ish/short/tall/tall-ish" ???
+-- OB_CONFIG.room_heights = "normal/short-ish/short/tall/tall-ish" ???
 -- or LEVEL.room_height_style ?
--- PARAM.wad_minimum_brightness /  PARAM.wad_maximum_brightness
+-- OB_CONFIG.wad_minimum_brightness /  OB_CONFIG.wad_maximum_brightness
 
 -- END PARAMETERS --
 

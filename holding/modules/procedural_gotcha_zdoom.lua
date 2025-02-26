@@ -1411,16 +1411,16 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.grab_random_trait(btype, etraits)
 
   if btype == "melee" and info.probmele > 0 then
     tprob = info.probmele
-    tprob = tprob * (((info.difffact-1.0) * PARAM.boss_gen_tmult)+1)
+    tprob = tprob * (((info.difffact-1.0) * OB_CONFIG.boss_gen_tmult)+1)
   elseif btype == "hitscan" and info.probscan > 0 then
     tprob = info.probscan
-    tprob = tprob * (((info.difffact-1.0) * PARAM.boss_gen_tmult)+1)
+    tprob = tprob * (((info.difffact-1.0) * OB_CONFIG.boss_gen_tmult)+1)
   elseif btype == "missile" and info.probmisl > 0 then
     tprob = info.probmisl
-    tprob = tprob * (((info.mislfact-1.0) * PARAM.boss_gen_tmult)+1)
+    tprob = tprob * (((info.mislfact-1.0) * OB_CONFIG.boss_gen_tmult)+1)
   end
 
-  if(info.mindiff>PARAM.boss_gen_tmult) then
+  if(info.mindiff>OB_CONFIG.boss_gen_tmult) then
       tprob = 0
   end
 
@@ -1428,9 +1428,9 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.grab_random_trait(btype, etraits)
     for etrait,einfo in pairs(etraits) do
         if einfo == info.name then
           stack = stack + 1
-        if PARAM.boss_gen_tmult < 0 then
+        if OB_CONFIG.boss_gen_tmult < 0 then
           tprob = math.floor(tprob * 0.25)
-        elseif PARAM.boss_gen_tmult > 1 then
+        elseif OB_CONFIG.boss_gen_tmult > 1 then
           tprob = tprob * 2
         end
         end
@@ -1461,14 +1461,14 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.syntaxize(str, str2)
 end
 
 function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.check_monsters_enabled()
-  if PARAM.float_mons == 0 and PARAM.bool_boss_gen == 1 then
+  if OB_CONFIG.float_mons == 0 and OB_CONFIG.bool_boss_gen == 1 then
     error("Monsters must be enabled for boss generator!")
   end
 end
 
 function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.end_lvl(self, LEVEL)
 
-  if PARAM.bool_boss_gen == 1 then
+  if OB_CONFIG.bool_boss_gen == 1 then
 
   if LEVEL.is_procedural_gotcha then
     local scripty = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.LVL
@@ -1481,29 +1481,29 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.end_lvl(self, LEVEL)
       if OB_CONFIG.length == "single" or OB_CONFIG.length == "few" then
         id = LEVEL.id
       else
-        id = 10 * (LEVEL.episode.ep_index - 1) + math.round(PARAM.episode_length * LEVEL.ep_along)
+        id = 10 * (LEVEL.episode.ep_index - 1) + math.round(OB_CONFIG.episode_length * LEVEL.ep_along)
       end
     end
 
     scripty = string.gsub(scripty, "NUM", id)
-    scripty = string.gsub(scripty, "CNT", PARAM.boss_count)
+    scripty = string.gsub(scripty, "CNT", OB_CONFIG.boss_count)
 
-    PARAM.lvlstr = PARAM.lvlstr .. scripty .. "\n"
+    OB_CONFIG.lvlstr = OB_CONFIG.lvlstr .. scripty .. "\n"
 
-    if PARAM.story_generator == "proc" then
+    if OB_CONFIG.story_generator == "proc" then
       if OB_CONFIG.length == "single" then
-        if LEVEL.id == 1 then table.insert(PARAM.epi_bosses,PARAM.boss_count) end
+        if LEVEL.id == 1 then table.insert(OB_CONFIG.epi_bosses,OB_CONFIG.boss_count) end
       elseif OB_CONFIG.length == "few" then
-        if LEVEL.id == 4 then table.insert(PARAM.epi_bosses,PARAM.boss_count) end
+        if LEVEL.id == 4 then table.insert(OB_CONFIG.epi_bosses,OB_CONFIG.boss_count) end
       elseif OB_CONFIG.length == "episode" then
-        if LEVEL.id == 11 then table.insert(PARAM.epi_bosses,PARAM.boss_count) end
+        if LEVEL.id == 11 then table.insert(OB_CONFIG.epi_bosses,OB_CONFIG.boss_count) end
       elseif OB_CONFIG.length == "game" then
         if LEVEL.id == 11 or LEVEL.id == 20 or LEVEL.id == 30 then
-        table.insert(PARAM.epi_bosses,PARAM.boss_count) end
+        table.insert(OB_CONFIG.epi_bosses,OB_CONFIG.boss_count) end
       end
     end
 
-    PARAM.boss_count = PARAM.boss_count + 1
+    OB_CONFIG.boss_count = OB_CONFIG.boss_count + 1
   end
 
   end
@@ -1516,12 +1516,12 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.boss_info(self, info)
   btype.attack = info.attack
   btype.health = info.health
 
-  table.insert(PARAM.boss_types, btype)
+  table.insert(OB_CONFIG.boss_types, btype)
 end
 
 function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
 
-  if PARAM.bool_boss_gen == 1 then
+  if OB_CONFIG.bool_boss_gen == 1 then
 
   local scripty = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.ZSC
   local btrait = ""
@@ -1531,21 +1531,21 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
   local bsummon = ""
   local btype = ""
 
-  if PARAM.boss_count <= 1 then
+  if OB_CONFIG.boss_count <= 1 then
     -- nothing happens and everyone is just sad
     warning("No procedural gotchas found by boss generator")
-    PARAM.boss_count = -1
+    OB_CONFIG.boss_count = -1
     return
   end
 
-  if PARAM.float_mons == 0 then
+  if OB_CONFIG.float_mons == 0 then
     -- no monsters, no boss, duh
     warning("No monsters found by boss generator")
-    PARAM.boss_count = -1
+    OB_CONFIG.boss_count = -1
     return
   end
 
-  scripty = string.gsub(scripty, "LEVELCODE", PARAM.lvlstr)
+  scripty = string.gsub(scripty, "LEVELCODE", OB_CONFIG.lvlstr)
 
   if ob_match_game({game = "doomish"}) then
     scripty = string.gsub(scripty, "BOSSDROP", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.BOSS_DROPS.doomish)
@@ -1557,38 +1557,38 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
     scripty = string.gsub(scripty, "BOSSDROP", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.BOSS_DROPS.doomish)
   end
 
-  if PARAM.bool_boss_gen_hpbar == 1 then
+  if OB_CONFIG.bool_boss_gen_hpbar == 1 then
     PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.game_specific_hpbar()
     scripty = string.gsub(scripty, "BOSSHPBAR", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.BAR)
   else
     scripty = string.gsub(scripty, "BOSSHPBAR", "")
   end
 
-  if PARAM.bool_boss_gen_music == 1 then
+  if OB_CONFIG.bool_boss_gen_music == 1 then
     scripty = string.gsub(scripty, "MUSIC", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.MUS)
   else
     scripty = string.gsub(scripty, "MUSIC", "")
   end
 
-  if PARAM.boss_gen_reinforce ~= "none" then
+  if OB_CONFIG.boss_gen_reinforce ~= "none" then
     scripty = string.gsub(scripty, "SUMCODE", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.SUM)
   else
     scripty = string.gsub(scripty, "SUMCODE", "")
   end
 
-  if PARAM.boss_gen_reinforce == "nightmare" then
+  if OB_CONFIG.boss_gen_reinforce == "nightmare" then
     scripty = string.gsub(scripty, "SMAXHEALTH", "10000")
   else
     scripty = string.gsub(scripty, "SMAXHEALTH", "1000")
   end
 
-  if PARAM.boss_gen_exit == "item" then
+  if OB_CONFIG.boss_gen_exit == "item" then
     scripty = string.gsub(scripty, "BEXIT", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.EXITEM)
   else
     scripty = string.gsub(scripty, "BEXIT", PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.TEMPLATES.EXNORMAL)
   end
 
-  for name,info in pairs(PARAM.boss_types) do
+  for name,info in pairs(OB_CONFIG.boss_types) do
     local bhp = info.health
     local batk = info.attack
     local traitstack = {}
@@ -1623,7 +1623,7 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
     local mult
     local hpcalc
 
-    if PARAM.boss_gen_diff == "nightmare" then
+    if OB_CONFIG.boss_gen_diff == "nightmare" then
       mult=1.5
     else
       if bhp<300 then mult=1.5
@@ -1632,15 +1632,15 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
       else mult=1.0 end
     end
 
-    hpcalc = math.floor(rand.pick({5000,5200,5400,5600,5800,6000})*mult*PARAM.float_boss_gen_mult)
+    hpcalc = math.floor(rand.pick({5000,5200,5400,5600,5800,6000})*mult*OB_CONFIG.float_boss_gen_mult)
 
-    if batk == "hitscan" and PARAM.boss_gen_dmult<3.0 then hpcalc = hpcalc*0.75 end
+    if batk == "hitscan" and OB_CONFIG.boss_gen_dmult<3.0 then hpcalc = hpcalc*0.75 end
 
     bhealth = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.syntaxize(bhealth,hpcalc)
 
     local sumcalc
 
-    sumcalc = math.floor(rand.pick({400,450,500,550,600})*PARAM.boss_gen_rmult)
+    sumcalc = math.floor(rand.pick({400,450,500,550,600})*OB_CONFIG.boss_gen_rmult)
     bsummon = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.syntaxize(bsummon,sumcalc)
 
   end
@@ -1652,19 +1652,19 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
   scripty = string.gsub(scripty, "BSUMMON", bsummon)
   scripty = string.gsub(scripty, "BTYPE", btype)
 
-  PARAM.BOSSSCRIPT = PARAM.BOSSSCRIPT .. scripty
-  PARAM.BOSSLANG = {}
-  PARAM.boss_count = PARAM.boss_count - 1
+  OB_CONFIG.BOSSSCRIPT = OB_CONFIG.BOSSSCRIPT .. scripty
+  OB_CONFIG.BOSSLANG = {}
+  OB_CONFIG.boss_count = OB_CONFIG.boss_count - 1
 
   local cnt = 1
 
-  for i = 1,PARAM.boss_count,1 do
+  for i = 1,OB_CONFIG.boss_count,1 do
 
     local demon_name
-    if PARAM.story_generator == "proc" then
-      for _,epiboss in pairs(PARAM.epi_bosses) do
+    if OB_CONFIG.story_generator == "proc" then
+      for _,epiboss in pairs(OB_CONFIG.epi_bosses) do
         if i == epiboss then
-          demon_name = PARAM.epi_names[cnt]
+          demon_name = OB_CONFIG.epi_names[cnt]
         cnt = cnt + 1
         end
       end
@@ -1683,15 +1683,15 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.all_done()
     end
 
     local line = "BOSS_NAME" .. i .. ' = "' .. demon_name .. '";\n'
-    table.insert(PARAM.BOSSLANG, line)
+    table.insert(OB_CONFIG.BOSSLANG, line)
 
     local taunt = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.grab_random_taunt()
     line = "BOSS_TAUNT" .. i .. ' = "' .. demon_name .. ": " .. taunt .. '";\n'
-    table.insert(PARAM.BOSSLANG, line)
+    table.insert(OB_CONFIG.BOSSLANG, line)
 
     local dead = PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.grab_random_death()
     line = "BOSS_DEATH" .. i .. ' = "' .. demon_name .. ": " .. dead .. '";\n'
-    table.insert(PARAM.BOSSLANG, line)
+    table.insert(OB_CONFIG.BOSSLANG, line)
 
   end
 
@@ -1724,49 +1724,49 @@ function PROCEDURAL_GOTCHA_FINE_TUNE_ZDOOM.setup(self)
 
   module_param_up(self)
 
-  if PARAM.bool_boss_gen == 1 then
+  if OB_CONFIG.bool_boss_gen == 1 then
 
-    PARAM.boss_types = {}
-    PARAM.lvlstr = ""
-    PARAM.BOSSSCRIPT = ""
-    PARAM.boss_count = 1
-    PARAM.epi_bosses = {}
-    PARAM.epi_names = {}
+    OB_CONFIG.boss_types = {}
+    OB_CONFIG.lvlstr = ""
+    OB_CONFIG.BOSSSCRIPT = ""
+    OB_CONFIG.boss_count = 1
+    OB_CONFIG.epi_bosses = {}
+    OB_CONFIG.epi_names = {}
 
-    if PARAM.boss_gen_diff == "easier" then
-      PARAM.boss_gen_dmult = -1.0
-    elseif PARAM.boss_gen_diff == "default" then
-      PARAM.boss_gen_dmult = 1.0
-    elseif PARAM.boss_gen_diff == "harder" then
-      PARAM.boss_gen_dmult = 2.0
-    elseif PARAM.boss_gen_diff == "nightmare" then
-      PARAM.boss_gen_dmult = 3.0
+    if OB_CONFIG.boss_gen_diff == "easier" then
+      OB_CONFIG.boss_gen_dmult = -1.0
+    elseif OB_CONFIG.boss_gen_diff == "default" then
+      OB_CONFIG.boss_gen_dmult = 1.0
+    elseif OB_CONFIG.boss_gen_diff == "harder" then
+      OB_CONFIG.boss_gen_dmult = 2.0
+    elseif OB_CONFIG.boss_gen_diff == "nightmare" then
+      OB_CONFIG.boss_gen_dmult = 3.0
     end
 
-    if PARAM.boss_trait_diff == "easier" then
-      PARAM.boss_gen_tmult = -1.0
-    elseif PARAM.boss_trait_diff == "default" then
-      PARAM.boss_gen_tmult = 1.0
-    elseif PARAM.boss_trait_diff == "harder" then
-      PARAM.boss_gen_tmult = 2.0
-    elseif PARAM.boss_trait_diff == "nightmare" then
-      PARAM.boss_gen_tmult = 3.0
+    if OB_CONFIG.boss_trait_diff == "easier" then
+      OB_CONFIG.boss_gen_tmult = -1.0
+    elseif OB_CONFIG.boss_trait_diff == "default" then
+      OB_CONFIG.boss_gen_tmult = 1.0
+    elseif OB_CONFIG.boss_trait_diff == "harder" then
+      OB_CONFIG.boss_gen_tmult = 2.0
+    elseif OB_CONFIG.boss_trait_diff == "nightmare" then
+      OB_CONFIG.boss_gen_tmult = 3.0
     end
 
-    if PARAM.boss_gen_reinforcerate == "weakester" then
-      PARAM.boss_gen_rmult = 4.0
-    elseif PARAM.boss_gen_reinforcerate == "weakest" then
-      PARAM.boss_gen_rmult = 2.0
-    elseif PARAM.boss_gen_reinforcerate == "weaker" then
-      PARAM.boss_gen_rmult = 1.5
-    elseif PARAM.boss_gen_reinforcerate == "default" then
-      PARAM.boss_gen_rmult = 1.0
-    elseif PARAM.boss_gen_reinforcerate == "harder" then
-      PARAM.boss_gen_rmult = 0.75
-    elseif PARAM.boss_gen_reinforcerate == "tougher" then
-      PARAM.boss_gen_rmult = 0.5
-    elseif PARAM.boss_gen_reinforcerate == "serious" then
-      PARAM.boss_gen_rmult = 0.25
+    if OB_CONFIG.boss_gen_reinforcerate == "weakester" then
+      OB_CONFIG.boss_gen_rmult = 4.0
+    elseif OB_CONFIG.boss_gen_reinforcerate == "weakest" then
+      OB_CONFIG.boss_gen_rmult = 2.0
+    elseif OB_CONFIG.boss_gen_reinforcerate == "weaker" then
+      OB_CONFIG.boss_gen_rmult = 1.5
+    elseif OB_CONFIG.boss_gen_reinforcerate == "default" then
+      OB_CONFIG.boss_gen_rmult = 1.0
+    elseif OB_CONFIG.boss_gen_reinforcerate == "harder" then
+      OB_CONFIG.boss_gen_rmult = 0.75
+    elseif OB_CONFIG.boss_gen_reinforcerate == "tougher" then
+      OB_CONFIG.boss_gen_rmult = 0.5
+    elseif OB_CONFIG.boss_gen_reinforcerate == "serious" then
+      OB_CONFIG.boss_gen_rmult = 0.25
     end
 
   end

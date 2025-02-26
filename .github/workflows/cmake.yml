@@ -42,10 +42,7 @@ jobs:
           ${{github.workspace}}/language
           ${{github.workspace}}/modules
           ${{github.workspace}}/ports
-          ${{github.workspace}}/presets
           ${{github.workspace}}/scripts
-          ${{github.workspace}}/theme
-          ${{github.workspace}}/tools
           ${{github.workspace}}/obsidian.exe
         retention-days: ${{env.RETENTION_DAYS}}
   build-linux:
@@ -71,9 +68,6 @@ jobs:
             language
             modules
             ports
-            presets
             scripts
-            theme
-            tools
             obsidian
           retention-days: ${{env.RETENTION_DAYS}}

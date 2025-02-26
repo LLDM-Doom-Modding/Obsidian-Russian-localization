@@ -1019,7 +1019,7 @@ PLUTONIA.MONSTERS =
 }
 
 function PLUTONIA.setup(self)
-  if not PARAM.doom2_weapons then
+  if not OB_CONFIG.doom2_weapons then
     GAME.MONSTERS["gunner"] = nil
     GAME.MONSTERS["knight"] = nil
     GAME.MONSTERS["revenant"] = nil

@@ -229,7 +229,7 @@ function Fab_load_all_definitions()
 
 
   local function process_resource_pack_fabs()
-    if PARAM.obsidian_resource_pack_active then
+    if OB_CONFIG.obsidian_resource_pack_active then
       for _,def in pairs(PREFABS) do
         if def.replaces then
           PREFABS[def.replaces].delete = true
@@ -701,8 +701,8 @@ function Fab_transform_Z(fab, T)
         E.delta_z = nil
       end
 
-      if PARAM.entity_delta_z then
-        E.z = E.z + PARAM.entity_delta_z
+      if OB_CONFIG.entity_delta_z then
+        E.z = E.z + OB_CONFIG.entity_delta_z
       end
 
       if E.angles then
@@ -1651,7 +1651,7 @@ function Fab_load_wad(def)
 
     -- sound control logic
     if spot_info.kind == "sound" then
-      if PARAM.ambient_sounds then
+      if OB_CONFIG.ambient_sounds then
         if not fab.sound then
           error(fab.name .. " has a sound thing without a sound def.\n" ..
           "Y U DO THIS?!?!?! Y HUH Y???!?!")
@@ -2375,23 +2375,23 @@ function Fab_replacements(LEVEL, fab)
       -- do textures last (may add e.g. special for liquids)
       -- probably add material checking here? - Dasho
       if C.tex and C.x     then
-        if PARAM.bool_print_fab_materials and PARAM.bool_print_fab_materials == 1 then
+        if OB_CONFIG.bool_print_fab_materials and OB_CONFIG.bool_print_fab_materials == 1 then
           table.add_unique(materials_table, C.tex)
         end
         C.tex  = check_tex (sanitize(C.tex), missing_mats)
-        if PARAM.missing_material_behavior and PARAM.missing_material_behavior ~= "ignore" then
-          if PARAM.bool_non_vanilla_as_missing and PARAM.bool_non_vanilla_as_missing == 1 then
+        if OB_CONFIG.missing_material_behavior and OB_CONFIG.missing_material_behavior ~= "ignore" then
+          if OB_CONFIG.bool_non_vanilla_as_missing and OB_CONFIG.bool_non_vanilla_as_missing == 1 then
             table.add_unique(used_texes, C.tex)
           end
         end
       end
       if C.tex and not C.x then
-        if PARAM.bool_print_fab_materials and PARAM.bool_print_fab_materials == 1 then
+        if OB_CONFIG.bool_print_fab_materials and OB_CONFIG.bool_print_fab_materials == 1 then
           table.add_unique(materials_table, C.tex)
         end
         C.tex  = check_flat(sanitize(C.tex), C, missing_mats)
-        if PARAM.missing_material_behavior and PARAM.missing_material_behavior ~= "ignore" then
-          if PARAM.bool_non_vanilla_as_missing and PARAM.bool_non_vanilla_as_missing == 1 then
+        if OB_CONFIG.missing_material_behavior and OB_CONFIG.missing_material_behavior ~= "ignore" then
+          if OB_CONFIG.bool_non_vanilla_as_missing and OB_CONFIG.bool_non_vanilla_as_missing == 1 then
             table.add_unique(used_flats, C.tex)
           end
         end
@@ -2406,7 +2406,7 @@ function Fab_replacements(LEVEL, fab)
     print("Materials for fab " .. fab.name .. "\nIn file " .. fab.file .. ":" .. table.tostr(materials_table) .. "\n")
   end
 
-  if PARAM.missing_material_behavior and PARAM.missing_material_behavior ~= "ignore" then
+  if OB_CONFIG.missing_material_behavior and OB_CONFIG.missing_material_behavior ~= "ignore" then
     local error_out = false
     local bad_flats = {}
     local bad_texes = {}
@@ -2445,7 +2445,7 @@ function Fab_replacements(LEVEL, fab)
         error_out = true
       end
     end
-    if PARAM.missing_material_behavior == "abort" and error_out == true then
+    if OB_CONFIG.missing_material_behavior == "abort" and error_out == true then
       error("\nFAB: " .. fab.name .. "\nIN FILE: " .. fab.file .. "\nHAS MATERIAL ERRORS! CHECK THE LOG FOR DETAILS!")
     end
   end
@@ -2575,9 +2575,9 @@ function Fabricate(LEVEL, room, def, T, skins)
 
   Fab_replacements (LEVEL, fab)
 
-  if PARAM.marine_gen and PARAM.level_has_marine_closets and fab.group == "marine_closet" then
+  if OB_CONFIG.marine_gen and OB_CONFIG.level_has_marine_closets and fab.group == "marine_closet" then
     MARINE_CLOSET_TUNE.randomize_count()
-    local marines = PARAM.marine_marines
+    local marines = OB_CONFIG.marine_marines
     for _,E in pairs(fab.entities) do
       if E.id and E.id == 8001 then
         if marines > 0 then
@@ -2742,11 +2742,11 @@ function Fab_find_matches(LEVEL, reqs, match_state)
     local kind = assert(def.kind)
 
     if def.jump_crouch and def.jump_crouch == true then
-      if not PARAM.bool_jump_crouch then
+      if not OB_CONFIG.bool_jump_crouch then
         def.use_prob = 0 
         return 0 
       end
-      if PARAM.bool_jump_crouch == 0 then
+      if OB_CONFIG.bool_jump_crouch == 0 then
         def.use_prob = 0
         return 0
       end
@@ -2825,7 +2825,7 @@ function Fab_find_matches(LEVEL, reqs, match_state)
     -- stair check
     if reqs.on_stairs and def.on_stairs == "never" then return 0 end
 
-    if def.has_teleporter and PARAM.teleporters == "none" then return 0 end
+    if def.has_teleporter and OB_CONFIG.teleporters == "none" then return 0 end
 
     -- park mode check
     if reqs.group and reqs.group == "natural_park" and def.park_mode == "no_nature" then return 0 end

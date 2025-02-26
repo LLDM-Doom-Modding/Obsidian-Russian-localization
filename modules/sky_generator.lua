@@ -92,11 +92,8 @@ SKY_GEN.NEBULA_COLOR_CHOICES =
 }
 
 function SKY_GEN.setup(self)
-  
-  module_param_up(self)
-
-  PARAM.episode_sky_color = {}
-  PARAM.sky_generator_active = true
+  OB_CONFIG.episode_sky_color = {}
+  OB_CONFIG.sky_generator_active = true
 end
 
 function SKY_GEN.generate_skies()
@@ -131,25 +128,25 @@ function SKY_GEN.generate_skies()
 
     is_starry = (index == starry_ep)
 
-    if PARAM.force_sky == "sky_day" then
+    if OB_CONFIG.force_sky == "sky_day" then
       is_starry = false
-    elseif PARAM.force_sky == "sky_night" then
+    elseif OB_CONFIG.force_sky == "sky_night" then
       is_starry = true
-    elseif PARAM.force_sky == "sky_25_day" and rand.odds(75) then
+    elseif OB_CONFIG.force_sky == "sky_25_day" and rand.odds(75) then
       is_starry = true
-    elseif PARAM.force_sky == "50" and rand.odds(50) then
+    elseif OB_CONFIG.force_sky == "50" and rand.odds(50) then
       is_starry = true
-    elseif PARAM.force_sky == "sky_75_day" and rand.odds(25) then
+    elseif OB_CONFIG.force_sky == "sky_75_day" and rand.odds(25) then
       is_starry = true
     else
       is_starry = false
     end
 
-    gui.printf("Forced sky: " .. PARAM.force_sky .. "\n")
+    gui.printf("Forced sky: " .. OB_CONFIG.force_sky .. "\n")
 
     local is_nebula = is_starry and rand.odds(60)
 
-    if PARAM.nebula_color == "none" then
+    if OB_CONFIG.nebula_color == "none" then
       is_nebula = false
     end
 
@@ -190,8 +187,8 @@ function SKY_GEN.generate_skies()
       -- don't use same one again
       cloud_tab[cloud_palette] = cloud_tab[cloud_palette] / 1000
 
-      if PARAM.cloud_color ~= "default" then
-        cloud_palette = PARAM.cloud_color
+      if OB_CONFIG.cloud_color ~= "default" then
+        cloud_palette = OB_CONFIG.cloud_color
       end
     end
 
@@ -202,8 +199,8 @@ function SKY_GEN.generate_skies()
       -- don't use same one again
       nebula_tab[cloud_palette] = nebula_tab[cloud_palette] / 1000
 
-      if PARAM.nebula_color ~= "default" then
-        cloud_palette = PARAM.nebula_color
+      if OB_CONFIG.nebula_color ~= "default" then
+        cloud_palette = OB_CONFIG.nebula_color
       end
     end
 
@@ -223,7 +220,7 @@ function SKY_GEN.generate_skies()
 
       EPI.dark_prob = 10
 
-      PARAM.episode_sky_color[index] = cloud_palette
+      OB_CONFIG.episode_sky_color[index] = cloud_palette
     end
   
     --- Stars ---
@@ -251,9 +248,9 @@ function SKY_GEN.generate_skies()
 
 
     --- Hills ---
-    if PARAM.force_hills == "hs_none" then
+    if OB_CONFIG.force_hills == "hs_none" then
        is_hilly = false
-    elseif PARAM.force_hills == "hs_always" then
+    elseif OB_CONFIG.force_hills == "hs_always" then
        is_hilly = true
     end
 
@@ -263,8 +260,8 @@ function SKY_GEN.generate_skies()
       -- don't use same one again
       hill_tab[name] = hill_tab[name] / 1000
 
-      if PARAM.terrain_color ~= "default" then
-        name = PARAM.terrain_color
+      if OB_CONFIG.terrain_color ~= "default" then
+        name = OB_CONFIG.terrain_color
       end
 
       local colormap = GAME.RESOURCES.SKY_GEN_COLORMAPS[name]
@@ -285,11 +282,11 @@ function SKY_GEN.generate_skies()
 
       info.frac_dim = rand.pick({1.4, 1.65, 1.8, 1.9 })
 
-      if PARAM.force_hill_params == "hp_hilly" then
+      if OB_CONFIG.force_hill_params == "hp_hilly" then
         info.max_h = rand.pick({0.5, 0.55, 0.6, 0.65 })
-      elseif PARAM.force_hill_params == "hp_mountainous" then
+      elseif OB_CONFIG.force_hill_params == "hp_mountainous" then
         info.max_h = rand.pick({.7, 0.75, 0.8, 0.85})
-      elseif PARAM.force_hill_params == "hp_cavernous" then
+      elseif OB_CONFIG.force_hill_params == "hp_cavernous" then
         info.max_h = rand.pick({0.9, 1, 1.1, 1.2, 1.3})
         info.min_h = rand.pick({0, 0.1, 0.2, 0.3, 0.4, 0.5})
       end
@@ -311,7 +308,7 @@ function SKY_GEN.generate_skies()
     -- hack fix for when a generated MAPINFO is available
     -- because Doom2 apparently handles sky lump names weirdly
     
-    if PARAM.zdoom_specials_active and OB_CONFIG.game == "doom2" then
+    if OB_CONFIG.zdoom_specials_active and OB_CONFIG.game == "doom2" then
       if EPI.id == 1 then EPI.sky_patch = "O_D2SKY1" end
       if EPI.id == 2 then EPI.sky_patch = "O_D2SKY2" end
       if EPI.id == 3 then EPI.sky_patch = "O_D2SKY3" end
@@ -407,16 +404,6 @@ OB_MODULES["sky_generator"] =
       priority = 5,
       tooltip = _("Picks the color of nebula if sky is night. 'None' means just a plain starry night sky. Default means random and theme-ish."),
       default = "default",
-    },
-
-
-    {
-      name = "bool_influence_map_darkness",
-      label=_("Sky Gen Lighting"),
-      valuator = "button",
-      default = 0,
-      priority = 4,
-      tooltip = _("Overrides (and ignores) Dark Outdoors setting in Miscellaneous tab. If the sky generator creates night skies for an episode, episode's map outdoors is also dark but bright if day-ish."),
-    },
+    }
   },
 }

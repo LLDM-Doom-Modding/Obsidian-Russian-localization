@@ -31,9 +31,7 @@
 static constexpr uint16_t LOG_BUF_LEN = 8192;
 
 static FILE *log_file = nullptr;
-static FILE *ref_file = nullptr;
 std::string  log_filename;
-std::string  ref_filename;
 
 bool debugging = false;
 bool terminal  = false;
@@ -57,31 +55,6 @@ bool LogInit(const std::string &filename)
     LogPrint("====== START OF OBSIDIAN LOGS ======\n\n");
 
     LogPrint("Initialized on %s", ctime(&result));
-
-    return true;
-}
-
-bool RefInit(const std::string &filename)
-{
-    if (!filename.empty())
-    {
-        ref_filename = filename;
-
-        // Clear previously generated reference if present
-        if (FileExists(ref_filename))
-        {
-            FileDelete(ref_filename);
-        }
-
-        ref_file = FileOpen(ref_filename, "w");
-
-        if (!ref_file)
-        {
-            return false;
-        }
-    }
-
-    RefPrint("====== OBSIDIAN REFERENCE for V%s BUILD %s ======\n\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_VERSION);
 
     return true;
 }
@@ -120,16 +93,6 @@ void LogClose(void)
     log_filename.clear();
 }
 
-void RefClose(void)
-{
-    RefPrint("\n====== END OF REFERENCE ======\n\n");
-
-    fclose(ref_file);
-    ref_file = nullptr;
-
-    ref_filename.clear();
-}
-
 void LogPrint(const char *message, ...)
 {
     if (!log_file && !terminal)
@@ -152,37 +115,6 @@ void LogPrint(const char *message, ...)
     {
         fprintf(log_file, "%s", message_buf);
         fflush(log_file);
-    }
-
-    if (terminal)
-    {
-        printf("%s", message_buf);
-        fflush(stdout);
-    }
-}
-
-void RefPrint(const char *message, ...)
-{
-    if (!ref_file && !terminal)
-        return;
-
-    char message_buf[LOG_BUF_LEN];
-
-    message_buf[LOG_BUF_LEN-1] = 0;
-
-    // Print the message into a text string
-    va_list argptr;
-
-    va_start(argptr, message);
-    vsprintf(message_buf, message, argptr);
-    va_end(argptr);
-
-    SYS_ASSERT(message_buf[LOG_BUF_LEN-1] == 0);
-
-    if (ref_file)
-    {
-        fprintf(ref_file, "%s", message_buf);
-        fflush(ref_file);
     }
 
     if (terminal)

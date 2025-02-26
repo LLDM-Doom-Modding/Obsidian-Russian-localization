@@ -188,34 +188,7 @@ function style_sel(name, v_none, v_few, v_some, v_heaps)
   return v_some
 end
 
-function module_param_up(module)
-  for _,opt in pairs(module.options) do
-    if string.match(opt.name, "header_") then goto skipoption end
-    if string.match(opt.name, "url_") then goto skipoption end
-    if opt.valuator then
-      if opt.valuator == "slider" then 
-        local value = tonumber(OB_CONFIG[opt.name])
-        if not value then
-          PARAM[opt.name] = OB_CONFIG[opt.name]
-        else
-          if opt.increment < 1 then
-            PARAM[opt.name] = value
-          else
-            PARAM[opt.name] = math.floor(value)
-          end
-        end
-      elseif opt.valuator == "button" then
-        PARAM[opt.name] = tonumber(OB_CONFIG[opt.name])
-      end
-    else
-      PARAM[opt.name] = OB_CONFIG[opt.name]
-    end
-    ::skipoption::
-  end
-end
-
 --------========|  TABLE UTILITIES  |========--------
-
 
 function table.size(t)
   local count = 0;

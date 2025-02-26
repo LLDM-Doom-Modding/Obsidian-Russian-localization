@@ -373,7 +373,7 @@ function Quest_create_initial_quest(LEVEL)
 
   local function add_secret_exit()
 
-    if LEVEL.is_procedural_gotcha and PARAM.bool_boss_gen and PARAM.bool_boss_gen == 1 then
+    if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen and OB_CONFIG.bool_boss_gen == 1 then
       LEVEL.need_secret_exit = true
       return
     end
@@ -1622,7 +1622,7 @@ function Quest_start_room(LEVEL)
 
   add_normal_start()
 
-  if PARAM.bool_alt_starts == 1 then
+  if OB_CONFIG.bool_alt_starts == 1 then
     find_alternate_start()
   end
 end
@@ -2311,7 +2311,7 @@ function Quest_nice_items(LEVEL)
       if LEVEL.secret_weapon == name then return true end
 
       -- the weapon was given in an earlier map?
-      if PARAM.bool_pistol_starts == 0 and EPISODE.seen_weapons[name] then return true end
+      if OB_CONFIG.pistol_starts == "no" and EPISODE.seen_weapons[name] then return true end
       ::continue::
     end
 
@@ -2429,10 +2429,6 @@ function Quest_nice_items(LEVEL)
     if OB_CONFIG.items == "more"  and rand.odds(50) then quota = 2 end
     if OB_CONFIG.items == "heaps" and rand.odds(80) then quota = 2 end
 
-    if PARAM.bool_scale_items_with_map_size and PARAM.bool_scale_items_with_map_size == 1 then
-      quota = math.round(quota * (1 + (LEVEL.map_W / 75)))
-    end
-
     if quota >= 1 then
       for loop = 1, quota do
         -- add the same item into each start room
@@ -2513,10 +2509,6 @@ function Quest_nice_items(LEVEL)
     if OB_CONFIG.items == "mixed" then quota = quota * rand.pick({ 0.5, 1.0, 2.0 }) end
 
     quota = rand.int(quota)
-
-    if PARAM.bool_scale_items_with_map_size and PARAM.bool_scale_items_with_map_size == 1 then
-      quota = math.round(quota * (1 + (LEVEL.map_W / 75)))
-    end
 
     gui.printf("Other Item quota : %1.2f\n", quota)
 
@@ -2697,7 +2689,7 @@ function Quest_nice_items(LEVEL)
   -- collect all the items we might use
   start_items = start_palette()
 
-  if PARAM.float_strength == 12 then
+  if OB_CONFIG.mons_strength == "12" then
     normal_items = crazy_palette()
   else
     normal_items = normal_palette()
@@ -3002,7 +2994,7 @@ function Quest_room_themes(LEVEL)
 
     R.theme = GAME.ROOM_THEMES[name]
     assert(R.theme)
-    if not PARAM.bool_avoid_room_theme_reuse or (PARAM.bool_avoid_room_theme_reuse and PARAM.bool_avoid_room_theme_reuse == 1) then
+    if not OB_CONFIG.bool_avoid_room_theme_reuse or (OB_CONFIG.bool_avoid_room_theme_reuse and OB_CONFIG.bool_avoid_room_theme_reuse == 1) then
       table.add_unique(SEEN_ROOM_THEMES, R.theme.name)
     end
   end
@@ -3027,7 +3019,7 @@ function Quest_room_themes(LEVEL)
 
     local function choose_wall_groups()
       local wg_tab = {}
-      local max_room_themes = math.floor(PARAM.float_max_room_themes or 2)
+      local max_room_themes = math.floor(OB_CONFIG.float_max_room_themes or 2)
   
       for _,T in pairs(GAME.THEMES) do
         local iterations
@@ -3055,9 +3047,9 @@ function Quest_room_themes(LEVEL)
 
     local building_tab = collect_usable_themes("building")
 
-    local max_room_theme = math.floor(PARAM.float_max_room_themes or 1)
+    local max_room_theme = math.floor(OB_CONFIG.float_max_room_themes or 1)
 
-    if not PARAM.bool_avoid_room_theme_reuse or (PARAM.bool_avoid_room_theme_reuse and PARAM.bool_avoid_room_theme_reuse == 1) then
+    if not OB_CONFIG.bool_avoid_room_theme_reuse or (OB_CONFIG.bool_avoid_room_theme_reuse and OB_CONFIG.bool_avoid_room_theme_reuse == 1) then
       for theme,odds in pairs(building_tab) do
         if table.has_elem(SEEN_ROOM_THEMES, theme) then
           building_tab[theme] = nil
@@ -3081,11 +3073,11 @@ function Quest_room_themes(LEVEL)
 
     visit_room(LEVEL.start_room, nil, nil, building_tab)
 
-    --local max_wall_groups = math.floor(PARAM.float_max_indoor_wall_groups or 2)
+    --local max_wall_groups = math.floor(OB_CONFIG.float_max_indoor_wall_groups or 2)
 
     local the_wall_group_tab --= table.copy(LEVEL.theme.wall_groups)
 
-    --[[if not PARAM.bool_avoid_wall_group_reuse or (PARAM.bool_avoid_wall_group_reuse and PARAM.bool_avoid_wall_group_reuse == 1) then
+    --[[if not OB_CONFIG.bool_avoid_wall_group_reuse or (OB_CONFIG.bool_avoid_wall_group_reuse and OB_CONFIG.bool_avoid_wall_group_reuse == 1) then
       for group,odds in pairs(the_wall_group_tab) do
         if table.has_elem(SEEN_WALL_GROUPS, group) then
           the_wall_group_tab[group] = nil
@@ -3182,7 +3174,7 @@ function Quest_room_themes(LEVEL)
       R.beam_group = rand.key_by_probs(THEME.beam_groups)
     end
 
-    if PARAM.bool_dynamic_lights == 1 then
+    if OB_CONFIG.bool_dynamic_lights == 1 then
       LEVEL.light_group = {}
 
       local tab = {}
@@ -3200,7 +3192,7 @@ function Quest_room_themes(LEVEL)
       if (OB_CONFIG.game == "doom2"
       or OB_CONFIG.game == "doom1"
       or OB_CONFIG.game == "ultdoom")
-      and not PARAM.obsidian_resource_pack_active then
+      and not OB_CONFIG.obsidian_resource_pack_active then
         c_tab = LIGHT_COLORS_COMPAT
       end
 
@@ -3497,7 +3489,7 @@ function Quest_room_themes(LEVEL)
 
   misc_fabs()
   
-  if PARAM.bool_foreshadowing_exit and PARAM.bool_foreshadowing_exit == 1 then
+  if OB_CONFIG.bool_foreshadowing_exit and OB_CONFIG.bool_foreshadowing_exit == 1 then
     choose_exit_theme()
   end
 

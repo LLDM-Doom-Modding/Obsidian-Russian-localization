@@ -757,8 +757,8 @@ function Junction_make_wall(junc)
 
     local plain_wall_prob = 0
 
-    if PARAM.wall_prob and PARAM.wall_prob ~= "fab_default" then
-      plain_wall_prob = plain_wall_prob + ((PREFAB_CONTROL.WALL_REDUCTION_ODDS[PARAM.wall_prob] or 0) * 100)
+    if OB_CONFIG.wall_prob and OB_CONFIG.wall_prob ~= "fab_default" then
+      plain_wall_prob = plain_wall_prob + ((PREFAB_CONTROL.WALL_REDUCTION_ODDS[OB_CONFIG.wall_prob] or 0) * 100)
       plain_wall_prob = math.clamp(0, plain_wall_prob, 100)
     end
 
@@ -831,7 +831,7 @@ function Junction_calc_fence_z(A1, A2)
     top_z = math.max(tmp_z, top_z)
   end
 
-  return top_z + PARAM.jump_height + 8
+  return top_z + GLOBAL_PARAMETERS.jump_height + 8
 end
 
 
@@ -918,14 +918,14 @@ function Junction_make_railing(LEVEL, junc, rail_mat, block)
   }
 
   -- 3D midtex blocking support for rails
-  if PARAM.passable_railings then
-    if PARAM.passable_railings == "on_occasion" then
+  if OB_CONFIG.passable_railings then
+    if OB_CONFIG.passable_railings == "on_occasion" then
       if A1.room and A2.room
       and not (junc.A1.mode == "cage" or junc.A2.mode == "cage") then
         junc.E1.rail_3dmidtex = 1
         junc.E1.rail_block = nil
       end
-    elseif PARAM.passable_railings == "always" then
+    elseif OB_CONFIG.passable_railings == "always" then
       junc.E1.rail_3dmidtex = 1
       junc.E1.rail_block = nil
     end
@@ -2884,20 +2884,20 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   local level_grammar = {}
 
-  if PARAM.float_grammar_boxes_of_death and rand.odds(PARAM.float_grammar_boxes_of_death) then
+  if OB_CONFIG.float_grammar_boxes_of_death and rand.odds(OB_CONFIG.float_grammar_boxes_of_death) then
     table.add_unique(level_grammar, SHAPES.BOXES_OF_DEATH)
   end
 
-  if PARAM.float_grammar_oblige_v745 and rand.odds(PARAM.float_grammar_oblige_v745) then
+  if OB_CONFIG.float_grammar_oblige_v745 and rand.odds(OB_CONFIG.float_grammar_oblige_v745) then
     table.add_unique(level_grammar, SHAPES.OBLIGE_745)
   end
 
-  if PARAM.float_grammar_backhalls and LEVEL.is_nature == false and rand.odds(PARAM.float_grammar_backhalls) then
+  if OB_CONFIG.float_grammar_backhalls and LEVEL.is_nature == false and rand.odds(OB_CONFIG.float_grammar_backhalls) then
     table.add_unique(level_grammar, SHAPES.BACKHALLS)
   end
 
   if not table.empty(level_grammar) then
-    if LEVEL.is_procedural_gotcha and PARAM.bool_gotcha_boss_fight == 1 then
+    if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_gotcha_boss_fight == 1 then
       SHAPE_GRAMMAR = SHAPES.OBSIDIAN
     else
       SHAPE_GRAMMAR = rand.pick(level_grammar)

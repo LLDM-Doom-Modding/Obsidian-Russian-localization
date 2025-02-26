@@ -231,9 +231,9 @@ function Layout_spot_for_wotsit(LEVEL, R, kind, required, SEEDS)
     -- already used?
     if chunk.content then return -1 end
 
-    if LEVEL.is_procedural_gotcha == true and PARAM.bool_boss_gen == 1 then
+    if LEVEL.is_procedural_gotcha == true and OB_CONFIG.bool_boss_gen == 1 then
       if chunk.kind == "closet" then return -1 end
-      if kind == "WEAPON" and PARAM.boss_gen_weap == "close" then
+      if kind == "WEAPON" and OB_CONFIG.boss_gen_weap == "close" then
         for _,goal in pairs(R.goals) do
           if goal.chunk and goal.kind == "START" and
             geom.dist(chunk.mx,chunk.my,goal.chunk.mx,goal.chunk.my) > 726 then
@@ -440,7 +440,7 @@ function Layout_place_importants(LEVEL, R, imp_pass, SEEDS)
         mx, my = point_in_front_of_closet(chunk, 96)
       end
 
-      if LEVEL.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then
+      if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then
         R:add_exclusion("keep_empty", mx, my,  100)
       else
         R:add_exclusion("keep_empty", mx, my,  640)
@@ -1650,7 +1650,7 @@ function Layout_decorate_rooms(LEVEL, pass, SEEDS)
 
     -- control check for Epic Textures module environment theme,
     -- if available -MSSP
-    if PARAM.environment_themes then
+    if OB_CONFIG.environment_themes then
       if A.is_outdoor then
         reqs.outdoor_theme = LEVEL.outdoor_theme
       end
@@ -2081,12 +2081,12 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
       prob = prob - math.clamp(0, LEVEL.autodetail_group_walls_factor, 35)
     end
 
-    if PARAM.group_wall_prob and PARAM.group_wall_prob ~= "fab_default" then
+    if OB_CONFIG.group_wall_prob and OB_CONFIG.group_wall_prob ~= "fab_default" then
       local mult = 1
       if THEME.plain_wall_multiplier then
         mult = THEME.plain_wall_multiplier
       end
-      prob = prob * (PREFAB_CONTROL.WALL_GROUP_ODDS[PARAM.group_wall_prob] 
+      prob = prob * (PREFAB_CONTROL.WALL_GROUP_ODDS[OB_CONFIG.group_wall_prob] 
       or 1) * mult
     end
 
@@ -2095,9 +2095,9 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     for _,fg in pairs(R.floor_groups) do
       if rand.odds(prob) then
         fg.wall_group = rand.key_by_probs(tab)
-        if not PARAM.bool_avoid_wall_group_reuse
-        or (PARAM.bool_avoid_wall_group_reuse
-        and PARAM.bool_avoid_wall_group_reuse == 1) then
+        if not OB_CONFIG.bool_avoid_wall_group_reuse
+        or (OB_CONFIG.bool_avoid_wall_group_reuse
+        and OB_CONFIG.bool_avoid_wall_group_reuse == 1) then
           table.add_unique(SEEN_WALL_GROUPS, fg.wall_group.name)
         end
       end
@@ -2121,13 +2121,13 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
         if not LEVEL.liquid then
           tab[sink_name] = 0
         end
-        if PARAM.liquid_sinks then
-          if PARAM.liquid_sinks == "no" then
+        if OB_CONFIG.liquid_sinks then
+          if OB_CONFIG.liquid_sinks == "no" then
             tab[sink_name] = 0
           end
           if LEVEL.liquid then
             if LEVEL.liquid.damage
-            and PARAM.liquid_sinks == "not_damaging" then
+            and OB_CONFIG.liquid_sinks == "not_damaging" then
               tab[sink_name] = 0
             end
             if LEVEL.liquid.damage and LEVEL.is_procedural_gotcha then
@@ -2334,8 +2334,8 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
       fab_none = 0,
     }
 
-    if PARAM.point_prob and PARAM.point_prob ~= "fab_default" then
-      decor_prob = decor_prob_tab[PARAM.point_prob]
+    if OB_CONFIG.point_prob and OB_CONFIG.point_prob ~= "fab_default" then
+      decor_prob = decor_prob_tab[OB_CONFIG.point_prob]
     end
 
     decor_prob = math.clamp(0, decor_prob / (LEVEL.autodetail_group_walls_factor / 2), 100)
@@ -2800,20 +2800,22 @@ function Layout_indoor_lighting(LEVEL)
   -- light sources are in that area (including windows).
   --
 
+  local light_mult = tonumber(OB_CONFIG.overall_lighting_mult)
+
   local LIGHT_LEVELS =
   {
-    bright   = math.floor(224 * PARAM.float_overall_lighting_mult),
-    normal   = math.floor(192 * PARAM.float_overall_lighting_mult),
-    dark     = math.floor(160 * PARAM.float_overall_lighting_mult),
-    verydark = math.floor(128 * PARAM.float_overall_lighting_mult),
+    bright   = math.floor(224 * light_mult),
+    normal   = math.floor(192 * light_mult),
+    dark     = math.floor(160 * light_mult),
+    verydark = math.floor(128 * light_mult),
   }
 
   local CAVE_LEVELS =
   {
-    bright   = math.floor(192 * PARAM.float_overall_lighting_mult),
-    normal   = math.floor(160 * PARAM.float_overall_lighting_mult),
-    dark     = math.floor(128 * PARAM.float_overall_lighting_mult),
-    verydark = math.floor(96 * PARAM.float_overall_lighting_mult),
+    bright   = math.floor(192 * light_mult),
+    normal   = math.floor(160 * light_mult),
+    dark     = math.floor(128 * light_mult),
+    verydark = math.floor(96 * light_mult),
   }
 
   local function sky_light_to_keyword()
@@ -2858,8 +2860,8 @@ function Layout_indoor_lighting(LEVEL)
 
     for _,A in pairs(R.areas) do
       -- brightness clamp
-      A.base_light = math.clamp(PARAM.wad_minimum_brightness or 0, 
-        base_light, PARAM.wad_maximum_brightness or 255)
+      A.base_light = math.clamp(OB_CONFIG.wad_minimum_brightness or 0, 
+        base_light, OB_CONFIG.wad_maximum_brightness or 255)
     end
 
   end

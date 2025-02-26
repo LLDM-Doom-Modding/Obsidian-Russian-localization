@@ -539,8 +539,8 @@ end
 
 
 function ROOM_CLASS.spots_do_decor(R, floor_h)
-  local low_h  = PARAM.spot_low_h
-  local high_h = PARAM.spot_high_h
+  local low_h  = GLOBAL_PARAMETERS.spot_low_h
+  local high_h = GLOBAL_PARAMETERS.spot_high_h
 
   for _,ent in pairs(R.solid_ents) do
     local z1 = ent.z
@@ -1427,7 +1427,7 @@ function Room_make_windows(LEVEL, A1, A2, SEEDS)
   end]]
 
   -- remove windows into quiet start rooms... but not on procedural gotchas
-  if PARAM.bool_quiet_start == 1 and not LEVEL.is_procedural_gotcha then
+  if OB_CONFIG.bool_quiet_start == 1 and not LEVEL.is_procedural_gotcha then
     if A1.room and A1.room.is_start then
       if A2.room then return end
     end
@@ -2310,7 +2310,7 @@ function Room_choose_size(LEVEL, R, not_big)
       R.is_big = true
 
       -- extra code for single-room gotchas
-      if PARAM.bool_boss_gen == 1 then
+      if OB_CONFIG.bool_boss_gen == 1 then
         R.size_limit = LEVEL.map_W * 20
       end
     end
@@ -2801,7 +2801,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       if C.kind == "stair" then goto continue end
 
       local diff = math.abs(A1.floor_h - A2.floor_h)
-      if diff <= PARAM.jump_height then goto continue end
+      if diff <= OB_CONFIG.jump_height then goto continue end
 
       -- FIXME : generally build single staircases (a la V6 and earlier)
 

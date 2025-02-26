@@ -1338,146 +1338,146 @@ MARINE_CLOSET_TUNE.TECHWPN =
 }
 
 function MARINE_CLOSET_TUNE.setup(self)
-  PARAM.marine_gen = true
-  PARAM.marine_closets = 0
-  PARAM.marine_marines = 0
-  PARAM.marine_tech = 1
+  OB_CONFIG.marine_gen = true
+  OB_CONFIG.marine_closets = 0
+  OB_CONFIG.marine_marines = 0
+  OB_CONFIG.marine_tech = 1
 
   module_param_up(self)
 end
 
 function MARINE_CLOSET_TUNE.calc_closets(self, LEVEL)
-  if rand.odds(PARAM.float_m_c_chance)
+  if rand.odds(OB_CONFIG.float_m_c_chance)
   and not LEVEL.prebuilt
-  and not (PARAM.bool_m_c_boss == 0 and LEVEL.is_procedural_gotcha) then
+  and not (OB_CONFIG.bool_m_c_boss == 0 and LEVEL.is_procedural_gotcha) then
     local rngmin
     local rngmax
 
-    PARAM.level_has_marine_closets = true
+    OB_CONFIG.level_has_marine_closets = true
 
-    rngmin = math.min(PARAM.float_m_c_min,PARAM.float_m_c_max)
-    rngmax = math.max(PARAM.float_m_c_min,PARAM.float_m_c_max)
+    rngmin = math.min(OB_CONFIG.float_m_c_min,OB_CONFIG.float_m_c_max)
+    rngmax = math.max(OB_CONFIG.float_m_c_min,OB_CONFIG.float_m_c_max)
 
-    if PARAM.m_c_type == "default" then
-      PARAM.marine_closets = rand.irange(rngmin,rngmax)
-    elseif PARAM.m_c_type == "prog" then
-      PARAM.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_type == "reg" then
-      PARAM.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_type == "epi" then
-      PARAM.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
-    elseif PARAM.m_c_type == "epi2" then
-      PARAM.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
+    if OB_CONFIG.m_c_type == "default" then
+      OB_CONFIG.marine_closets = rand.irange(rngmin,rngmax)
+    elseif OB_CONFIG.m_c_type == "prog" then
+      OB_CONFIG.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
+    elseif OB_CONFIG.m_c_type == "reg" then
+      OB_CONFIG.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
+    elseif OB_CONFIG.m_c_type == "epi" then
+      OB_CONFIG.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
+    elseif OB_CONFIG.m_c_type == "epi2" then
+      OB_CONFIG.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
     end
 
-    rngmin = math.min(PARAM.float_m_c_m_min,PARAM.float_m_c_m_max)
-    rngmax = math.max(PARAM.float_m_c_m_min,PARAM.float_m_c_m_max)
+    rngmin = math.min(OB_CONFIG.float_m_c_m_min,OB_CONFIG.float_m_c_m_max)
+    rngmax = math.max(OB_CONFIG.float_m_c_m_min,OB_CONFIG.float_m_c_m_max)
 
-    if PARAM.m_c_m_type == "default" then
-      PARAM.marine_marines = rand.irange(rngmin,rngmax)
-    elseif PARAM.m_c_m_type == "prog" then
-      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_m_type == "reg" then
-      PARAM.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_m_type == "epi" then
-      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
-    elseif PARAM.m_c_m_type == "epi2" then
-      PARAM.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
+    if OB_CONFIG.m_c_m_type == "default" then
+      OB_CONFIG.marine_marines = rand.irange(rngmin,rngmax)
+    elseif OB_CONFIG.m_c_m_type == "prog" then
+      OB_CONFIG.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
+    elseif OB_CONFIG.m_c_m_type == "reg" then
+      OB_CONFIG.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
+    elseif OB_CONFIG.m_c_m_type == "epi" then
+      OB_CONFIG.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
+    elseif OB_CONFIG.m_c_m_type == "epi2" then
+      OB_CONFIG.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
     end
 
-    if PARAM.m_c_tech == "vlow" then
-      PARAM.marine_tech = 1
-    elseif PARAM.m_c_tech == "low" then
-      PARAM.marine_tech = rand.irange(1,3)
-    elseif PARAM.m_c_tech == "mid" then
-      PARAM.marine_tech = rand.irange(5,7)
-    elseif PARAM.m_c_tech == "high" then
-      PARAM.marine_tech = rand.irange(8,9)
-    elseif PARAM.m_c_tech == "rng" then
-      PARAM.marine_tech = 99
-    elseif PARAM.m_c_tech == "bfg" then
-      PARAM.marine_tech = 66
-    elseif PARAM.m_c_tech == "prog" then
+    if OB_CONFIG.m_c_tech == "vlow" then
+      OB_CONFIG.marine_tech = 1
+    elseif OB_CONFIG.m_c_tech == "low" then
+      OB_CONFIG.marine_tech = rand.irange(1,3)
+    elseif OB_CONFIG.m_c_tech == "mid" then
+      OB_CONFIG.marine_tech = rand.irange(5,7)
+    elseif OB_CONFIG.m_c_tech == "high" then
+      OB_CONFIG.marine_tech = rand.irange(8,9)
+    elseif OB_CONFIG.m_c_tech == "rng" then
+      OB_CONFIG.marine_tech = 99
+    elseif OB_CONFIG.m_c_tech == "bfg" then
+      OB_CONFIG.marine_tech = 66
+    elseif OB_CONFIG.m_c_tech == "prog" then
       if LEVEL.game_along < 1.0 then
-        PARAM.marine_tech = math.ceil(LEVEL.game_along * 10)
+        OB_CONFIG.marine_tech = math.ceil(LEVEL.game_along * 10)
       else
-        PARAM.marine_tech = 10
+        OB_CONFIG.marine_tech = 10
       end
     end
 
   else
-    PARAM.level_has_marine_closets = false
+    OB_CONFIG.level_has_marine_closets = false
   end
 
   local info =
   {
     kind = "marine_closet",
     min_count = 1,
-    max_count = PARAM.marine_closets,
-    min_prog = PARAM.float_m_c_level_min_pos,
-    max_prog = PARAM.float_m_c_level_max_pos,
+    max_count = OB_CONFIG.marine_closets,
+    min_prog = OB_CONFIG.float_m_c_level_min_pos,
+    max_prog = OB_CONFIG.float_m_c_level_max_pos,
     level_prob = 100,
   }
 
-  if PARAM.bool_m_c_in_secret then
+  if OB_CONFIG.bool_m_c_in_secret then
     info.not_secret = true
   end
 
-  if PARAM.level_has_marine_closets then
+  if OB_CONFIG.level_has_marine_closets then
     table.insert(LEVEL.secondary_importants, info)
   end
 end
 
 function MARINE_CLOSET_TUNE.grab_type()
-  return rand.pick(MARINE_CLOSET_TUNE.TECHWPN[PARAM.marine_tech])
+  return rand.pick(MARINE_CLOSET_TUNE.TECHWPN[OB_CONFIG.marine_tech])
 end
 
 function MARINE_CLOSET_TUNE.randomize_count()
-   if PARAM.m_c_m_type ~= "default" then return end
-   local rngmin = math.min(PARAM.float_m_c_m_min,PARAM.float_m_c_m_max)
-   local rngmax = math.max(PARAM.float_m_c_m_min,PARAM.float_m_c_m_max)
-   PARAM.marine_marines = rand.irange(rngmin,rngmax)
+   if OB_CONFIG.m_c_m_type ~= "default" then return end
+   local rngmin = math.min(OB_CONFIG.float_m_c_m_min,OB_CONFIG.float_m_c_m_max)
+   local rngmax = math.max(OB_CONFIG.float_m_c_m_min,OB_CONFIG.float_m_c_m_max)
+   OB_CONFIG.marine_marines = rand.irange(rngmin,rngmax)
 end
 
 function MARINE_CLOSET_TUNE.all_done()
 
   local scripty = MARINE_CLOSET_TUNE.TEMPLATES.ZSC
 
-  if PARAM.bool_m_c_power == 1 then
-    if PARAM.m_c_sprites == "no" then
+  if OB_CONFIG.bool_m_c_power == 1 then
+    if OB_CONFIG.m_c_sprites == "no" then
       scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.MSTRN
     else
       scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.MGSTRN
     end
   else
-    if PARAM.m_c_sprites == "no" then
+    if OB_CONFIG.m_c_sprites == "no" then
       scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.MWEAK
     else
       scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.MGWEAK
     end
   end
 
-  scripty = string.gsub(scripty, "MHEALTH", tostring(PARAM.float_m_c_health))
+  scripty = string.gsub(scripty, "MHEALTH", tostring(OB_CONFIG.float_m_c_health))
 
-  if PARAM.bool_m_c_follow == 1 then
+  if OB_CONFIG.bool_m_c_follow == 1 then
     scripty = string.gsub(scripty, "MFOLLOW", "true")
   else
     scripty = string.gsub(scripty, "MFOLLOW", "false")
   end
 
-  scripty = string.gsub(scripty, "FOLLOW_DIST", PARAM.float_m_c_follow_distance)
+  scripty = string.gsub(scripty, "FOLLOW_DIST", OB_CONFIG.float_m_c_follow_distance)
 
-  if PARAM.m_c_waker == "sight" then
+  if OB_CONFIG.m_c_waker == "sight" then
     scripty = string.gsub(scripty, "WSTATE", MARINE_CLOSET_TUNE.TEMPLATES.WAKER1)
-  elseif PARAM.m_c_waker == "range" then
+  elseif OB_CONFIG.m_c_waker == "range" then
     scripty = string.gsub(scripty, "WSTATE", MARINE_CLOSET_TUNE.TEMPLATES.WAKER2)
-  elseif PARAM.m_c_waker == "close" then
+  elseif OB_CONFIG.m_c_waker == "close" then
     scripty = string.gsub(scripty, "WSTATE", MARINE_CLOSET_TUNE.TEMPLATES.WAKER3)
   else
     scripty = string.gsub(scripty, "WSTATE", MARINE_CLOSET_TUNE.TEMPLATES.WAKER4)
   end
 
-  if PARAM.m_c_ff ~= "yes" then
+  if OB_CONFIG.m_c_ff ~= "yes" then
     scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.PROJREP
     scripty = string.gsub(scripty, "\"BulletPuff\"", "\"BulletPuffAIMarine\"")
     scripty = string.gsub(scripty, "\"PlasmaBall\"", "\"PlasmaBallAIMarine\"")
@@ -1485,34 +1485,34 @@ function MARINE_CLOSET_TUNE.all_done()
     scripty = string.gsub(scripty, "\"BFGBall\"", "\"BFGBallAIMarine\"")
   end
 
-  if PARAM.m_c_ff == "no2" then
+  if OB_CONFIG.m_c_ff == "no2" then
     scripty = string.gsub(scripty, "MFRIENDLYFIREX", MARINE_CLOSET_TUNE.TEMPLATES.FFX)
   else
     scripty = string.gsub(scripty, "MFRIENDLYFIREX", "return 0;")
   end
 
-  if PARAM.m_c_sprites == "yes1" then
+  if OB_CONFIG.m_c_sprites == "yes1" then
     gui.wad_merge_sections("modules/zdoom_internal_scripts/AISprite.wad")
   end
 
-  if PARAM.m_c_color == "MarAI1" then
+  if OB_CONFIG.m_c_color == "MarAI1" then
     scripty = string.gsub(scripty, "MTRANSLATE", "")
-  elseif PARAM.m_c_color == "rng" then
+  elseif OB_CONFIG.m_c_color == "rng" then
     scripty = string.gsub(scripty, "MTRANSLATE", MARINE_CLOSET_TUNE.TEMPLATES.TRANSL2)
-  elseif PARAM.m_c_color == "rng2" then
+  elseif OB_CONFIG.m_c_color == "rng2" then
     scripty = string.gsub(scripty, "MTRANSLATE", MARINE_CLOSET_TUNE.TEMPLATES.TRANSL3)
   else
     scripty = string.gsub(scripty, "MTRANSLATE", MARINE_CLOSET_TUNE.TEMPLATES.TRANSL)
-    scripty = string.gsub(scripty, "MTRANSDEF", "\"" .. PARAM.m_c_color .. "\"")
+    scripty = string.gsub(scripty, "MTRANSDEF", "\"" .. OB_CONFIG.m_c_color .. "\"")
   end
 
-  if PARAM.bool_m_c_pdamage == 1 then
+  if OB_CONFIG.bool_m_c_pdamage == 1 then
     scripty = string.gsub(scripty, "MPLAYERDAMAGEX", MARINE_CLOSET_TUNE.TEMPLATES.PLDMG)
   else
     scripty = string.gsub(scripty, "MPLAYERDAMAGEX", "")
   end
 
-  if PARAM.bool_m_c_rip == 1 then
+  if OB_CONFIG.bool_m_c_rip == 1 then
     scripty = string.gsub(scripty, "MDEATHMESSAGEX", MARINE_CLOSET_TUNE.TEMPLATES.DTHMSG)
   else
     scripty = string.gsub(scripty, "MDEATHMESSAGEX", "")
@@ -1524,8 +1524,8 @@ function MARINE_CLOSET_TUNE.all_done()
   SCRIPTS.doomednums = ScriptMan_combine_script(SCRIPTS.doomednums,
     MARINE_CLOSET_TUNE.MAPINFO)
 
-  if PARAM.m_c_color ~= "MarAI1" then
-    PARAM.MARINETRNSLATE = MARINE_CLOSET_TUNE.TRNSLATE
+  if OB_CONFIG.m_c_color ~= "MarAI1" then
+    OB_CONFIG.MARINETRNSLATE = MARINE_CLOSET_TUNE.TRNSLATE
   end
 end
 

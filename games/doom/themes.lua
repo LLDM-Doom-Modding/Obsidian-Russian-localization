@@ -6436,7 +6436,7 @@ end
 function DOOM.slump_setup()
   if ob_match_game({game = {doom2=1, tnt=1, plutonia=1}}) then
     if OB_CONFIG.theme == "default" then
-      PARAM.slump_config = DOOM.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = DOOM.THEMES.DEFAULTS.slump_config
     elseif OB_CONFIG.theme == "jumble" then
       local possible_configs = {}
       for _,tab in pairs(DOOM.THEMES) do
@@ -6444,11 +6444,11 @@ function DOOM.slump_setup()
           table.insert(possible_configs, tab.slump_config)
         end
       end
-      PARAM.slump_config = rand.pick(possible_configs)
+      OB_CONFIG.slump_config = rand.pick(possible_configs)
     elseif DOOM.THEMES[OB_CONFIG.theme].slump_config then
-      PARAM.slump_config = DOOM.THEMES[OB_CONFIG.theme].slump_config
+      OB_CONFIG.slump_config = DOOM.THEMES[OB_CONFIG.theme].slump_config
     else
-      PARAM.slump_config = DOOM.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = DOOM.THEMES.DEFAULTS.slump_config
     end
   end
 end

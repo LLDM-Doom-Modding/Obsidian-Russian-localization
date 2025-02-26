@@ -211,7 +211,7 @@ function ZDOOM_SPECIALS_HERETIC.shuffle_music()
 
   local music_table = ZDOOM_SPECIALS_HERETIC.MUSIC
 
-  if PARAM.mapinfo_music_shuffler_heretic ~= "no" then
+  if OB_CONFIG.mapinfo_music_shuffler_heretic ~= "no" then
     rand.shuffle(music_table)
   end
 
@@ -228,7 +228,7 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
   local function pick_sky_color_from_skygen_map(epi_num)
     local color = "00 00 00"
 
-    local skyname = PARAM.episode_sky_color[epi_num]
+    local skyname = OB_CONFIG.episode_sky_color[epi_num]
 
     if ZDOOM_SPECIALS_HERETIC.FOG_COLORS[skyname] then
       color = ZDOOM_SPECIALS_HERETIC.FOG_COLORS[skyname] 
@@ -295,7 +295,7 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
     local sky_texture
 
     -- resolve proper episodic sky texture assignments
-    if not PARAM.episode_sky_color then
+    if not OB_CONFIG.episode_sky_color then
       if map_num <= 9 then
         sky_texture = "SKY1"
       elseif map_num <= 18 then
@@ -379,35 +379,35 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
     local fog_intensity = "48"
 
     -- resolve fog intensity
-    if PARAM.fog_intensity_heretic == "subtle" then
+    if OB_CONFIG.fog_intensity_heretic == "subtle" then
       fog_intensity = "16"
-    elseif PARAM.fog_intensity_heretic == "misty" then
+    elseif OB_CONFIG.fog_intensity_heretic == "misty" then
       fog_intensity = "48"
-    elseif PARAM.fog_intensity_heretic == "smoky" then
+    elseif OB_CONFIG.fog_intensity_heretic == "smoky" then
       fog_intensity = "128"
-    elseif PARAM.fog_intensity_heretic == "foggy" then
+    elseif OB_CONFIG.fog_intensity_heretic == "foggy" then
       fog_intensity = "255"
-    elseif PARAM.fog_intensity_heretic == "dense" then
+    elseif OB_CONFIG.fog_intensity_heretic == "dense" then
       fog_intensity = "368"
-    elseif PARAM.fog_intensity_heretic == "mixed" then
+    elseif OB_CONFIG.fog_intensity_heretic == "mixed" then
       fog_intensity = "" .. rand.irange(16,368)
     end
 
     local fog_intensity_line = '  fogdensity = ' .. fog_intensity .. '\n'
 
     -- fog forced to outdoors only
-    if PARAM.fog_env_heretic == "outdoor" then
+    if OB_CONFIG.fog_env_heretic == "outdoor" then
       fog_color_line = '  OutsideFog  = "' .. fog_color .. '"\n'
       fog_intensity_line = '  outsidefogdensity = ' .. fog_intensity .. '\n'
     end
 
     -- if fog tints sky, based on ZDoom GL specs
-    if PARAM.bool_fog_affects_sky_heretic == 1 then
+    if OB_CONFIG.bool_fog_affects_sky_heretic == 1 then
       fog_intensity_line = fog_intensity_line .. '  skyfog = ' .. fog_intensity + 16 .. '\n'
     end
 
     -- no fog in MAPINFO at all if the fog generator is off
-    if PARAM.fog_generator_heretic == "no" then
+    if OB_CONFIG.fog_generator_heretic == "no" then
       fog_color_line = ""
       fog_intensity_line = ""
     end
@@ -495,7 +495,7 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
       special_attributes = ''
     end
 
-    if PARAM.bool_no_intermission_heretic == 1 then
+    if OB_CONFIG.bool_no_intermission_heretic == 1 then
       special_attributes = special_attributes .. '  nointermission\n'
     end
 
@@ -525,9 +525,9 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
   local function add_clusterdef(interpic)
     local clusterdef = {''}
 
-    local cluster_music_line = '  music = "' .. PARAM.generic_intermusic_heretic .. '"\n'
+    local cluster_music_line = '  music = "' .. OB_CONFIG.generic_intermusic_heretic .. '"\n'
 
-    if PARAM.story_generator_heretic == "generic" then
+    if OB_CONFIG.story_generator_heretic == "generic" then
 
 
       clusterdef =
@@ -696,7 +696,7 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
       }
     end
 
-    if PARAM.story_generator_heretic == "proc" then
+    if OB_CONFIG.story_generator_heretic == "proc" then
       -- create cluster information
       clusterdef =
       {
@@ -820,13 +820,13 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
 --  local ipic = ZDOOM_SPECIALS_HERETIC.INTERPICS[cluster_num]
 
   -- collect lines for MAPINFO lump
-  PARAM.mapinfolump = {}
-  PARAM.gameinfolump = {}
+  OB_CONFIG.mapinfolump = {}
+  OB_CONFIG.gameinfolump = {}
 
-  if PARAM.bool_heretic_quit_messages == 1 then
+  if OB_CONFIG.bool_heretic_quit_messages == 1 then
     local gamedef_lines = add_gamedef()
     for _,line in pairs(gamedef_lines) do
-      table.insert(PARAM.gameinfolump,line)
+      table.insert(OB_CONFIG.gameinfolump,line)
     end
     ZStoryGen_quitmessages()
   end
@@ -856,8 +856,8 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
       info.interpic = ZDOOM_SPECIALS_HERETIC.INTERPICS[10]
     end
 
-    if PARAM.fog_generator_heretic == "per_sky_gen" then
-      if not PARAM.episode_sky_color then
+    if OB_CONFIG.fog_generator_heretic == "per_sky_gen" then
+      if not OB_CONFIG.episode_sky_color then
         gui.printf("WARNING: User set fog color to be set by Sky Generator " ..
         "but Sky Generator is turned off! Fog color will now match vanilla skies.\n")
         if i <= 9 then
@@ -884,9 +884,9 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
           info.fog_color = pick_sky_color_from_skygen_map(5)
         end
       end
-    elseif PARAM.fog_generator_heretic == "random" then
+    elseif OB_CONFIG.fog_generator_heretic == "random" then
       info.fog_color = pick_random_fog_color()
-    elseif PARAM.fog_generator_heretic == "natural" then
+    elseif OB_CONFIG.fog_generator_heretic == "natural" then
       local shades = 
       {
         "ff ff ff",
@@ -902,45 +902,45 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
 
     local mapinfo_lines = add_mapinfo(info)
     for _,line in pairs(mapinfo_lines) do
-      table.insert(PARAM.mapinfolump,line)
+      table.insert(OB_CONFIG.mapinfolump,line)
     end
 
   end
 
   -- lines for episode definition
 
-    table.insert(PARAM.mapinfolump,"clearepisodes\n")
+    table.insert(OB_CONFIG.mapinfolump,"clearepisodes\n")
 
     local episode_info = add_episodedef(1)
     for _,line in pairs(episode_info) do
-      table.insert(PARAM.mapinfolump,line)
+      table.insert(OB_CONFIG.mapinfolump,line)
     end
 
     if #GAME.levels > 9 then
       episode_info = add_episodedef(10)
       for _,line in pairs(episode_info) do
-        table.insert(PARAM.mapinfolump,line)
+        table.insert(OB_CONFIG.mapinfolump,line)
       end
     end
 
     if #GAME.levels > 18 then
       episode_info = add_episodedef(19)
       for _,line in pairs(episode_info) do
-        table.insert(PARAM.mapinfolump,line)
+        table.insert(OB_CONFIG.mapinfolump,line)
       end
     end
 
     if #GAME.levels > 27 then
       episode_info = add_episodedef(28)
       for _,line in pairs(episode_info) do
-        table.insert(PARAM.mapinfolump,line)
+        table.insert(OB_CONFIG.mapinfolump,line)
       end
     end
 
     if #GAME.levels > 36 then
       episode_info = add_episodedef(37)
       for _,line in pairs(episode_info) do
-        table.insert(PARAM.mapinfolump,line)
+        table.insert(OB_CONFIG.mapinfolump,line)
       end
     end
 
@@ -948,18 +948,18 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
   local clusterinfo_lines = add_clusterdef(info.interpic)
   if clusterinfo_lines then
     for _,line in pairs(clusterinfo_lines) do
-      table.insert(PARAM.mapinfolump,line)
+      table.insert(OB_CONFIG.mapinfolump,line)
     end
   end
 
   -- FIX-ME!!! Redo all code here to use strings as per original Doom ZDoom Specials Module.
   local lines_as_string = ''
-  for _,line in pairs(PARAM.mapinfolump,line) do
+  for _,line in pairs(OB_CONFIG.mapinfolump,line) do
     lines_as_string = lines_as_string .. line
   end
   SCRIPTS.mapinfolump = ScriptMan_combine_script(SCRIPTS.mapinfolump, lines_as_string)
 
-  if PARAM.story_generator_heretic == "proc" then
+  if OB_CONFIG.story_generator_heretic == "proc" then
     -- language lump is written inside the story generator
     ZStoryGen_init()
   end

@@ -40,10 +40,7 @@ jobs:
           ${{github.workspace}}/language
           ${{github.workspace}}/modules
           ${{github.workspace}}/ports
-          ${{github.workspace}}/presets
           ${{github.workspace}}/scripts
-          ${{github.workspace}}/theme
-          ${{github.workspace}}/tools
           ${{github.workspace}}/obsidian.exe
         retention-days: ${{env.RETENTION_DAYS}}
   build-win64:
@@ -75,9 +72,6 @@ jobs:
           ${{github.workspace}}/language
           ${{github.workspace}}/modules
           ${{github.workspace}}/ports
-          ${{github.workspace}}/presets
           ${{github.workspace}}/scripts
-          ${{github.workspace}}/theme
-          ${{github.workspace}}/tools
           ${{github.workspace}}/obsidian.exe
         retention-days: ${{env.RETENTION_DAYS}}

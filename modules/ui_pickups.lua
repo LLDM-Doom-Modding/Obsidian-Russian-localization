@@ -60,13 +60,6 @@ UI_PICKUPS.SECRET_ROOM_BONUS =
   "heapsest", _("Resplendent")
 }
 
-function UI_PICKUPS.setup(self)
-  
-  module_param_up(self)
-
-end
-
-
 OB_MODULES["ui_pickups"] =
 {
   label = _("Pickups"),
@@ -78,7 +71,6 @@ OB_MODULES["ui_pickups"] =
 
   hooks =
   {
-    setup = UI_PICKUPS.setup,
   },
 
   options =

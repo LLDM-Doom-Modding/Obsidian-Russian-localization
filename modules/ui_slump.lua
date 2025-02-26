@@ -27,75 +27,6 @@ UI_SLUMP.MON_VARIETY =
   "noflyzone", _("No Fly Zone"),
 }
 
-function UI_SLUMP.setup(self)
-  
-  module_param_up(self)
-
-end
-
-OB_MODULES["ui_slump_arch"] =
-{
-
-  name = "ui_slump_arch",
-
-  label = _("Architecture"),
-
-  where = "arch",
-  priority = 104,
-  port = "limit_enforcing",
-
-  hooks = 
-  {
-    setup = UI_SLUMP.setup,
-  },
-
-  options =
-  {
-    { 
-      name="float_minrooms_slump",
-      label=_("Level Size"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 22,
-      nan = _("Mix It Up"),
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Determines size of map in rooms."),
-      priority = 100,
-      
-    },
-    { 
-      name="float_minrooms_slump_ub",
-      label=_("Upper Bound"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 36,
-      nan = _("Mix It Up"),
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Determines maximum map size when using Mix It Up."),
-      priority = 99,
-      
-    },
-    { 
-      name="float_minrooms_slump_lb",
-      label=_("Lower Bound"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 2,
-      nan = _("Mix It Up"),
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Determines minimum room size when using Mix It Up."),
-      priority = 98,
-      
-    },
-  }
-}
-
 OB_MODULES["misc_slump"] =
 {
   name = "misc_slump",
@@ -114,7 +45,7 @@ OB_MODULES["misc_slump"] =
 
   options =
   {
-
+--[[
     {
       name = "float_bigify_slump",
       label = _("Room Bigification Chance"),
@@ -141,20 +72,20 @@ OB_MODULES["misc_slump"] =
       longtip = _("0% should look like a bunch of murder hallways. Forking is not guaranteed to succeed, especially if the Room Bigification Chance is increased."),
       
     },
-
+]]--
     {
-      name = "bool_dm_starts_slump",
+      name = "slump_dm_starts",
       label = _("Deathmatch Spawns"),
-      valuator = "button",
-      default = 0,
+      choices = YES_NO_CHOICES,
+      default = "no",
       tooltip = _("Add Deathmatch starts to generated levels.")
     },
     
     {
-      name = "bool_major_nukage_slump",
+      name = "slump_major_nukage",
       label = _("Major Nukage Mode"),
-      valuator = "button",
-      default = 0,
+      choices = YES_NO_CHOICES,
+      default = "no",
       tooltip = _("Watch your step!"),
       longtip = _("Will fill most rooms with damaging liquids."),
       
@@ -187,23 +118,10 @@ OB_MODULES["ui_slump_mons"] =
       label = _("Monster Variety"),
       choices = UI_SLUMP.MON_VARIETY,
       default = "normal",
-      tooltip = _("Control what types of monsters are available"),
-      
+      tooltip = _("Control what types of monsters are available"),    
     },
-
-    {
-      name = "bool_quiet_start_slump",
-      label = _("Quiet Start"),
-      valuator = "button",
-      default = 1,
-      tooltip = _("Prevents monsters from spawning in the starting room."),
-      longtip = _("Monsters in other rooms may still have a line of sight to you, so be careful!"),
-    }
-
   }
 }
-
-
 
 OB_MODULES["slump_all_nazis"] =
 {

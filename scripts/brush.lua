@@ -347,8 +347,8 @@ function Trans.entity(name, x, y, z, props)
 
   if info.delta_z then
     z = z + info.delta_z
-  elseif PARAM.entity_delta_z then
-    z = z + PARAM.entity_delta_z
+  elseif OB_CONFIG.entity_delta_z then
+    z = z + OB_CONFIG.entity_delta_z
   end
 
   if info.spawnflags then

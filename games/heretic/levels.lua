@@ -129,20 +129,6 @@ HERETIC.EPISODES =
   },
 }
 
-HERETIC.PREBUILT_LEVELS =
-{
-  E1M8 =
-  {
-    { prob=50, file="games/heretic/data/boss_maw1.wad", map="E1M8" },
-  },
-
-  E2M8 =
-  {
-    { prob=50, file="games/heretic/data/boss_portal1.wad", map="E2M8" },
-  },
-}
-
-
 ------------------------------------------------------------
 
 function HERETIC.get_levels()
@@ -190,90 +176,76 @@ function HERETIC.get_levels()
 
       LEV.secret_exit = GAME.SECRET_EXITS[LEV.name]
 
-      -- prebuilt levels
-      if PARAM.bool_prebuilt_levels == 1 then
-        LEV.prebuilt = GAME.PREBUILT_LEVELS[LEV.name]
-      end
-  
-      if LEV.prebuilt then
-        LEV.name_class = LEV.prebuilt.name_class or "BOSS"
-      end
-          -- procedural gotcha management code
+    -- procedural gotcha management code
 
-    -- Prebuilts are to exist over procedural gotchas
-    -- this means procedural gotchas will not override
-    -- Icon of Sin for example if prebuilts are still on
-    if not LEV.prebuilt then
+    --handling for the Final Only option
+    if OB_CONFIG.gotcha_frequency == "final" then
+      if OB_CONFIG.length == "single" then
+        if current_map == 1 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "few" then
+        if current_map == 4 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "episode" then
+        if current_map == 8 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "game" then
+        if current_map == 44 then LEV.is_procedural_gotcha = true end
+      end
+    end
 
-      --handling for the Final Only option
-      if PARAM.gotcha_frequency == "final" then
-        if OB_CONFIG.length == "single" then
-          if current_map == 1 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "few" then
-          if current_map == 4 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "episode" then
-          if current_map == 8 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "game" then
-          if current_map == 44 then LEV.is_procedural_gotcha = true end
-        end
+    if OB_CONFIG.gotcha_frequency == "epi" then
+      if current_map == ep_index * 9 - 1 then
+        LEV.is_procedural_gotcha = true
       end
-
-      if PARAM.gotcha_frequency == "epi" then
-        if current_map == ep_index * 9 - 1 then
-          LEV.is_procedural_gotcha = true
-        end
+    end
+    if OB_CONFIG.gotcha_frequency == "2epi" then
+      if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 5 then
+        LEV.is_procedural_gotcha = true
       end
-      if PARAM.gotcha_frequency == "2epi" then
-        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 5 then
-          LEV.is_procedural_gotcha = true
-        end
+    end
+    if OB_CONFIG.gotcha_frequency == "3epi" then
+      if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 4 or current_map == ep_index * 9 - 7 then
+        LEV.is_procedural_gotcha = true
       end
-      if PARAM.gotcha_frequency == "3epi" then
-        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 4 or current_map == ep_index * 9 - 7 then
-          LEV.is_procedural_gotcha = true
-        end
-      end
-      if PARAM.gotcha_frequency == "4epi" then
-        if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 3 or current_map == ep_index * 9 - 5 or current_map == ep_index * 9 - 7 then
-          LEV.is_procedural_gotcha = true
-        end
-      end
-
-      --5% of maps after map 4,
-      if PARAM.gotcha_frequency == "5p" then
-        if current_map > 4 and current_map % 9 ~= 0 then
-          if rand.odds(5) then LEV.is_procedural_gotcha = true end
-        end
-      end
-
-      -- 10% of maps after map 4,
-      if PARAM.gotcha_frequency == "10p" then
-        if current_map > 4 and current_map % 9 ~= 0 then
-          if rand.odds(10) then LEV.is_procedural_gotcha = true end
-        end
-      end
-
-      -- for masochists... or debug testing
-      if PARAM.gotcha_frequency == "all" then
+    end
+    if OB_CONFIG.gotcha_frequency == "4epi" then
+      if current_map == ep_index * 9 - 1 or current_map == ep_index * 9 - 3 or current_map == ep_index * 9 - 5 or current_map == ep_index * 9 - 7 then
         LEV.is_procedural_gotcha = true
       end
     end
 
+    --5% of maps after map 4,
+    if OB_CONFIG.gotcha_frequency == "5p" then
+      if current_map > 4 and current_map % 9 ~= 0 then
+        if rand.odds(5) then LEV.is_procedural_gotcha = true end
+      end
+    end
+
+    -- 10% of maps after map 4,
+    if OB_CONFIG.gotcha_frequency == "10p" then
+      if current_map > 4 and current_map % 9 ~= 0 then
+        if rand.odds(10) then LEV.is_procedural_gotcha = true end
+      end
+    end
+
+    -- for masochists... or debug testing
+    if OB_CONFIG.gotcha_frequency == "all" then
+      LEV.is_procedural_gotcha = true
+    end
+
     local special_mode = {}
 
-    if PARAM.float_streets_mode and rand.odds(PARAM.float_streets_mode) then
+    if OB_CONFIG.float_streets_mode and rand.odds(OB_CONFIG.float_streets_mode) then
       table.add_unique(special_mode, "streets")
     end
  
-    if PARAM.float_linear_mode and rand.odds(PARAM.float_linear_mode) then
+    if OB_CONFIG.float_linear_mode and rand.odds(OB_CONFIG.float_linear_mode) then
       table.add_unique(special_mode, "linear")
     end
 
-    if PARAM.float_nature_mode and rand.odds(PARAM.float_nature_mode) then
+    if OB_CONFIG.float_nature_mode and rand.odds(OB_CONFIG.float_nature_mode) then
       table.add_unique(special_mode, "nature")
     end
 
-    if not table.empty(special_mode) and not LEV.prebuilt then
+    if not table.empty(special_mode) then
       local selected_mode = rand.pick(special_mode)
       if selected_mode == "streets" then
         LEV.has_streets = true

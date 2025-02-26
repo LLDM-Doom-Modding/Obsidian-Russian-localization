@@ -22,9 +22,9 @@
 
 function Render_add_exit_sign(E, z, SEEDS, LEVEL)
 
-  if not PARAM.bool_exit_signs then return end
+  if not OB_CONFIG.bool_exit_signs then return end
 
-  if PARAM.bool_exit_signs ~= 1 then return end
+  if OB_CONFIG.bool_exit_signs ~= 1 then return end
 
   if ob_match_game({ game = "doomish" }) then return end
 
@@ -643,13 +643,13 @@ function Render_edge(LEVEL, E, SEEDS)
 
     -- for fences, add impassable lines on certain occasions
     if def.passable then
-      if PARAM.passable_windows == "not_on_vistas"
-      or not PARAM.passable_windows then
+      if OB_CONFIG.passable_windows == "not_on_vistas"
+      or not OB_CONFIG.passable_windows then
         if E.peer.area.mode == "scenic"
         or E.area.mode == "scenic" then
           set_blocking_line(E)
         end
-      elseif PARAM.passable_windows == "never" then
+      elseif OB_CONFIG.passable_windows == "never" then
         set_blocking_line(E)
       end
     end
@@ -1004,13 +1004,13 @@ stderrf("dA = (%1.1f %1.1f)  dB = (%1.1f %1.1f)\n", adx, ady, bdx, bdy)
 
     -- for windows, add impassable lines on certain occasions
     if def.passable then
-      if PARAM.passable_windows == "not_on_vistas"
-      or not PARAM.passable_windows then
+      if OB_CONFIG.passable_windows == "not_on_vistas"
+      or not OB_CONFIG.passable_windows then
         if E.peer.area.mode == "scenic"
         or E.area.mode == "scenic" then
           set_blocking_line(E)
         end
-      elseif PARAM.passable_windows == "never" then
+      elseif OB_CONFIG.passable_windows == "never" then
         set_blocking_line(E)
       end
     end
@@ -2079,7 +2079,7 @@ function Render_chunk(LEVEL, chunk, SEEDS)
 
   local function content_exit(chunk, secret_exit)
 
-    if LEVEL.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then return -1 end
+    if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then return -1 end
 
     local dir = player_face_dir(chunk)
 
@@ -2344,7 +2344,7 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
     local T = Trans.spot_transform(chunk.mx, chunk.my, ceil_h, chunk.prefab_dir or 2)
 
     -- dynamic light fabrication for ZDoom dynamic lights module
-    if PARAM.bool_dynamic_lights == 1 then
+    if OB_CONFIG.bool_dynamic_lights == 1 then
       if def.kind == "light" and def.light_color ~= "none" then
         local light_ent = {
           x = chunk.mx,
@@ -2738,7 +2738,7 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
   -- FIX-ME: transfer dynamic lighting code from ceiling lights to here
   -- this just disables dynamic light entities if they are used directly
   -- when Dynamic Lights is off
-  if not PARAM.bool_dynamic_lights then
+  if not OB_CONFIG.bool_dynamic_lights then
     def.thing_14998 = 0
     def.thing_14997 = 0
     def.thing_14996 = 0
@@ -2853,7 +2853,7 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
 
   Ambient_push(A.lighting)
 
-  if PARAM.bool_peered_exits and PARAM.bool_peered_exits == 1 then
+  if OB_CONFIG.bool_peered_exits and OB_CONFIG.bool_peered_exits == 1 then
     local start_fab_override = check_peered_exits(def, chunk)
     if start_fab_override then
       def = start_fab_override
@@ -3061,7 +3061,7 @@ function Render_all_areas(LEVEL, SEEDS)
 
   Render_skybox(LEVEL)
 
-  if LEVEL.has_streets and PARAM.bool_road_markings == 1 then
+  if LEVEL.has_streets and OB_CONFIG.bool_road_markings == 1 then
     Render_find_street_markings(LEVEL, SEEDS)
     Render_all_street_markings(LEVEL, SEEDS)
     Render_establish_street_lanes(LEVEL, SEEDS)

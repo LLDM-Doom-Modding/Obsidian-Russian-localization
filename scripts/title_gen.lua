@@ -2024,7 +2024,7 @@ end
 
 
 function Title_make_interpic()
-  if not PARAM.interpic_lump then return end
+  if not OB_CONFIG.interpic_lump then return end
 
   gui.title_create(320, 200, "#000")
   gui.title_set_palette(GAME.RESOURCES.PALETTES.normal)
@@ -2051,10 +2051,10 @@ function Title_make_interpic()
   end
   end
 
-  local lump   = PARAM.interpic_lump
-  local format = PARAM.interpic_format
+  local lump   = OB_CONFIG.interpic_lump
+  local format = OB_CONFIG.interpic_format
 
-  if PARAM.tga_images then format = "tga" end
+  if OB_CONFIG.tga_images then format = "tga" end
 
   gui.title_write(lump, format)
   gui.title_free()
@@ -2079,7 +2079,7 @@ end
 
 
 function Title_make_titlepic()
-  if not PARAM.titlepic_lump then return end
+  if not OB_CONFIG.titlepic_lump then return end
 
   gui.title_create(320, 200, "#000")
   gui.title_set_palette(GAME.RESOURCES.PALETTES.normal)
@@ -2088,10 +2088,10 @@ function Title_make_titlepic()
   Title_add_credit()
   Title_add_title()
 
-  local lump   = PARAM.titlepic_lump
-  local format = PARAM.titlepic_format
+  local lump   = OB_CONFIG.titlepic_lump
+  local format = OB_CONFIG.titlepic_format
 
-  if PARAM.tga_images then format = "tga" end
+  if OB_CONFIG.tga_images then format = "tga" end
 
   gui.title_write(lump, format)
   gui.title_free()

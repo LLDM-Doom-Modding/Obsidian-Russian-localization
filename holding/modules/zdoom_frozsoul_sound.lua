@@ -30,7 +30,7 @@
 -- chunk as well as decorate code for each entry.
 
 -- Thing ID's are dynamically assigned based on the
--- PARAM.snd_start_id selected on the module.
+-- OB_CONFIG.snd_start_id selected on the module.
 
 -- The module also handles the actual replacement of sound spot
 -- specials (thing 8185) in prefab WAD's with the appropriate
@@ -87,7 +87,7 @@ ZDOOM_SOUND.TEMPLATES =
 }
 
 function ZDOOM_SOUND.build_lumps()
-  local offset_count = tonumber(PARAM.snd_start_id)
+  local offset_count = tonumber(OB_CONFIG.snd_start_id)
   local sndtable = table.deep_copy(ZDOOM_SOUND_DEFS)
   local dec_lump = ""
   SCRIPTS.SNDINFO = ""
@@ -132,7 +132,7 @@ end
 
 function ZDOOM_SOUND.populate_level_ambience(self, LEVEL)
 
-  if not PARAM.ambient_sounds then
+  if not OB_CONFIG.ambient_sounds then
     return
   end
 
@@ -231,13 +231,13 @@ function ZDOOM_SOUND.setup(self)
 
   module_param_up(self)
 
-  PARAM.ambient_sounds = true
+  OB_CONFIG.ambient_sounds = true
   ZDOOM_SOUND.build_lumps()
 end
 
 function ZDOOM_SOUND.merge_frozsoul_sounds(self)
 
-  if PARAM.bool_merge_frozsoul_sounds == 1 then
+  if OB_CONFIG.bool_merge_frozsoul_sounds == 1 then
     local dir = "games/doom/data/sounds/"
 
     for _,sound in pairs(ZDOOM_SOUND_DEFS) do

@@ -1454,23 +1454,23 @@ function MODDED_GAME_EXTRAS.setup(self)
 
   SCRIPTS.hn_id_table = {}
 
-  if PARAM.bool_hn_markers == 1 then
+  if OB_CONFIG.bool_hn_markers == 1 then
     MODDED_GAME_EXTRAS.init_hn_info()
   end
 
-  if PARAM.bool_custom_actor_names == 1 then
+  if OB_CONFIG.bool_custom_actor_names == 1 then
     MODDED_GAME_EXTRAS.generate_custom_actor_names()
   end
 
-  if PARAM.bool_qcde_lootboxes == 1 then
+  if OB_CONFIG.bool_qcde_lootboxes == 1 then
     MODDED_GAME_EXTRAS.add_qcde_lootboxes()
   end
 
-  if PARAM.bool_d4t_ents == 1 then
+  if OB_CONFIG.bool_d4t_ents == 1 then
     MODDED_GAME_EXTRAS.add_d4t_ents()
   end
 
-  if PARAM.bool_trailblazer == 1 then
+  if OB_CONFIG.bool_trailblazer == 1 then
     table.name_up(MODDED_GAME_EXTRAS.TRAILBLAZER_THINGS)
 
     GAME.NICE_ITEMS = table.deep_merge(GAME.NICE_ITEMS, MODDED_GAME_EXTRAS.TRAILBLAZER_THINGS, 2)
@@ -1484,7 +1484,7 @@ function MODDED_GAME_EXTRAS.setup(self)
     SCRIPTS.doomednums = ScriptMan_combine_script(SCRIPTS.doomednums, MODDED_GAME_EXTRAS.TRAILBLAZER_DOOMEDNUMS)
   end
 
-  if PARAM.bool_complex_doom == 1 then
+  if OB_CONFIG.bool_complex_doom == 1 then
     MODDED_GAME_EXTRAS.add_complex_doom_things()
   end
 end
@@ -1492,7 +1492,7 @@ end
 function MODDED_GAME_EXTRAS.init_hn_info()
   HN_INFO_TABLE = {}
 
-  PARAM.hn_thing_start_offset = 15000
+  OB_CONFIG.hn_thing_start_offset = 15000
 end
 
 function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
@@ -1501,10 +1501,10 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
   -- and procedural gotchas (what the heck are you gonna navigate in two rooms?)
   if not LEVEL then return end
   if LEVEL.is_procedural_gotcha and 
-    PARAM.hn_info_type == "hn_info_quest" then return end
+    OB_CONFIG.hn_info_type == "hn_info_quest" then return end
   if LEVEL.prebuilt then return end
 
-  if PARAM.bool_hn_markers == 0 then
+  if OB_CONFIG.bool_hn_markers == 0 then
     return
   end
 
@@ -1675,8 +1675,8 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     end
 
     if R.is_secret then
-      goal_string = goal_string .. " (Secret Area #" .. PARAM.hn_secret_count .. ")"
-      PARAM.hn_secret_count = PARAM.hn_secret_count + 1
+      goal_string = goal_string .. " (Secret Area #" .. OB_CONFIG.hn_secret_count .. ")"
+      OB_CONFIG.hn_secret_count = OB_CONFIG.hn_secret_count + 1
     end
 
     if R.lev_along and not R.is_start and #LEVEL.rooms > 2 then
@@ -1795,12 +1795,12 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     end
 
     local info = {}
-    info.editor_num = PARAM.hn_thing_start_offset
+    info.editor_num = OB_CONFIG.hn_thing_start_offset
 
     for _,chunk in pairs(R.floor_chunks) do
       if chunk.prefab_def then
         info.name = "Point: " .. chunk.prefab_def.name
-        info.editor_num = PARAM.hn_thing_start_offset
+        info.editor_num = OB_CONFIG.hn_thing_start_offset
 
         if chunk.area.floor_group and chunk.area.floor_group.wall_group then
           info.name = info.name .. " (Wall Group: " .. 
@@ -1825,8 +1825,8 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
           SCRIPTS.hn_id_table[info.name] = {}
           SCRIPTS.hn_id_table[info.name].id = info.editor_num
           SCRIPTS.hn_id_table[info.name].name = info.name
-          info.editor_num = PARAM.hn_thing_start_offset
-          PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+          info.editor_num = OB_CONFIG.hn_thing_start_offset
+          OB_CONFIG.hn_thing_start_offset = OB_CONFIG.hn_thing_start_offset + 1
         end
 
         local x = chunk.mx
@@ -1843,11 +1843,11 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     end
     --for _,chunk in pairs(R.ceil_chunks ) do visit_chunk(chunk) end
 
-    info.editor_num = PARAM.hn_thing_start_offset
+    info.editor_num = OB_CONFIG.hn_thing_start_offset
     for _,chunk in pairs(R.closets) do
       if chunk.prefab_def then
         info.name = "Closet: " .. chunk.prefab_def.name
-        info.editor_num = PARAM.hn_thing_start_offset
+        info.editor_num = OB_CONFIG.hn_thing_start_offset
 
         if chunk.from_area.floor_group and chunk.from_area.floor_group.wall_group then
           info.name = info.name .. " (Wall Group: " ..
@@ -1878,8 +1878,8 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
           SCRIPTS.hn_id_table[info.name] = {}
           SCRIPTS.hn_id_table[info.name].id = info.editor_num
           SCRIPTS.hn_id_table[info.name].name = info.name
-          info.editor_num = PARAM.hn_thing_start_offset
-          PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+          info.editor_num = OB_CONFIG.hn_thing_start_offset
+          OB_CONFIG.hn_thing_start_offset = OB_CONFIG.hn_thing_start_offset + 1
         end
 
         if chunk.from_dir == 8 then
@@ -1894,10 +1894,10 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       end
     end
 
-    info.editor_num = PARAM.hn_thing_start_offset
+    info.editor_num = OB_CONFIG.hn_thing_start_offset
     for _,chunk in pairs(R.joiners) do
       info.name = "Joiner: " .. chunk.prefab_def.name
-      info.editor_num = PARAM.hn_thing_start_offset
+      info.editor_num = OB_CONFIG.hn_thing_start_offset
 
       if SCRIPTS.hn_id_table[info.name] then
         info.editor_num = SCRIPTS.hn_id_table[info.name].id
@@ -1905,8 +1905,8 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
         SCRIPTS.hn_id_table[info.name] = {}
         SCRIPTS.hn_id_table[info.name].id = info.editor_num
         SCRIPTS.hn_id_table[info.name].name = info.name
-        info.editor_num = PARAM.hn_thing_start_offset
-        PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+        info.editor_num = OB_CONFIG.hn_thing_start_offset
+        OB_CONFIG.hn_thing_start_offset = OB_CONFIG.hn_thing_start_offset + 1
       end
 
       if chunk.from_dir == 2 or chunk.from_dir == 8 then
@@ -1945,7 +1945,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
         hn_add_entity(info, x - (chunk.sw * SEED_SIZE) + 64, y, z2 + 1)
       end
     end
-    info.editor_num = PARAM.hn_thing_start_offset
+    info.editor_num = OB_CONFIG.hn_thing_start_offset
     --for _,chunk in pairs(R.pieces ) do visit_chunk(chunk) end
   end
 
@@ -1954,8 +1954,8 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     local info = {}
 
     -- pick different info classes
-    if PARAM.hn_info_type == "hn_info_debug" 
-    or PARAM.hn_info_type == "hn_info_debug_prefabs" then
+    if OB_CONFIG.hn_info_type == "hn_info_debug" 
+    or OB_CONFIG.hn_info_type == "hn_info_debug_prefabs" then
       info.name = fetch_room_shapes(R)
     else
       info.name = R.zone.hn_name
@@ -1964,7 +1964,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       info.name = "Location: " .. info.name .. fetch_room_goal(R)
     end
 
-    info.editor_num = PARAM.hn_thing_start_offset
+    info.editor_num = OB_CONFIG.hn_thing_start_offset
 
     local x_span = (R.sx2 - R.sx1) * SEED_SIZE
     local y_span = (R.sy2 - R.sy1) * SEED_SIZE
@@ -1972,7 +1972,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     info.radius = (x_span + y_span)/2
     info.env = R:get_env()
 
-    PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+    OB_CONFIG.hn_thing_start_offset = OB_CONFIG.hn_thing_start_offset + 1
 
     local prefered_S = find_closest_seed_to_center(R)
     if not prefered_S then return end
@@ -1994,10 +1994,10 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     generate_name(Z)
   end
 
-  PARAM.hn_secret_count = 1
+  OB_CONFIG.hn_secret_count = 1
   for _,R in pairs(LEVEL.rooms) do
     make_room_info(R)
-    if PARAM.hn_info_type == "hn_info_debug_prefabs" then
+    if OB_CONFIG.hn_info_type == "hn_info_debug_prefabs" then
       make_prefab_info(R)
     end
   end
@@ -2013,7 +2013,7 @@ function MODDED_GAME_EXTRAS.generate_hn_decorate()
     table.add_unique(HN_INFO_TABLE, s_tab)
   end
 
-  if PARAM.bool_hn_markers == 0 then
+  if OB_CONFIG.bool_hn_markers == 0 then
     return
   end
 

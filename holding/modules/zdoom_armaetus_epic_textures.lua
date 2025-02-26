@@ -657,7 +657,7 @@ actor AssIsHell : Inventory
 
 function OBS_RESOURCE_PACK_EPIC_TEXTURES.setup(self)
 
-  PARAM.obsidian_resource_pack_active = true
+  OB_CONFIG.obsidian_resource_pack_active = true
   module_param_up(self)
   OBS_RESOURCE_PACK_EPIC_TEXTURES.put_new_materials()
   OBS_RESOURCE_PACK_EPIC_TEXTURES.synthesize_procedural_themes()
@@ -665,7 +665,7 @@ end
 
 
 function OBS_RESOURCE_PACK_EPIC_TEXTURES.synthesize_procedural_themes()
-  if PARAM.bool_orp_room_theme_synthesizer == false then
+  if OB_CONFIG.bool_orp_room_theme_synthesizer == false then
     return
   end
 
@@ -706,7 +706,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.synthesize_procedural_themes()
     end
 
     t.env = "building"
-    t.prob = rand.pick({20,30,40,50,60}) * PARAM.float_orp_room_theme_synth_mult
+    t.prob = rand.pick({20,30,40,50,60}) * OB_CONFIG.float_orp_room_theme_synth_mult
 
     t.floors[pick_element(theme, "floors")] = 5
     t.floors[pick_element(theme, "floors")] = 5
@@ -739,7 +739,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.get_levels_after_themes()
 
   table.deep_merge(GAME.ENTITIES, ORP_ENTITIES.ENTITIES)
 
-  if PARAM.bool_include_custom_actors ~= 1 then
+  if OB_CONFIG.bool_include_custom_actors ~= 1 then
     if not THEME.entity_remap then
       THEME.entity_remap = {}
     end
@@ -794,17 +794,17 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.decide_environment_themes()
   -- Essentially, when "Temperate" is the selected theme, the
   -- environment theme code simply just doesn't run.
 
-  if PARAM.environment_themes == "no" then return end
+  if OB_CONFIG.environment_themes == "no" then return end
 
   -- pick a random environment
-  if PARAM.environment_themes == "random" then
+  if OB_CONFIG.environment_themes == "random" then
     for _,L in pairs(GAME.levels) do
       L.outdoor_theme = rand.pick({"temperate","snow","desert"})
     end
   end
 
   -- just like a bit mixed - every 2-6 levels, the theme will change
-  if PARAM.environment_themes == "mixed" then
+  if OB_CONFIG.environment_themes == "mixed" then
     local previous_theme
     local outdoor_theme_along
 
@@ -835,28 +835,28 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.decide_environment_themes()
   end
 
   -- -ish environment themes
-  if PARAM.environment_themes == "snowish" then
+  if OB_CONFIG.environment_themes == "snowish" then
     for _,L in pairs(GAME.levels) do
       L.outdoor_theme = rand.pick({"temperate","snow"})
     end
-  elseif PARAM.environment_themes == "desertish" then
+  elseif OB_CONFIG.environment_themes == "desertish" then
     for _,L in pairs(GAME.levels) do
       L.outdoor_theme = rand.pick({"temperate","desert"})
     end
   end
 
   -- absolutes
-  if PARAM.environment_themes == "snow" then
+  if OB_CONFIG.environment_themes == "snow" then
     for _,L in pairs(GAME.levels) do
       L.outdoor_theme = "snow"
     end
-  elseif PARAM.environment_themes == "desert" then
+  elseif OB_CONFIG.environment_themes == "desert" then
     for _,L in pairs(GAME.levels) do
       L.outdoor_theme = "desert"
     end
   end
 
-  if PARAM.environment_themes == "episodic" then
+  if OB_CONFIG.environment_themes == "episodic" then
     local prev_theme
 
     for _,E in pairs(GAME.episodes) do
@@ -879,7 +879,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.decide_environment_themes()
     end
   end
 
-  if PARAM.bool_no_env_theme_for_hell == 1 then
+  if OB_CONFIG.bool_no_env_theme_for_hell == 1 then
     for _,L in pairs(GAME.levels) do
       if L.theme_name == "hell" then
         L.outdoor_theme = "temperate"
@@ -911,7 +911,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.generate_environment_themes(self, LEVEL
     end
   end
 
-  if PARAM.bool_jump_crouch == 0 then
+  if OB_CONFIG.bool_jump_crouch == 0 then
     if THEME.wide_halls then
       THEME.wide_halls.organs = 0
       THEME.wide_halls.conveyorh = 0
@@ -919,34 +919,34 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.generate_environment_themes(self, LEVEL
   end
 
   -- initialize default tables
-  if not PARAM.default_environment_themes_init then
+  if not OB_CONFIG.default_environment_themes_init then
     -- Doom 2
     if OB_CONFIG.game == "doom2" then
       -- floors
-      PARAM.def_tech_floors = GAME.ROOM_THEMES.tech_Outdoors_generic.floors
-      PARAM.def_urban_floors = GAME.ROOM_THEMES.urban_Outdoors_generic.floors
-      PARAM.def_hell_floors = GAME.ROOM_THEMES.hell_Outdoors_generic.floors
+      OB_CONFIG.def_tech_floors = GAME.ROOM_THEMES.tech_Outdoors_generic.floors
+      OB_CONFIG.def_urban_floors = GAME.ROOM_THEMES.urban_Outdoors_generic.floors
+      OB_CONFIG.def_hell_floors = GAME.ROOM_THEMES.hell_Outdoors_generic.floors
       -- naturals
-      PARAM.def_tech_naturals = GAME.ROOM_THEMES.tech_Outdoors_generic.naturals
-      PARAM.def_urban_naturals = GAME.ROOM_THEMES.urban_Outdoors_generic.naturals
-      PARAM.def_hell_naturals = GAME.ROOM_THEMES.hell_Outdoors_generic.naturals
+      OB_CONFIG.def_tech_naturals = GAME.ROOM_THEMES.tech_Outdoors_generic.naturals
+      OB_CONFIG.def_urban_naturals = GAME.ROOM_THEMES.urban_Outdoors_generic.naturals
+      OB_CONFIG.def_hell_naturals = GAME.ROOM_THEMES.hell_Outdoors_generic.naturals
 
     -- Doom 1
     elseif OB_CONFIG.game == "doom1"
     or OB_CONFIG.game == "ultdoom" then
       -- floors
-      PARAM.def_tech_floors = GAME.ROOM_THEMES.tech_Outdoors.floors
-      PARAM.def_deimos_floors = GAME.ROOM_THEMES.deimos_Outdoors.floors
-      PARAM.def_hell_floors = GAME.ROOM_THEMES.hell_Outdoors.floors
-      PARAM.def_flesh_floors = GAME.ROOM_THEMES.flesh_Outdoors.floors
+      OB_CONFIG.def_tech_floors = GAME.ROOM_THEMES.tech_Outdoors.floors
+      OB_CONFIG.def_deimos_floors = GAME.ROOM_THEMES.deimos_Outdoors.floors
+      OB_CONFIG.def_hell_floors = GAME.ROOM_THEMES.hell_Outdoors.floors
+      OB_CONFIG.def_flesh_floors = GAME.ROOM_THEMES.flesh_Outdoors.floors
       -- naturals
-      PARAM.def_tech_naturals = GAME.ROOM_THEMES.tech_Outdoors.naturals
-      PARAM.def_deimos_naturals = GAME.ROOM_THEMES.deimos_Outdoors.naturals
-      PARAM.def_hell_naturals = GAME.ROOM_THEMES.hell_Outdoors.naturals
-      PARAM.def_flesh_naturals = GAME.ROOM_THEMES.flesh_Outdoors.naturals
+      OB_CONFIG.def_tech_naturals = GAME.ROOM_THEMES.tech_Outdoors.naturals
+      OB_CONFIG.def_deimos_naturals = GAME.ROOM_THEMES.deimos_Outdoors.naturals
+      OB_CONFIG.def_hell_naturals = GAME.ROOM_THEMES.hell_Outdoors.naturals
+      OB_CONFIG.def_flesh_naturals = GAME.ROOM_THEMES.flesh_Outdoors.naturals
     end
 
-    PARAM.default_environment_themes_init = true
+    OB_CONFIG.default_environment_themes_init = true
   end
 
   -- checking in on custom outdoors
@@ -982,12 +982,12 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.generate_environment_themes(self, LEVEL
       GAME.ROOM_THEMES.hell_Outdoors_generic.floors = sand_hell_floors
       GAME.ROOM_THEMES.hell_Outdoors_generic.naturals = sand_naturals
     elseif LEVEL.outdoor_theme == "temperate" then
-      GAME.ROOM_THEMES.tech_Outdoors_generic.floors = PARAM.def_tech_floors
-      GAME.ROOM_THEMES.tech_Outdoors_generic.naturals = PARAM.def_tech_naturals
-      GAME.ROOM_THEMES.urban_Outdoors_generic.floors = PARAM.def_urban_floors
-      GAME.ROOM_THEMES.urban_Outdoors_generic.naturals = PARAM.def_urban_naturals
-      GAME.ROOM_THEMES.hell_Outdoors_generic.floors = PARAM.def_hell_floors
-      GAME.ROOM_THEMES.hell_Outdoors_generic.naturals = PARAM.def_hell_naturals
+      GAME.ROOM_THEMES.tech_Outdoors_generic.floors = OB_CONFIG.def_tech_floors
+      GAME.ROOM_THEMES.tech_Outdoors_generic.naturals = OB_CONFIG.def_tech_naturals
+      GAME.ROOM_THEMES.urban_Outdoors_generic.floors = OB_CONFIG.def_urban_floors
+      GAME.ROOM_THEMES.urban_Outdoors_generic.naturals = OB_CONFIG.def_urban_naturals
+      GAME.ROOM_THEMES.hell_Outdoors_generic.floors = OB_CONFIG.def_hell_floors
+      GAME.ROOM_THEMES.hell_Outdoors_generic.naturals = OB_CONFIG.def_hell_naturals
     end
   -- MSSP-TODO: check cliff mats for Doom1
   elseif OB_CONFIG.game == "doom1"
@@ -1011,14 +1011,14 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.generate_environment_themes(self, LEVEL
       GAME.ROOM_THEMES.flesh_Outdoors.floors = snow_urban_floors
       GAME.ROOM_THEMES.flesh_Outdoors.naturals = sand_naturals
     elseif LEVEL.outdoor_theme == "temperate" then
-      GAME.ROOM_THEMES.tech_Outdoors.floors = PARAM.def_tech_floors
-      GAME.ROOM_THEMES.tech_Outdoors.naturals = PARAM.def_tech_naturals
-      GAME.ROOM_THEMES.deimos_Outdoors.floors = PARAM.def_deimos_floors
-      GAME.ROOM_THEMES.deimos_Outdoors.naturals = PARAM.def_deimos_naturals
-      GAME.ROOM_THEMES.hell_Outdoors.floors = PARAM.def_hell_naturals
-      GAME.ROOM_THEMES.hell_Outdoors.naturals = PARAM.def_hell_naturals
-      GAME.ROOM_THEMES.flesh_Outdoors.floors = PARAM.def_flesh_naturals
-      GAME.ROOM_THEMES.flesh_Outdoors.naturals = PARAM.def_flesh_naturals
+      GAME.ROOM_THEMES.tech_Outdoors.floors = OB_CONFIG.def_tech_floors
+      GAME.ROOM_THEMES.tech_Outdoors.naturals = OB_CONFIG.def_tech_naturals
+      GAME.ROOM_THEMES.deimos_Outdoors.floors = OB_CONFIG.def_deimos_floors
+      GAME.ROOM_THEMES.deimos_Outdoors.naturals = OB_CONFIG.def_deimos_naturals
+      GAME.ROOM_THEMES.hell_Outdoors.floors = OB_CONFIG.def_hell_naturals
+      GAME.ROOM_THEMES.hell_Outdoors.naturals = OB_CONFIG.def_hell_naturals
+      GAME.ROOM_THEMES.flesh_Outdoors.floors = OB_CONFIG.def_flesh_naturals
+      GAME.ROOM_THEMES.flesh_Outdoors.naturals = OB_CONFIG.def_flesh_naturals
     end
   end
 
@@ -1049,7 +1049,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.put_new_materials()
 
     -- put the custom theme definitions in the themes table!!!
     -- LIQUIDZ
-    if PARAM.bool_custom_liquids == 1 then
+    if OB_CONFIG.bool_custom_liquids == 1 then
       GAME.THEMES = table.deep_merge(GAME.THEMES, OBS_RESOURCE_PACK_LIQUIDS, 2)
     end
 
@@ -1070,7 +1070,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.put_new_materials()
 
     -- put the custom theme definitions in the themes table!!!
     -- LIQUIDZ
-    if PARAM.bool_custom_liquids == 1 then
+    if OB_CONFIG.bool_custom_liquids == 1 then
       GAME.THEMES = table.deep_merge(GAME.THEMES, OBS_RESOURCE_PACK_DOOM1_LIQUIDS, 2)
     end
 
@@ -1104,7 +1104,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.put_new_materials()
     GAME.THEMES.flesh.wide_halls = OBS_RESOURCE_PACK_HELL_WIDE_HALLS
   end
 
-  if PARAM.bool_include_generative_AI_textures == 1 then
+  if OB_CONFIG.bool_include_generative_AI_textures == 1 then
     GAME.MATERIALS = table.deep_merge(GAME.MATERIALS, OBS_RESOURCE_PACK_GENAI_MATERIALS, 2)
     GAME.ROOM_THEMES = table.deep_merge(GAME.ROOM_THEMES, OBS_RESOURCE_PACK_GENAI_ROOM_THEMES, 2)
     GAME.THEMES = table.deep_merge(GAME.THEMES, OBS_RESOURCE_PACK_GENAI_THEMES, 2)
@@ -1116,7 +1116,7 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.put_the_texture_wad_in()
   local wad_file_2 = "games/doom/data/ObAddon_Textures_2.wad"
   local wad_file_3 = "games/doom/data/ObAddon_Textures_3.wad"
 
-  if PARAM.bool_include_package == 1 then
+  if OB_CONFIG.bool_include_package == 1 then
     SCRIPTS.animdefs = ScriptMan_combine_script(SCRIPTS.animdefs, OBS_RESOURCE_PACK_ANIMDEFS)
 
     gui.wad_transfer_lump(wad_file, "CREDITS", "CREDITS")
@@ -1190,17 +1190,17 @@ function OBS_RESOURCE_PACK_EPIC_TEXTURES.put_the_texture_wad_in()
     gui.wad_add_binary_lump("HI_END",{})
   end
 
-  if PARAM.custom_trees ~= "no" then
+  if OB_CONFIG.custom_trees ~= "no" then
     wad_file = "modules/zdoom_internal_scripts/ObAddon_trees.wad"
     gui.wad_merge_sections(wad_file)
   end
 
-  if PARAM.bool_include_brightmaps == 1 then
+  if OB_CONFIG.bool_include_brightmaps == 1 then
     wad_file = "games/doom/data/ObAddon_Textures_Brightmaps.wad"
     gui.wad_merge_sections(wad_file)
   end
 
-  if PARAM.bool_include_custom_actors == 1 then
+  if OB_CONFIG.bool_include_custom_actors == 1 then
     SCRIPTS.decorate = ScriptMan_combine_script(SCRIPTS.decorate, ORP_ENTITIES.DECORATE)
     wad_file = "games/doom/data/blood_pack.wad"
     gui.wad_merge_sections(wad_file)

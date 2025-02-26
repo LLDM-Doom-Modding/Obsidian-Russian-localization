@@ -417,25 +417,20 @@ function Item_simulate_battle(LEVEL, R)
     local heal_mul = HEALTH_FACTORS[OB_CONFIG.health]
     local ammo_mul =   AMMO_FACTORS[OB_CONFIG.ammo]
 
-    heal_mul = heal_mul * (PARAM.health_factor or 1)
-    ammo_mul = ammo_mul * (PARAM.ammo_factor or 1)
+    heal_mul = heal_mul * (OB_CONFIG.health_factor or 1)
+    ammo_mul = ammo_mul * (OB_CONFIG.ammo_factor or 1)
 
-    if LEVEL.is_procedural_gotcha and PARAM.bool_boss_gen == 1 then
-      ammo_mul = ammo_mul * (PARAM.float_boss_gen_ammo * PARAM.float_boss_gen_mult)
-      heal_mul = heal_mul * PARAM.float_boss_gen_heal
+    if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 then
+      ammo_mul = ammo_mul * (OB_CONFIG.float_boss_gen_ammo * OB_CONFIG.float_boss_gen_mult)
+      heal_mul = heal_mul * OB_CONFIG.float_boss_gen_heal
     end
 
     -- give less ammo in later maps (to counter the build-up over an episode)
-    if PARAM.bool_pistol_starts == 0 then
+    if OB_CONFIG.pistol_starts == "no" then
       local along = math.clamp(0, LEVEL.ep_along - 0.2, 0.8)
       local factor = 1.1 - along * 0.25
 
       ammo_mul = ammo_mul * factor
-    end
-
-    if PARAM.bool_scale_items_with_map_size and PARAM.bool_scale_items_with_map_size == 1 then
-      heal_mul = heal_mul * (1 + (LEVEL.map_W / 75))
-      ammo_mul = ammo_mul * (1 + (LEVEL.map_W / 75))
     end
 
     for name,qty in pairs(stats) do
@@ -499,7 +494,7 @@ function Item_simulate_battle(LEVEL, R)
       end
     end
 
-    if PARAM.bool_pistol_starts == 0 then
+    if OB_CONFIG.pistol_starts == "no" then
       -- allow weapons from previous levels
       for name,_ in pairs(EPISODE.seen_weapons) do
         if not seen[name] then
@@ -726,7 +721,7 @@ function Item_pickups_for_class(LEVEL, CL)
   local function place_item(item_name, x, y, z)
     local props = {}
 
-    if PARAM.use_spawnflags then
+    if OB_CONFIG.use_spawnflags then
       -- no change
     else
       props.flags = DOOM_FLAGS.EASY + DOOM_FLAGS.MEDIUM + DOOM_FLAGS.HARD
@@ -901,17 +896,13 @@ function Item_pickups_for_class(LEVEL, CL)
       end
     end
 
-    if PARAM.float_strength == 12 then
+    if OB_CONFIG.mons_strength == "12" then
       bonus = bonus * 2
     end
 
     -- compensation for environmental hazards
     if stat == "health" and R.hazard_health then
       bonus = bonus + R.hazard_health * HEALTH_FACTORS[OB_CONFIG.health]
-    end
-
-    if PARAM.bool_scale_items_with_map_size and PARAM.bool_scale_items_with_map_size == 1 then
-      bonus = bonus * (1 + (LEVEL.map_W / 75))
     end
 
     return bonus

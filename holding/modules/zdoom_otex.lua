@@ -636,7 +636,7 @@ OBLODA01
 ]]
 
 function OTEX_PROC_MODULE.setup(self)
-  PARAM.OTEX_module_activated = true
+  OB_CONFIG.OTEX_module_activated = true
   module_param_up(self)
   OTEX_PROC_MODULE.synthesize_procedural_themes()
 end
@@ -812,7 +812,7 @@ function OTEX_PROC_MODULE.synthesize_procedural_themes()
   {
     "tech","hell","urban"
   }
-  for i = 1, PARAM.float_otex_num_themes * 0.75 do
+  for i = 1, OB_CONFIG.float_otex_num_themes * 0.75 do
     for _,T in pairs(themes) do
       local grouping, room_theme = {}
       local tab_pick, tex_pick, RT_name
@@ -821,7 +821,7 @@ function OTEX_PROC_MODULE.synthesize_procedural_themes()
       room_theme =
       {
         env = "building",
-        prob = rand.pick({40,50,60}) * PARAM.float_otex_rt_prob_mult,
+        prob = rand.pick({40,50,60}) * OB_CONFIG.float_otex_rt_prob_mult,
         name = RT_name
       }
       room_theme.walls = {}
@@ -859,7 +859,7 @@ function OTEX_PROC_MODULE.synthesize_procedural_themes()
   end
 
   -- try a completely random theme
-  for i = 1, PARAM.float_otex_num_themes * 0.25 do
+  for i = 1, OB_CONFIG.float_otex_num_themes * 0.25 do
     local RT_name = "any_OTEX_random_" .. i .. "_"
     local room_theme, tab_pick = {}
     local tex_pick

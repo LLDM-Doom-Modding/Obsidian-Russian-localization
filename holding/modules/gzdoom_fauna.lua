@@ -338,11 +338,11 @@ function FAUNA_MODULE.end_level(self, LEVEL)
 
   if LEVEL.prebuilt then return end
 
-  if PARAM.bool_flies == 1 then
+  if OB_CONFIG.bool_flies == 1 then
     FAUNA_MODULE.add_flies(LEVEL)
   end
 
-  if PARAM.bool_rats == 1 then
+  if OB_CONFIG.bool_rats == 1 then
     FAUNA_MODULE.add_rats(LEVEL)
   end
 
@@ -465,11 +465,11 @@ end
 
 
 function FAUNA_MODULE.all_done()
-  if PARAM.bool_flies == 1 or PARAM.bool_rats == 1 then
+  if OB_CONFIG.bool_flies == 1 or OB_CONFIG.bool_rats == 1 then
     SCRIPTS.fauna_SNDINFO = FAUNA_MODULE.SNDINFO
   end
 
-  if PARAM.bool_flies == 1 then
+  if OB_CONFIG.bool_flies == 1 then
     SCRIPTS.zscript = ScriptMan_combine_script(SCRIPTS.zscript, FAUNA_MODULE.ZSC)
     SCRIPTS.doomednums = ScriptMan_combine_script(SCRIPTS.doomednums, FAUNA_MODULE.DOOMEDNUMS)
 
@@ -478,7 +478,7 @@ function FAUNA_MODULE.all_done()
     gui.wad_insert_file(dir .. "sounds/FLYBUZZ.ogg", "FLYBUZZ")
   end
 
-  if PARAM.bool_rats == 1 then
+  if OB_CONFIG.bool_rats == 1 then
     SCRIPTS.decorate = ScriptMan_combine_script(SCRIPTS.decorate, FAUNA_MODULE.DEC)
 
     local dir = "games/doom/data/"

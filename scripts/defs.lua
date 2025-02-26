@@ -22,7 +22,6 @@
 
 -- important global tables
 GAME   = {}
-PARAM  = {}
 STYLE  = {}
 THEME  = {}
 
@@ -121,6 +120,14 @@ LENGTH_CHOICES =
 -- size of each seed square
 SEED_SIZE = 128
 
+-- largest map size
+SEED_W    = 90 --112
+SEED_H    = 90 --112
+-- MSSP: the absolute maximum size is tightened down to the largest
+-- agreed map size for performance's sake. Current agreed maximum is 74 W.
+-- any higher will cause skyboxes and teleporter rooms to start merging with
+-- the main map.
+
 -- highest possible Z coord (and lowest, when negative)
 EXTREME_H = 32000
 
@@ -155,27 +162,6 @@ MONSTER_QUANTITIES =
   chaotic = 5.5,
   unhinged = 6.0,
   ludicrous = 6.66
-}
-
-MONSTER_KIND_TAB =
-{
-  none   = 0.1,
-  rarest = 0.25,
-  rarer  = 0.5,
-  rare   = 0.75,
-  scarce = 1.0,
-  few    = 1.33,
-  less   = 1.6,
-  normal = 1.9,
-  more   = 2.0,
-  heaps  = 2.0,
-  legions = 2.0,
-  insane = 2.0,
-  deranged = 2.0,
-  nuts   = 2.0,
-  chaotic = 2.0,
-  unhinged = 2.0,
-  ludicrous = 2.0
 }
 
 -- weapon max_damage thresholds
@@ -555,6 +541,12 @@ STYLE_CHOICES =
   "more",   _("More"),
   "heaps",  _("Heaps"),
   "mixed",  _("Mix It Up")
+}
+
+YES_NO_CHOICES =
+{
+  "no",  _("No"),
+  "yes", _("Yes"),
 }
 
 

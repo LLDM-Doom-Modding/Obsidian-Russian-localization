@@ -527,7 +527,7 @@ CHEX1.THEMES =
 function CHEX1.slump_setup()
   if ob_match_game({game = {chex1=1}}) then
     if OB_CONFIG.theme == "default" then
-      PARAM.slump_config = CHEX1.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = CHEX1.THEMES.DEFAULTS.slump_config
     elseif OB_CONFIG.theme == "jumble" then
       local possible_configs = {}
       for _,tab in pairs(CHEX1.THEMES) do
@@ -535,11 +535,11 @@ function CHEX1.slump_setup()
           table.insert(possible_configs, tab.slump_config)
         end
       end
-      PARAM.slump_config = rand.pick(possible_configs)
+      OB_CONFIG.slump_config = rand.pick(possible_configs)
     elseif CHEX1.THEMES[OB_CONFIG.theme].slump_config then
-      PARAM.slump_config = CHEX1.THEMES[OB_CONFIG.theme].slump_config
+      OB_CONFIG.slump_config = CHEX1.THEMES[OB_CONFIG.theme].slump_config
     else
-      PARAM.slump_config = CHEX1.THEMES.DEFAULTS.slump_config
+      OB_CONFIG.slump_config = CHEX1.THEMES.DEFAULTS.slump_config
     end
   end
 end

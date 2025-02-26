@@ -220,7 +220,7 @@ ZDOOM_SPECIALS.FOG_COLORS =
 }
 
 function ZDOOM_SPECIALS.setup(self)
-  PARAM.zdoom_specials_active = true
+  OB_CONFIG.zdoom_specials_active = true
   module_param_up(self)
 end
 
@@ -242,7 +242,7 @@ function ZDOOM_SPECIALS.shuffle_music()
     music_table = ZDOOM_SPECIALS.MUSIC_DOOM2
   end
 
-  if PARAM.mapinfo_music_shuffler == "merge_d1_d2" then
+  if OB_CONFIG.mapinfo_music_shuffler == "merge_d1_d2" then
     music_table = ZDOOM_SPECIALS.MUSIC_DOOM
     local j
     for i,songs in pairs(ZDOOM_SPECIALS.MUSIC_DOOM2) do
@@ -250,7 +250,7 @@ function ZDOOM_SPECIALS.shuffle_music()
     end
   end
 
-  if PARAM.mapinfo_music_shuffler ~= "no" then
+  if OB_CONFIG.mapinfo_music_shuffler ~= "no" then
     -- extra code for UltDoom music shuffling - replace the
     -- entries for the last episode with anything else to make sure
     -- there's no bias in picking songs
@@ -275,14 +275,10 @@ function ZDOOM_SPECIALS.do_special_stuff()
 
   local level_count = #GAME.levels
 
-  if PARAM.float_full_game_length and OB_CONFIG.length == "full" then
-    level_count = PARAM.float_full_game_length
-  end
-
   local function pick_sky_color_from_skygen_map(epi_num)
     local color = "00 00 00"
 
-    local skyname = PARAM.episode_sky_color[epi_num]
+    local skyname = OB_CONFIG.episode_sky_color[epi_num]
 
     if ZDOOM_SPECIALS.FOG_COLORS[skyname] then
       color = ZDOOM_SPECIALS.FOG_COLORS[skyname] 
@@ -365,7 +361,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
 
     -- resolve proper episodic sky texture assignments
     if OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" then
-      if PARAM.sky_generator_active then
+      if OB_CONFIG.sky_generator_active then
         if map_num <= 11 then
           sky_tex = "O_D2SKY1"
         elseif map_num > 11 and map_num <= 20 then
@@ -394,7 +390,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
       end
     end
 
-    if PARAM.fireblu_mode == "enable" then
+    if OB_CONFIG.fireblu_mode == "enable" then
       sky_tex = "FIREBLU1"
     end
 
@@ -476,35 +472,35 @@ function ZDOOM_SPECIALS.do_special_stuff()
     local fog_intensity = "48"
 
     -- resolve fog intensity
-    if PARAM.fog_intensity == "subtle" then
+    if OB_CONFIG.fog_intensity == "subtle" then
       fog_intensity = "16"
-    elseif PARAM.fog_intensity == "misty" then
+    elseif OB_CONFIG.fog_intensity == "misty" then
       fog_intensity = "48"
-    elseif PARAM.fog_intensity == "smoky" then
+    elseif OB_CONFIG.fog_intensity == "smoky" then
       fog_intensity = "128"
-    elseif PARAM.fog_intensity == "foggy" then
+    elseif OB_CONFIG.fog_intensity == "foggy" then
       fog_intensity = "255"
-    elseif PARAM.fog_intensity == "dense" then
+    elseif OB_CONFIG.fog_intensity == "dense" then
       fog_intensity = "368"
-    elseif PARAM.fog_intensity == "mixed" then
+    elseif OB_CONFIG.fog_intensity == "mixed" then
       fog_intensity = "" .. rand.irange(16,368)
     end
 
     local fog_intensity_line = '  fogdensity = ' .. fog_intensity .. '\n'
 
     -- fog forced to outdoors only
-    if PARAM.fog_env == "outdoor" then
+    if OB_CONFIG.fog_env == "outdoor" then
       fog_color_line = '  OutsideFog  = "' .. fog_color .. '"\n'
       fog_intensity_line = '  outsidefogdensity = ' .. fog_intensity .. '\n'
     end
 
     -- if fog tints sky, based on ZDoom GL specs
-    if PARAM.bool_fog_affects_sky == 1 then
+    if OB_CONFIG.bool_fog_affects_sky == 1 then
       fog_intensity_line = fog_intensity_line .. '  skyfog = ' .. fog_intensity + 16 .. '\n'
     end
 
     -- no fog in MAPINFO at all if the fog generator is off
-    if PARAM.fog_generator == "no" then
+    if OB_CONFIG.fog_generator == "no" then
       fog_color_line = ""
       fog_intensity_line = ""
     end
@@ -512,7 +508,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
     -- add cluster linking for DOOM2,
     local cluster_line = ''
 
-    if PARAM.story_generator == "generic" then
+    if OB_CONFIG.story_generator == "generic" then
       if OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia"  then
         if map_num >= 1 and map_num <= 5 then
           cluster_line = "  Cluster = 5\n"
@@ -530,7 +526,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
           cluster_line = "  Cluster = 11\n"
         end
       end
-    elseif PARAM.story_generator == "proc" then
+    elseif OB_CONFIG.story_generator == "proc" then
       if OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia"  then
         if map_num >= 1 and map_num <= 5 then
           cluster_line = "  Cluster = 1\n"
@@ -598,14 +594,14 @@ function ZDOOM_SPECIALS.do_special_stuff()
       end
     end
 
-    if PARAM.bool_no_intermission == 1 then
+    if OB_CONFIG.bool_no_intermission == 1 then
       special_attributes = special_attributes .. '  nointermission\n'
     end
 
     special_attributes = special_attributes .. '  ClipMidTextures\n'
 
     local mapinfo =
-      'map ' .. map_id .. ' lookup ' .. PARAM.bex_map_prefix .. name_string_map_id ..'\n' ..
+      'map ' .. map_id .. ' lookup ' .. OB_CONFIG.bex_map_prefix .. name_string_map_id ..'\n' ..
       '{\n' ..
       --'  cluster = 1\n'
       '  sky1 = "' .. sky_tex .. '"\n' ..
@@ -626,9 +622,9 @@ function ZDOOM_SPECIALS.do_special_stuff()
   local function add_clusterdef(interpic)
     local clusterdef = ''
 
-    local cluster_music_line = '  music = "' .. PARAM.generic_intermusic .. '"\n'
+    local cluster_music_line = '  music = "' .. OB_CONFIG.generic_intermusic .. '"\n'
 
-    if ( OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" ) and PARAM.story_generator == "generic" then
+    if ( OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" ) and OB_CONFIG.story_generator == "generic" then
 
 
       clusterdef =
@@ -729,7 +725,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
         '}\n'
     end
 
-    if ( OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" ) and PARAM.story_generator == "proc" then
+    if ( OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" ) and OB_CONFIG.story_generator == "proc" then
       -- create cluster information
       clusterdef =
         'cluster 1\n' .. -- MAP01-MAP05
@@ -823,12 +819,12 @@ function ZDOOM_SPECIALS.do_special_stuff()
   local ipic = rand.key_by_probs(ZDOOM_SPECIALS.INTERPICS)
 
   -- collect lines for MAPINFO lump
-  PARAM.gameinfolump = {}
+  OB_CONFIG.gameinfolump = {}
 
-  if PARAM.bool_custom_quit_messages == 1 then
+  if OB_CONFIG.bool_custom_quit_messages == 1 then
     local gamedef_lines = add_gamedef()
     for _,line in pairs(gamedef_lines) do
-      table.insert(PARAM.gameinfolump,line)
+      table.insert(OB_CONFIG.gameinfolump,line)
     end
     ZStoryGen_quitmessages()
   end
@@ -838,12 +834,12 @@ function ZDOOM_SPECIALS.do_special_stuff()
     info.map_num = i
     info.interpic = ipic
 
-    if PARAM.fireblu_mode == "enable" then
+    if OB_CONFIG.fireblu_mode == "enable" then
       info.interpic = "OBDNLOAT"
     end
 
-    if PARAM.fog_generator == "per_sky_gen" then
-      if not PARAM.episode_sky_color then
+    if OB_CONFIG.fog_generator == "per_sky_gen" then
+      if not OB_CONFIG.episode_sky_color then
         gui.printf("WARNING: User set fog color to be set by Sky Generator " ..
         "but Sky Generator is turned off! Fog color will now match vanilla skies.\n")
         if OB_CONFIG.game == "doom2" or OB_CONFIG.game == "tnt" or OB_CONFIG.game == "plutonia" then
@@ -904,9 +900,9 @@ function ZDOOM_SPECIALS.do_special_stuff()
           end
         end
       end
-    elseif PARAM.fog_generator == "random" then
+    elseif OB_CONFIG.fog_generator == "random" then
       info.fog_color = pick_random_fog_color()
-    elseif PARAM.fog_generator == "natural" then
+    elseif OB_CONFIG.fog_generator == "natural" then
       local shades = 
       {
         "ff ff ff",
@@ -925,7 +921,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
   end
 
   -- lines for episode definition
-  if PARAM.bool_episode_selection == 1 then
+  if OB_CONFIG.bool_episode_selection == 1 then
 
     -- for Doom2 (yes, there's no Doom2 episode splitting)
     -- but there is from now on
@@ -955,14 +951,14 @@ function ZDOOM_SPECIALS.do_special_stuff()
   -- collect lines for the cluster information in MAPINFO
   SCRIPTS.mapinfolump = ScriptMan_combine_script(SCRIPTS.mapinfolump, add_clusterdef(ipic))
  
-  if PARAM.story_generator == "proc" then
+  if OB_CONFIG.story_generator == "proc" then
     -- language lump is written inside the story generator
     ZStoryGen_init()
   end
 
   -- insert custom music
-  if PARAM.story_generator ~= "none" then
-    if PARAM.generic_intermusic == "$MUSIC_DM2INT" then
+  if OB_CONFIG.story_generator ~= "none" then
+    if OB_CONFIG.generic_intermusic == "$MUSIC_DM2INT" then
       gui.wad_insert_file("games/doom/data/music/D_DM2INT.ogg","D_DM2INT")
     end
   end

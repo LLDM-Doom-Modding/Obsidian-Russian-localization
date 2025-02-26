@@ -60,19 +60,6 @@ DOOM.EPISODES =
 }
 
 
-DOOM.PREBUILT_LEVELS =
-{
-  MAP30 =
-  {
-    { prob=50, file="games/doom/data/boss2/icon1.wad", map="MAP30" },
-    { prob=50, file="games/doom/data/boss2/icon2.wad", map="MAP30" },
-    { prob=50, file="games/doom/data/boss2/icon3.wad", map="MAP01" },
-    { prob=50, file="games/doom/data/boss2/icon3.wad", map="MAP02" },
-    { prob=50, file="games/doom/data/boss2/icon3.wad", map="MAP03" }
-  }
-}
-
-
 --------------------------------------------------------------------
 
 function DOOM.themes_alts()
@@ -107,10 +94,6 @@ end
 
 function DOOM.get_levels()
   local MAP_LEN_TAB = { few=4, episode=11, game=32 }
-
-  if OB_CONFIG.length == "game" and PARAM.float_full_game_length then
-    MAP_LEN_TAB["game"] = PARAM.float_full_game_length
-  end
 
   local MAP_NUM = MAP_LEN_TAB[OB_CONFIG.length] or 1
 
@@ -174,6 +157,7 @@ function DOOM.get_levels()
       ep_along = ep_along,
       game_along = game_along
     }
+    assert(LEV)
 
     table.insert( EPI.levels, LEV)
     table.insert(GAME.levels, LEV)
@@ -209,111 +193,90 @@ function DOOM.get_levels()
       LEV.dist_to_end = 2
     end
 
-    -- prebuilt levels
-    local pb_name = LEV.name
-
-    if PARAM.bool_prebuilt_levels == 1 then
-      LEV.prebuilt = GAME.PREBUILT_LEVELS[LEV.name]
-    end
-
-    if LEV.prebuilt then
-      LEV.name_class = LEV.prebuilt.name_class or "BOSS"
-    end
-
     -- procedural gotcha management code
 
-    -- Prebuilts are to exist over procedural gotchas
-    -- this means procedural gotchas will not override
-    -- Icon of Sin for example if prebuilts are still on
-    if not LEV.prebuilt then
+    --handling for the Final Only option
+    if OB_CONFIG.gotcha_frequency == "final" then
+      if OB_CONFIG.length == "single" then
+        if map == 1 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "few" then
+        if map == 4 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "episode" then
+        if map == 11 then LEV.is_procedural_gotcha = true end
+      elseif OB_CONFIG.length == "game" then
+        if map == 30 then LEV.is_procedural_gotcha = true end
+      end
+    end
 
-      --handling for the Final Only option
-      if PARAM.gotcha_frequency == "final" then
-        if OB_CONFIG.length == "single" then
-          if map == 1 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "few" then
-          if map == 4 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "episode" then
-          if map == 11 then LEV.is_procedural_gotcha = true end
-        elseif OB_CONFIG.length == "game" then
-          if map == 30 then LEV.is_procedural_gotcha = true end
-        end
+    --every 10 maps
+    if OB_CONFIG.gotcha_frequency == "epi" then
+      if map == 11 or map == 20 or map == 30 then
+        LEV.is_procedural_gotcha = true
       end
-
-      --every 10 maps
-      if PARAM.gotcha_frequency == "epi" then
-        if map == 11 or map == 20 or map == 30 then
-          LEV.is_procedural_gotcha = true
-        end
+    end
+    if OB_CONFIG.gotcha_frequency == "2epi" then
+      if map == 5 or map == 11 or map == 16 or map == 20 or map == 25 or map == 30 then
+        LEV.is_procedural_gotcha = true
       end
-      if PARAM.gotcha_frequency == "2epi" then
-        if map == 5 or map == 11 or map == 16 or map == 20 or map == 25 or map == 30 then
-          LEV.is_procedural_gotcha = true
-        end
+    end
+    if OB_CONFIG.gotcha_frequency == "3epi" then
+      if map == 3 or map == 7 or map == 11 or map == 14 or map == 17 or map == 20 or map == 23 or map == 27 or map == 30 then
+        LEV.is_procedural_gotcha = true
       end
-      if PARAM.gotcha_frequency == "3epi" then
-        if map == 3 or map == 7 or map == 11 or map == 14 or map == 17 or map == 20 or map == 23 or map == 27 or map == 30 then
-          LEV.is_procedural_gotcha = true
-        end
-      end
-      if PARAM.gotcha_frequency == "4epi" then
-        if map == 3 or map == 6 or map == 9 or map == 11 or map == 14 or map == 16 or map == 18 or map == 20 or map == 23 or map == 26 or map == 28 or map == 30 then
-          LEV.is_procedural_gotcha = true
-        end
-      end
-
-      --5% of maps after map 4,
-      if PARAM.gotcha_frequency == "5p" then
-        if map > 4 and map ~= 15 and map ~= 31 then
-          if rand.odds(5) then LEV.is_procedural_gotcha = true end
-        end
-      end
-
-      -- 10% of maps after map 4,
-      if PARAM.gotcha_frequency == "10p" then
-        if map > 4 and map ~= 15 and map ~= 31 then
-          if rand.odds(10) then LEV.is_procedural_gotcha = true end
-        end
-      end
-
-      -- for masochists... or debug testing
-      if PARAM.gotcha_frequency == "all" then
+    end
+    if OB_CONFIG.gotcha_frequency == "4epi" then
+      if map == 3 or map == 6 or map == 9 or map == 11 or map == 14 or map == 16 or map == 18 or map == 20 or map == 23 or map == 26 or map == 28 or map == 30 then
         LEV.is_procedural_gotcha = true
       end
     end
 
-    local special_mode = {}
-
-    if PARAM.float_streets_mode and rand.odds(PARAM.float_streets_mode) then
-      table.add_unique(special_mode, "streets")
-    end
- 
-    if PARAM.float_linear_mode and rand.odds(PARAM.float_linear_mode) then
-      table.add_unique(special_mode, "linear")
-    end
-
-    if PARAM.float_nature_mode and rand.odds(PARAM.float_nature_mode) then
-      table.add_unique(special_mode, "nature")
-    end
-
-    if not table.empty(special_mode) and not LEV.prebuilt then
-      local selected_mode = rand.pick(special_mode)
-      if selected_mode == "streets" then
-        LEV.has_streets = true
-        LEV.is_nature = false
-      else
-        LEV.has_streets = false
-        LEV.is_nature = true
+    --5% of maps after map 4,
+    if OB_CONFIG.gotcha_frequency == "5p" then
+      if map > 4 and map ~= 15 and map ~= 31 then
+        if rand.odds(5) then LEV.is_procedural_gotcha = true end
       end
+    end
+
+    -- 10% of maps after map 4,
+    if OB_CONFIG.gotcha_frequency == "10p" then
+      if map > 4 and map ~= 15 and map ~= 31 then
+        if rand.odds(10) then LEV.is_procedural_gotcha = true end
+      end
+    end
+
+    -- for masochists... or debug testing
+    if OB_CONFIG.gotcha_frequency == "all" then
+      LEV.is_procedural_gotcha = true
+    end
+
+  local special_mode = {}
+
+  if OB_CONFIG.float_streets_mode and rand.odds(OB_CONFIG.float_streets_mode) then
+    table.add_unique(special_mode, "streets")
+  end
+
+  if OB_CONFIG.float_linear_mode and rand.odds(OB_CONFIG.float_linear_mode) then
+    table.add_unique(special_mode, "linear")
+  end
+
+  if OB_CONFIG.float_nature_mode and rand.odds(OB_CONFIG.float_nature_mode) then
+    table.add_unique(special_mode, "nature")
+  end
+
+  if not table.empty(special_mode) then
+    local selected_mode = rand.pick(special_mode)
+    if selected_mode == "streets" then
+      LEV.has_streets = true
+      LEV.is_nature = false
     else
       LEV.has_streets = false
-      LEV.is_nature = false
+      LEV.is_nature = true
     end
-
-    if MAP_NUM == 1 or (map % 10) == 3 then
-      LEV.demo_lump = string.format("DEMO%d", ep_index)
-    end
+  else
+    LEV.has_streets = false
+    LEV.is_nature = false
   end
+end
 
   -- handle "dist_to_end" for FEW and EPISODE lengths
   if OB_CONFIG.length ~= "single" and OB_CONFIG.length ~= "game" then

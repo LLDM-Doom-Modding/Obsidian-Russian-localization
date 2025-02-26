@@ -126,7 +126,7 @@ function STORY_GEN.generate_story()
 
 --stderrf("num_lines = %d\n", num_lines)
 
-    if num_lines > PARAM.max_screen_lines then
+    if num_lines > OB_CONFIG.max_screen_lines then
       return false
     end
 

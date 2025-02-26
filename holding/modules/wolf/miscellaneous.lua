@@ -30,12 +30,6 @@ MISC_STUFF_WOLF_3D.ROOM_SIZE_MULTIPLIER_CHOICES =
   "mixed", _("Mix It Up")
 }
 
-function MISC_STUFF_WOLF_3D.setup(self)
-  
-  module_param_up(self)
-
-end
-
 OB_MODULES["misc_wolf_3d"] =
 {
 
@@ -50,7 +44,6 @@ OB_MODULES["misc_wolf_3d"] =
 
   hooks =
   {
-    setup = MISC_STUFF_WOLF_3D.setup,
     begin_level = MISC_STUFF_WOLF_3D.begin_level
   },
 

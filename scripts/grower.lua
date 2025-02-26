@@ -720,7 +720,7 @@ function Grower_preprocess_grammar(test_grammar)
 
       gui.printf("Preprocess shape grammars...\n")
 
-      PARAM.shape_rule_count = 0
+      OB_CONFIG.shape_rule_count = 0
 
       table.name_up(grammar)
 
@@ -733,7 +733,7 @@ function Grower_preprocess_grammar(test_grammar)
         if cur_def.is_processed then goto continue end
         cur_def.is_processed = true
 
-        PARAM.shape_rule_count = PARAM.shape_rule_count + 1 -- debug counter for amount of shape rules read
+        OB_CONFIG.shape_rule_count = OB_CONFIG.shape_rule_count + 1 -- debug counter for amount of shape rules read
 
         -- instantiate debug stats for growth
         GROWER_DEBUG_INFO[cur_def.name] =
@@ -779,7 +779,7 @@ function Grower_preprocess_grammar(test_grammar)
         ::continue::
       end
 
-      gui.printf(PARAM.shape_rule_count .. " rules loaded!\n")
+      gui.printf(OB_CONFIG.shape_rule_count .. " rules loaded!\n")
 
   end
 
@@ -866,14 +866,14 @@ function Grower_calc_rule_probs(LEVEL)
 
   ---| Grower_calc_rule_probs |---
 
-  PARAM.skipped_rules = 0
+  OB_CONFIG.skipped_rules = 0
 
   for _,rule in pairs(SHAPE_GRAMMAR) do
     if type(rule) == "table" then
       local new_prob = calc_prob(rule, LEVEL)
       rule.use_prob = new_prob
       if new_prob == 0 then
-        PARAM.skipped_rules = PARAM.skipped_rules + 1
+        OB_CONFIG.skipped_rules = OB_CONFIG.skipped_rules + 1
       end
 
       -- attempt to ignore hallway sprouts
@@ -882,7 +882,7 @@ function Grower_calc_rule_probs(LEVEL)
         and rule.new_room.env
         and rule.new_room.env == "hallway" then
           rule.use_prob = 0
-          PARAM.skipped_rules = PARAM.skipped_rules + 1
+          OB_CONFIG.skipped_rules = OB_CONFIG.skipped_rules + 1
         end
       end
     end
@@ -901,13 +901,13 @@ function Grower_calc_rule_probs(LEVEL)
     end
   end
 
-  gui.printf("Shape rules skipped for this level: " .. PARAM.skipped_rules ..
-  " / " .. PARAM.shape_rule_count .. "\n")
+  gui.printf("Shape rules skipped for this level: " .. OB_CONFIG.skipped_rules ..
+  " / " .. OB_CONFIG.shape_rule_count .. "\n")
   gui.printf("Rules can be disabled via skip probability or level styles.\n")
 
   -- Shape grouping system
-  PARAM.cur_shape_group = ""
-  PARAM.cur_shape_group_apply_count = 0
+  OB_CONFIG.cur_shape_group = ""
+  OB_CONFIG.cur_shape_group_apply_count = 0
 
   -- Layout Absurdifier (AKA Layout Consistency)
 
@@ -916,8 +916,8 @@ function Grower_calc_rule_probs(LEVEL)
   end
 
   if not LEVEL.is_procedural_gotcha and not LEVEL.is_nature and not LEVEL.has_streets then
-    if PARAM.float_layout_absurdity then
-      if rand.odds(PARAM.float_layout_absurdity) then
+    if OB_CONFIG.float_layout_absurdity then
+      if rand.odds(OB_CONFIG.float_layout_absurdity) then
         LEVEL.is_absurd = true
       end
     end
@@ -1076,8 +1076,8 @@ function Grower_decide_extents(LEVEL)
 
 
   if LEVEL.has_streets then
-    if PARAM.bool_appropriate_street_themes 
-    and PARAM.bool_appropriate_street_themes == 1 
+    if OB_CONFIG.bool_appropriate_street_themes 
+    and OB_CONFIG.bool_appropriate_street_themes == 1 
     and not LEVEL.theme.streets_friendly then
       LEVEL.has_streets = nil
     end
@@ -1159,7 +1159,7 @@ function Grower_decide_extents(LEVEL)
   -- specific instructions for procedural gotcha
 
   if LEVEL.is_procedural_gotcha == true then
-    if PARAM.bool_boss_gen == 1 then
+    if OB_CONFIG.bool_boss_gen == 1 then
       LEVEL.min_rooms = 1
       LEVEL.max_rooms = 1
     else
@@ -1184,9 +1184,9 @@ function Grower_decide_extents(LEVEL)
   end
 
   -- linear start code
-  if PARAM.linear_start 
-  and PARAM.linear_start ~= "default"
-  and PARAM.linear_start == "all" then
+  if OB_CONFIG.linear_start 
+  and OB_CONFIG.linear_start ~= "default"
+  and OB_CONFIG.linear_start == "all" then
     LEVEL.has_linear_start = true
   end
 
@@ -3465,55 +3465,55 @@ end
     if LEVEL.is_absurd then return end
 
     -- reset when rooms have changed
-    if PARAM.operated_room ~= R.id and PARAM.cur_shape_group then
-      PARAM.operated_room = R.id
+    if OB_CONFIG.operated_room ~= R.id and OB_CONFIG.cur_shape_group then
+      OB_CONFIG.operated_room = R.id
       change_group_probs("reset", LEVEL)
-      PARAM.cur_shape_groop = ""
-      PARAM.cur_shape_group_apply_count = 0
+      OB_CONFIG.cur_shape_groop = ""
+      OB_CONFIG.cur_shape_group_apply_count = 0
     end
 
-    PARAM.operated_room = R.id
+    OB_CONFIG.operated_room = R.id
 
-    --[[if PARAM.cur_shape_group ~= ""
-    and PARAM.print_shape_steps
-    and PARAM.print_shape_steps ~= "no" then
-      gui.printf("Shape group: " .. PARAM.cur_shape_group .. "\n")
-      gui.printf("Shape count: " .. PARAM.cur_shape_group_apply_count .. "\n")
+    --[[if OB_CONFIG.cur_shape_group ~= ""
+    and OB_CONFIG.print_shape_steps
+    and OB_CONFIG.print_shape_steps ~= "no" then
+      gui.printf("Shape group: " .. OB_CONFIG.cur_shape_group .. "\n")
+      gui.printf("Shape count: " .. OB_CONFIG.cur_shape_group_apply_count .. "\n")
     end]]
 
     -- start it up
-    if (rule.group and PARAM.cur_shape_group == "")
-    and PARAM.cur_shape_group_apply_count == 0
+    if (rule.group and OB_CONFIG.cur_shape_group == "")
+    and OB_CONFIG.cur_shape_group_apply_count == 0
     and rand.odds(50) then
-      PARAM.cur_shape_group = rule.group
+      OB_CONFIG.cur_shape_group = rule.group
 
       change_group_probs("highlight", LEVEL)
 
-      PARAM.cur_shape_group_apply_count = rand.irange(6,15)
+      OB_CONFIG.cur_shape_group_apply_count = rand.irange(6,15)
     end
 
     -- behavior for subsequent use of the same rules
-    if (rule.group == PARAM.cur_shape_group) then
-      PARAM.cur_shape_group_apply_count = PARAM.cur_shape_group_apply_count - 1
+    if (rule.group == OB_CONFIG.cur_shape_group) then
+      OB_CONFIG.cur_shape_group_apply_count = OB_CONFIG.cur_shape_group_apply_count - 1
 
       -- decrease probability for rules as each rule in the same
       -- 'smart group' is applied
-      if PARAM.cur_shape_group_apply_count > 0 then
+      if OB_CONFIG.cur_shape_group_apply_count > 0 then
         change_group_probs("reduce", LEVEL)
 
       -- reset the probabilities of all rules in the smart group
       -- once the apply count has reached count
-      elseif PARAM.cur_shape_group_apply_count <= 0 then
+      elseif OB_CONFIG.cur_shape_group_apply_count <= 0 then
         change_group_probs("reset", LEVEL)
 
-        PARAM.cur_shape_group = ""
+        OB_CONFIG.cur_shape_group = ""
       end
 
     end
 
     -- end of the rine - sometimes the shape group doesn't manifest
-    if PARAM.cur_shape_group_apply_count == 0 then
-      PARAM.cur_shape_group = ""
+    if OB_CONFIG.cur_shape_group_apply_count == 0 then
+      OB_CONFIG.cur_shape_group = ""
     end
 
   end
@@ -4206,7 +4206,7 @@ function Grower_begin_trunks(LEVEL, SEEDS)
   local extra_prob = style_sel("teleporters", 0, 10, 35, 70)
   local  many_prob = style_sel("teleporters", 0,  0,  5, 50)
 
-  if PARAM.teleporters and rand.odds(some_prob) then
+  if OB_CONFIG.teleporters and rand.odds(some_prob) then
     max_trunks = 2
 
     if rand.odds(extra_prob) then max_trunks = max_trunks + 1 end
@@ -4464,15 +4464,10 @@ gui.debugf("=== Coverage seeds: %d/%d  rooms: %d/%d\n",
 
     if final_R.is_hallway or final_R.is_grown then return end
 
-    if PARAM.bool_allow_teleporter_emergency_breaks == 1 then
-      final_R.has_teleporter_break = true
-      print(final_R.name .. " in critical condition! " ..
-      "GET THE TELEPORNEPHERINE!\n")
-      Grower_add_teleporter_trunk(SEEDS, LEVEL, final_R, true)
-    else
-      print(final_R.name .. " needs Telepornepherine, but " ..
-      "teleporter emergency breaks are disabled!\n")
-    end
+    final_R.has_teleporter_break = true
+    print(final_R.name .. " in critical condition! " ..
+    "GET THE TELEPORNEPHERINE!\n")
+    Grower_add_teleporter_trunk(SEEDS, LEVEL, final_R, true)
   end
 
 
@@ -4561,7 +4556,7 @@ gui.debugf("=== Coverage seeds: %d/%d  rooms: %d/%d\n",
     end
 
     --[[if LEVEL.cur_coverage <= LEVEL.min_coverage / 4
-    and PARAM.bool_allow_teleporter_emergency_breaks == 1 then
+    and OB_CONFIG.bool_allow_teleporter_emergency_breaks == 1 then
       for _,R in pairs(LEVEL.rooms) do
         if not R.shapes_applied or 
         (R.shaped_applied and R.shapes_applied == 0) then
@@ -4991,11 +4986,11 @@ function Grower_create_rooms(LEVEL, SEEDS)
   Seed_squarify(LEVEL, SEEDS)
 
   -- debugging aid
-  if OB_CONFIG.svg or (PARAM.bool_save_svg and PARAM.bool_save_svg == 1) then
+  if OB_CONFIG.svg or (OB_CONFIG.bool_save_svg and OB_CONFIG.bool_save_svg == 1) then
     Seed_save_svg_image(OB_CONFIG.title .. "_" .. LEVEL.name .. ".svg", SEEDS)
   end
 
-  if PARAM.bool_shape_rule_stats == 1 then
+  if OB_CONFIG.bool_shape_rule_stats == 1 then
     table.sort(GROWER_DEBUG_INFO, function(A,B)
     return (A.trials > B.trials) end)
 

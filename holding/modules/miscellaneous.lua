@@ -160,8 +160,8 @@ function MISC_STUFF.setup(self)
   module_param_up(self)
 
   --Brightness sliders
-  PARAM["wad_minimum_brightness"] = math.min(PARAM.float_minimum_brightness, PARAM.float_maximum_brightness)
-  PARAM["wad_maximum_brightness"] = math.max(PARAM.float_minimum_brightness, PARAM.float_maximum_brightness)
+  PARAM["wad_minimum_brightness"] = math.min(OB_CONFIG.float_minimum_brightness, OB_CONFIG.float_maximum_brightness)
+  PARAM["wad_maximum_brightness"] = math.max(OB_CONFIG.float_minimum_brightness, OB_CONFIG.float_maximum_brightness)
 end
 
 function MISC_STUFF.begin_level(self, LEVEL)
@@ -189,15 +189,15 @@ function MISC_STUFF.begin_level(self, LEVEL)
     ::continue::
   end
 
-  if PARAM.outdoor_openness then
-    if PARAM.outdoor_openness == "urbtech"
+  if OB_CONFIG.outdoor_openness then
+    if OB_CONFIG.outdoor_openness == "urbtech"
     and LEVEL.theme_name == "urban" 
     or LEVEL.theme_name == "tech" then
       LEVEL.outdoor_openness = true
-    elseif PARAM.outdoor_openness == "urban"
+    elseif OB_CONFIG.outdoor_openness == "urban"
     and LEVEL.theme_name == "urban" then
       LEVEL.outdoor_openness = true
-    elseif PARAM.outdoor_openness == "always" then
+    elseif OB_CONFIG.outdoor_openness == "always" then
       LEVEL.outdoor_openness = true
     end
   end

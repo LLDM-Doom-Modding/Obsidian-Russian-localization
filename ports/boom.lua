@@ -74,7 +74,7 @@ function BOOM.create_dehacked()
   --- level names ---
 
   for _,L in pairs(GAME.levels) do
-    local prefix = PARAM.bex_map_prefix
+    local prefix = OB_CONFIG.bex_map_prefix
 
     if L.description and prefix then
       local id
@@ -110,11 +110,11 @@ function BOOM.create_dehacked()
     end
   end
 
-  if GAME.secret_text and PARAM.bex_secret_name then
-    add_string(PARAM.bex_secret_name, GAME.secret_text)
+  if GAME.secret_text and OB_CONFIG.bex_secret_name then
+    add_string(OB_CONFIG.bex_secret_name, GAME.secret_text)
   end
-  if GAME.secret2_text and PARAM.bex_secret2_name then
-    add_string(PARAM.bex_secret2_name, GAME.secret2_text)
+  if GAME.secret2_text and OB_CONFIG.bex_secret2_name then
+    add_string(OB_CONFIG.bex_secret2_name, GAME.secret2_text)
   end
 
   table.insert(data, "\n");

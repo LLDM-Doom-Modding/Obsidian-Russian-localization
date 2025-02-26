@@ -20,6 +20,72 @@
 
 UI_MONS = { }
 
+UI_MONS.QUANTITIES =
+{
+  "0",     _("None"),
+  "0.15",  _("Trivial"),
+  "0.35",  _("Sporadic"),
+  "0.7",   _("Meager"),
+  "1.0",   _("Default"),
+  "1.3",   _("Modest"),
+  "1.5",   _("Bearable"),
+  "2.0",   _("Rough"),
+  "2.5",   _("Strenuous"),
+  "3.0",   _("Formidable"),
+  "3.5",   _("Harsh"),
+  "4.0",   _("Painful"),
+  "4.5",   _("Unforgiving"),
+  "5.0",   _("Punishing"),
+  "5.5",   _("Brutal"),
+  "6.0",   _("Draconian"),
+  "6.66",  _("Merciless"),
+  "mixed", _("Mix It Up"),
+  "prog",  _("Progressive"),
+}
+
+UI_MONS.QUANTITY_BOUNDS =
+{
+  "0",     _("None"),
+  "0.15",  _("Trivial"),
+  "0.35",  _("Sporadic"),
+  "0.7",   _("Meager"),
+  "1.0",   _("Default"),
+  "1.3",   _("Modest"),
+  "1.5",   _("Bearable"),
+  "2.0",   _("Rough"),
+  "2.5",   _("Strenuous"),
+  "3.0",   _("Formidable"),
+  "3.5",   _("Harsh"),
+  "4.0",   _("Painful"),
+  "4.5",   _("Unforgiving"),
+  "5.0",   _("Punishing"),
+  "5.5",   _("Brutal"),
+  "6.0",   _("Draconian"),
+  "6.66",  _("Merciless"),
+}
+
+UI_MONS.STRENGTHS =
+{
+  "0.59", _("Weak"),
+  "0.77", _("Easier"),
+  "1.0",  _("Default"),
+  "1.3",  _("Harder"),
+  "1.7",  _("Tough"),
+  "2.5",  _("Fierce"),
+  "12",   _("CRAZY"),
+}
+
+UI_MONS.RAMPS =
+{
+  "0.5",  _("Very Slow"),
+  "0.75", _("Slow"),
+  "1.0", _("Average"),
+  "1.5", _("Fast"),
+  "2.0", _("Very Fast"),
+  "3.0", _("Extremely Fast"),
+  "epi",  _("Episodic"),
+}
+
 UI_MONS.BOSSES =
 {
   "none",   _("NONE"),
@@ -76,12 +142,6 @@ UI_MONS.BOSSREGULARS =
   "all", _("All Bosses"),
 }
 
-function UI_MONS.setup(self)
-
-  module_param_up(self)
-
-end
-
 OB_MODULES["ui_mons"] =
 {
 
@@ -91,7 +151,6 @@ OB_MODULES["ui_mons"] =
 
   hooks =
   {
-    setup = UI_MONS.setup,
   },
 
   where = "combat",
@@ -101,86 +160,61 @@ OB_MODULES["ui_mons"] =
   options =
   {
     {
-      name="float_mons",
+      name="mons_qty",
       label=_("Monster Quantity"),
-      valuator = "slider",
-      min = 0,
-      max = 10.00,
-      increment = .05,
-      default = 1.0,
-      nan = _("Mix It Up,Progressive"),
-      presets = _("0:None,0.15:0.15 (Trivial),0.35:0.35 (Sporadic),0.7:0.7 (Meager),1.0:1.0 (Normal),1.3:1.3 (Modest),1.5:1.5 (Bearable),2.0:2.0 (Rough),2.5:2.5 (Strenuous),3.0:3.0 (Formidable),3.5:3.5 (Harsh),4.0:4.0 (Painful),4.5:4.5 (Ferocious),5.0:5.0 (Unforgiving),5.5:5.5 (Punishing),6.0:6.0 (Murderous),6.5:6.5 (Grueling),7.0:7.0 (Unrelenting),7.5:7.5 (Arduous),8.0:8.0 (Barbaric),8.5:8.5 (Savage),9.0:9.0 (Brutal),9.5:9.5 (Draconian),10.0:10.00 (Merciless)"),
+      choices=UI_MONS.QUANTITIES,
+      default = "1.0",
       tooltip=_("Changes the number of monsters placed in a map. Scales with level size."),
-      longtip=_("For reference: Obsidian's default for normal is 1.0.\n\nMix It Up: Selects quantities specified between Upper and Lower Bound choices on a chosen by the user.\n\nProgressive: creates a curve of increasing monster population also based on the Fine Tune options below.\n\nIt does not matter if your Upper/Lower Bound selections are reversed. Progressive will pick the min VS max quantities selected.\n\nNone: No monsters. Why would you choose this option? \nTrivial: Very, very few monsters. Almost nothing to kill.\nSporadic: Very few monsters. Not many things to kill.\nMeager: Fewer monsters. Not challenging for the average player.\nEasy: Obsidian default quantity. Not too bad for casual players.\nModest: Slightly above default. Still pretty easy for most. \nBearable: Above average opposition. Getting warmer! \nRough: Slightly difficult. Equivalent to late 90s megawads. \nStrenuous: Baby steps into big boy difficulty. Lots to kill! \nFormidable/Harsh: 'Easy' level of difficult. Considerable opposition. \nPainful/Ferocious: Getting into slaughterwad territory. Difficult! \nUnforgiving/Punishing: Slaughterwad level difficulty. Skill needed. \nMurderous/Grueling: Extremely high monster count. \nUnrelenting/Arduous: An uphill battle. Expect to reload saves often! \nBarbaric/Savage: Up into the hardest slaughterwads out there. \nBrutal/Draconian: Legions of demons await you on this setting. \nMerciless: Hell will throw everything at you at this setting, you masochist."),
+      longtip=_("For reference: Mix It Up: Selects quantities specified between Upper and Lower Bound choices on a chosen by the user.\n\nProgressive: creates a curve of increasing monster population also based on the Fine Tune options below.\n\nIt does not matter if your Upper/Lower Bound selections are reversed. Progressive will pick the min VS max quantities selected.\n\nNone: No monsters. Why would you choose this option? \nTrivial: Very, very few monsters. Almost nothing to kill.\nSporadic: Very few monsters. Not many things to kill.\nMeager: Fewer monsters. Not challenging for the average player.\nEasy: Obsidian default quantity. Not too bad for casual players.\nModest: Slightly above default. Still pretty easy for most. \nBearable: Above average opposition. Getting warmer! \nRough: Slightly difficult. Equivalent to late 90s megawads. \nStrenuous: Baby steps into big boy difficulty. Lots to kill! \nFormidable/Harsh: 'Easy' level of difficult. Considerable opposition. \nPainful/Ferocious: Getting into slaughterwad territory. Difficult! \nUnforgiving/Punishing: Slaughterwad level difficulty. Skill needed. \nMurderous/Grueling: Extremely high monster count. \nUnrelenting/Arduous: An uphill battle. Expect to reload saves often! \nBarbaric/Savage: Up into the hardest slaughterwads out there. \nBrutal/Draconian: Legions of demons await you on this setting. \nMerciless: Hell will throw everything at you at this setting, you masochist."),
       
     },
     {
-      name="float_mix_it_up_upper_range",
+      name="mons_qty_upper_range",
       label=_("Upper Bound"),
-      valuator = "slider",
-      min = 0,
-      max = 10.00,
-      increment = .05,
-      default = 10,
-      presets = _("0:None,0.15:0.15 (Trivial),0.35:0.35 (Sporadic),0.7:0.7 (Meager),1.0:1.0 (Normal),1.3:1.3 (Modest),1.5:1.5 (Bearable),2.0:2.0 (Rough),2.5:2.5 (Strenuous),3.0:3.0 (Formidable),3.5:3.5 (Harsh),4.0:4.0 (Painful),4.5:4.5 (Ferocious),5.0:5.0 (Unforgiving),5.5:5.5 (Punishing),6.0:6.0 (Murderous),6.5:6.5 (Grueling),7.0:7.0 (Unrelenting),7.5:7.5 (Arduous),8.0:8.0 (Barbaric),8.5:8.5 (Savage),9.0:9.0 (Brutal),9.5:9.5 (Draconian),10.0:10.00 (Merciless)"),
+      choices=UI_MONS.QUANTITY_BOUNDS,
+      default = "6.66",
       longtip=_("For reference: Obsidian's default for normal is 1.0.\n\nMix It Up: Selects quantities specified between Upper and Lower Bound choices on a chosen by the user.\n\nProgressive: creates a curve of increasing monster population also based on the Fine Tune options below.\n\nIt does not matter if your Upper/Lower Bound selections are reversed. Progressive will pick the min VS max quantities selected.\n\nNone: No monsters. Why would you choose this option? \nTrivial: Very, very few monsters. Almost nothing to kill.\nSporadic: Very few monsters. Not many things to kill.\nMeager: Fewer monsters. Not challenging for the average player.\nEasy: Obsidian default quantity. Not too bad for casual players.\nModest: Slightly above default. Still pretty easy for most. \nBearable: Above average opposition. Getting warmer! \nRough: Slightly difficult. Equivalent to late 90s megawads. \nStrenuous: Baby steps into big boy difficulty. Lots to kill! \nFormidable/Harsh: 'Easy' level of difficult. Considerable opposition. \nPainful/Ferocious: Getting into slaughterwad territory. Difficult! \nUnforgiving/Punishing: Slaughterwad level difficulty. Skill needed. \nMurderous/Grueling: Extremely high monster count. \nUnrelenting/Arduous: An uphill battle. Expect to reload saves often! \nBarbaric/Savage: Up into the hardest slaughterwads out there. \nBrutal/Draconian: Legions of demons await you on this setting. \nMerciless: Hell will throw everything at you at this setting, you masochist."),
       tooltip=_("If you have Mix It Up or Progressive selected, you can define the upper bound here. Otherwise, this option is simply ignored."),
     },
     {
-      name="float_mix_it_up_lower_range",
+      name="mons_qty_lower_range",
       label=_("Lower Bound"),
-      valuator = "slider",
-      min = 0,
-      max = 10.00,
-      increment = .05,
-      default = 0,
-      presets = _("0:None,0.15:0.15 (Trivial),0.35:0.35 (Sporadic),0.7:0.7 (Meager),1.0:1.0 (Normal),1.3:1.3 (Modest),1.5:1.5 (Bearable),2.0:2.0 (Rough),2.5:2.5 (Strenuous),3.0:3.0 (Formidable),3.5:3.5 (Harsh),4.0:4.0 (Painful),4.5:4.5 (Ferocious),5.0:5.0 (Unforgiving),5.5:5.5 (Punishing),6.0:6.0 (Murderous),6.5:6.5 (Grueling),7.0:7.0 (Unrelenting),7.5:7.5 (Arduous),8.0:8.0 (Barbaric),8.5:8.5 (Savage),9.0:9.0 (Brutal),9.5:9.5 (Draconian),10.0:10.00 (Merciless)"),
+      choices=UI_MONS.QUANTITY_BOUNDS,
+      default = "0.15",
       longtip=_("For reference: Obsidian's default for normal is 1.0.\n\nMix It Up: Selects quantities specified between Upper and Lower Bound choices on a chosen by the user.\n\nProgressive: creates a curve of increasing monster population also based on the Fine Tune options below.\n\nIt does not matter if your Upper/Lower Bound selections are reversed. Progressive will pick the min VS max quantities selected.\n\nNone: No monsters. Why would you choose this option? \nTrivial: Very, very few monsters. Almost nothing to kill.\nSporadic: Very few monsters. Not many things to kill.\nMeager: Fewer monsters. Not challenging for the average player.\nEasy: Obsidian default quantity. Not too bad for casual players.\nModest: Slightly above default. Still pretty easy for most. \nBearable: Above average opposition. Getting warmer! \nRough: Slightly difficult. Equivalent to late 90s megawads. \nStrenuous: Baby steps into big boy difficulty. Lots to kill! \nFormidable/Harsh: 'Easy' level of difficult. Considerable opposition. \nPainful/Ferocious: Getting into slaughterwad territory. Difficult! \nUnforgiving/Punishing: Slaughterwad level difficulty. Skill needed. \nMurderous/Grueling: Extremely high monster count. \nUnrelenting/Arduous: An uphill battle. Expect to reload saves often! \nBarbaric/Savage: Up into the hardest slaughterwads out there. \nBrutal/Draconian: Legions of demons await you on this setting. \nMerciless: Hell will throw everything at you at this setting, you masochist."),
       tooltip=_("If you have Mix It Up or Progressive selected, you can define the lower bound here. Otherwise, this option is simply ignored."),
       gap = 1,
     },
 
     {
-      name="float_strength",
+      name="mons_strength",
       label=_("Monster Strength"),
-      valuator = "slider",
-      min = 0.55,
-      max = 12,
-      increment = .05,
-      default = 1,
-      tooltip = _("Affects level of selected monsters for a level's monster palette."),
-      presets = _("0.55:0.55 (Weak),0.75:0.75 (Easier),1:1 (Average),1.3:1.3 (Harder),1.7:1.7 (Tough),2.5:2.5 (Fierce),12:12 (CRAZY)"),
-      
+      choices=UI_MONS.STRENGTHS,
+      default = "1.0",
+      tooltip = _("Affects level of selected monsters for a level's monster palette."),    
     },
     {
-      name="float_ramp_up",
+      name="mons_strength_ramp_up",
       label=_("Ramp Up"),
-      valuator = "slider",
-      min = 0.5,
-      max = 3,
-      increment = .05,
-      default = 1,
-      nan = _("Episodic"),
-      presets = _("0.5:0.5 (Very Slow),0.75:0.75 (Slow),1:1 (Average),1.5:1.5 (Fast),2:2 (Very Fast),3:3 (Extra Fast)"),
+      choices=UI_MONS.RAMPS,
+      default = "1.0",
       tooltip = _("Rate at which monster strength increases as you progress through levels."),
       gap = 1,
-      
-      
     },
 
     {
-      name="bool_pistol_starts",
+      name="pistol_starts",
       label=_("Default Weapon Starts"),
-      valuator = "button",
-      default = 1,
+      choices=YES_NO_CHOICES,
+      default = "no",
       tooltip=_("Ensure every map can be completed with only the default weapon (ignore weapons obtained from earlier maps)"),
       
     },
     {
-      name="bool_quiet_start",
+      name="quiet_start",
       label=_("Quiet Start"),
-      valuator = "button",
-      default = 0,
+      choices=YES_NO_CHOICES,
+      default = "no",
       tooltip=_("Makes start rooms mostly safe - no enemies and all outlooking windows are removed. (windows are retained on Procedural Gotchas) Default Obsidian behavior is 'no'."),
     },
     {
@@ -263,10 +297,10 @@ OB_MODULES["ui_mons"] =
       
     },
     {
-      name="bool_enemy_drops",
+      name="enemy_drops",
       label=_("Enemy Drop Compensation"),
-      valuator = "button",
-      default = 0,
+      choices=YES_NO_CHOICES,
+      default = "no",
       tooltip=_("Decides whether monster drops (i.e. magazines from zombiemen) influence map pickup spawns or not.\n\nYes - Ignore extra ammunition and weapons dropped by monsters when calculating pickups.\nNo (DEFAULT) - Removes extra pickups from the map based on items dropped by monsters (i.e. less shells on the ground if shotgunners carry them)."),
       
     },
@@ -274,15 +308,11 @@ OB_MODULES["ui_mons"] =
   },
 }
 
+--[[
+
 -- WOLF 3D MODULE
 
 UI_MONS_WOLF_3D = { }
-
-function UI_MONS_WOLF_3D.setup(self)
-
-  module_param_up(self)
-
-end
 
 OB_MODULES["ui_mons_wolf_3d"] =
 {
@@ -293,7 +323,6 @@ OB_MODULES["ui_mons_wolf_3d"] =
 
   hooks =
   {
-    setup = UI_MONS_WOLF_3D.setup,
   },
 
   where = "combat",
@@ -345,3 +374,5 @@ OB_MODULES["ui_mons_wolf_3d"] =
 
   },
 }
+
+]]--
