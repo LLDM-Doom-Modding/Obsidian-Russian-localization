@@ -8,7 +8,7 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(OBSIDIAN_GUI ON)
+set(OBSIDIAN_GUI OFF)
 
 if(OBSIDIAN_GUI)
   add_compile_definitions(OBSIDIAN_ENABLE_GUI=1)

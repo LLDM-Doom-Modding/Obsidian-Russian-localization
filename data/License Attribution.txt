@@ -116,10 +116,6 @@ MIT License
 minilua - Copyright (c) 2020-2023 Eduardo Bart (https://github.com/edubart).
 				Copyright (c) 1994–2019 Lua.org, PUC-Rio.
 
-miniz - Copyright (c) 2013-2014 RAD Game Tools and Valve Software
-				Copyright (c) 2010-2014 Rich Geldreich and Tenacious Software LLC
-
-
 ===========================================================================================
 Public Domain
 ===========================================================================================
@@ -127,12 +123,6 @@ Public Domain
 ppmforge - John Walker
 
 "Rainforest Ambiance" sound - GlorySunz via SoundBible.com
-
-===========================================================================================
-The Unlicense
-===========================================================================================
-
-steve - Lou Catonnet
 
 ===========================================================================================
 zlib License

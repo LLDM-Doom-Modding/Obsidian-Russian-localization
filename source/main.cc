@@ -86,7 +86,6 @@ unsigned long long next_rand_seed;
 
 std::string              batch_output_file;
 std::string              numeric_locale;
-std::vector<std::string> batch_randomize_groups;
 
 // options
 int         filename_prefix        = 0;
@@ -97,11 +96,6 @@ bool        debug_messages         = false;
 bool        limit_break            = false;
 bool        preserve_failures      = false;
 bool        preserve_old_config    = false;
-bool        did_randomize          = false;
-bool        randomize_architecture = false;
-bool        randomize_monsters     = false;
-bool        randomize_pickups      = false;
-bool        randomize_misc         = false;
 bool        random_string_seeds    = false;
 bool        password_mode          = false;
 bool        mature_word_lists      = false;
@@ -145,12 +139,6 @@ static void ShowInfo()
            "  -a --addon    <file>...   Addon(s) to use\n"
            "  -l --load     <file>      Load settings from a file\n"
            "  -k --keep                 Keep SEED from loaded settings\n"
-           "\n"
-           "     --randomize-all        Randomize all options\n"
-           "     --randomize-arch       Randomize architecture settings\n"
-           "     --randomize-combat     Randomize combat-related settings\n"
-           "     --randomize-pickups    Randomize item/weapon settings\n"
-           "     --randomize-other      Randomize other settings\n"
            "\n"
            "  -d --debug                Enable debugging\n"
            "  -v --verbose              Print log messages to stdout\n"
@@ -273,17 +261,7 @@ void Main::Shutdown(const bool error)
     // (it's state may be compromised by a script error).
     if (!config_file.empty() && !error)
     {
-        if (did_randomize)
-        {
-            if (!preserve_old_config)
-            {
-                Cookie_Save(config_file);
-            }
-        }
-        else
-        {
-            Cookie_Save(config_file);
-        }
+        Cookie_Save(config_file);
     }
 
     if (!FileExists(options_file))
@@ -412,41 +390,6 @@ bool Build_Cool_Shit()
     return was_ok;
 }
 
-void Options_ParseArguments()
-{
-
-    if (argv::Find(0, "randomize-all") >= 0)
-    {
-        batch_randomize_groups.push_back("architecture");
-        batch_randomize_groups.push_back("monsters");
-        batch_randomize_groups.push_back("pickups");
-        batch_randomize_groups.push_back("misc");
-        goto skiprest;
-    }
-
-    if (argv::Find(0, "randomize-arch") >= 0)
-    {
-        batch_randomize_groups.push_back("architecture");
-    }
-
-    if (argv::Find(0, "randomize-monsters") >= 0)
-    {
-        batch_randomize_groups.push_back("monsters");
-    }
-
-    if (argv::Find(0, "randomize-pickups") >= 0)
-    {
-        batch_randomize_groups.push_back("pickups");
-    }
-
-    if (argv::Find(0, "randomize-other") >= 0)
-    {
-        batch_randomize_groups.push_back("misc");
-    }
-
-skiprest:;
-}
-
 /* ----- main program ----------------------------- */
 
 int main(int argc, char **argv)
@@ -524,8 +467,6 @@ int main(int argc, char **argv)
     Determine_ReferenceFile();
 
     Options_Load(options_file);
-
-    Options_ParseArguments();
 
     LogInit(logging_file);
 
@@ -786,8 +727,7 @@ cleanup:
     SDL_DestroyWindow(win);
     SDL_Quit();
     return 0;
-#endif
-
+#else
     Main_SetSeed();
     if (!Build_Cool_Shit())
     {
@@ -799,6 +739,7 @@ cleanup:
     }
     Main::Shutdown(false);
     return 0;
+#endif
 }
 
 //--- editor settings ---

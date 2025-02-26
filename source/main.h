@@ -85,11 +85,6 @@ extern bool        debug_messages;
 extern bool        limit_break;
 extern bool        preserve_failures;
 extern bool        preserve_old_config;
-extern bool        did_randomize;
-extern bool        randomize_architecture;
-extern bool        randomize_monsters;
-extern bool        randomize_pickups;
-extern bool        randomize_misc;
 extern bool        random_string_seeds;
 extern bool        password_mode;
 extern bool        mature_word_lists;
@@ -103,7 +98,6 @@ extern std::string def_filename;
 
 extern std::string              last_directory;
 extern std::string              numeric_locale;
-extern std::vector<std::string> batch_randomize_groups;
 
 extern std::string default_output_path;
 

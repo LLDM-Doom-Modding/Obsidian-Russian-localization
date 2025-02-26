@@ -59,7 +59,6 @@ OB_MODULES["historical_versions"] =
       tooltip = _("Sets chance of levels being generated using Oblige v2"),
       longtip = _("Gives levels a chance of being generated using an internal version of Oblige version 2.x. NOTE: Not all module settings will affect levels generated in this manner."),
       priority = 102,
-      randomize_group = "architecture",
     },
 
     {

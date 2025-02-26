@@ -62,22 +62,6 @@ void Parse_Option(const std::string &name, const std::string &value)
     {
         preserve_old_config = StringToInt(value) ? true : false;
     }
-    else if (StringCompare(name, "randomize_architecture") == 0)
-    {
-        randomize_architecture = StringToInt(value) ? true : false;
-    }
-    else if (StringCompare(name, "randomize_monsters") == 0)
-    {
-        randomize_monsters = StringToInt(value) ? true : false;
-    }
-    else if (StringCompare(name, "randomize_pickups") == 0)
-    {
-        randomize_pickups = StringToInt(value) ? true : false;
-    }
-    else if (StringCompare(name, "randomize_misc") == 0)
-    {
-        randomize_misc = StringToInt(value) ? true : false;
-    }
     else if (StringCompare(name, "random_string_seeds") == 0)
     {
         random_string_seeds = StringToInt(value) ? true : false;
@@ -191,10 +175,6 @@ bool Options_Save(const std::string &filename)
     fprintf(option_fp, "debug_messages = %d\n", (debug_messages ? 1 : 0));
     fprintf(option_fp, "limit_break = %d\n", (limit_break ? 1 : 0));
     fprintf(option_fp, "preserve_old_config = %d\n", (preserve_old_config ? 1 : 0));
-    fprintf(option_fp, "randomize_architecture = %d\n", (randomize_architecture ? 1 : 0));
-    fprintf(option_fp, "randomize_monsters = %d\n", (randomize_monsters ? 1 : 0));
-    fprintf(option_fp, "randomize_pickups = %d\n", (randomize_pickups ? 1 : 0));
-    fprintf(option_fp, "randomize_misc = %d\n", (randomize_misc ? 1 : 0));
     fprintf(option_fp, "random_string_seeds = %d\n", (random_string_seeds ? 1 : 0));
     fprintf(option_fp, "password_mode = %d\n", (password_mode ? 1 : 0));
     fprintf(option_fp, "mature_word_lists = %d\n", (mature_word_lists ? 1 : 0));

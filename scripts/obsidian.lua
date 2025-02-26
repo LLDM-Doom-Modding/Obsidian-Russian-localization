@@ -56,7 +56,6 @@ gui.set_import_dir("data/text/")
 
 gui.import("random_words_en.lua")
 gui.import("random_words_en_m.lua")
-gui.import("dialogues.lua")
 
 gui.set_import_dir("")
 
@@ -1472,23 +1471,6 @@ function ob_get_random_words()
   end
 end
 
-local last_Clippy_advice_index = -1       -- Like "static last_Clippy_advice_index = -1;"...
-function ob_random_advice()
-  if #HELPFUL_ADVICE == 0 then
-    return nil
-  end
-
-  if last_Clippy_advice_index < 0 then
-    -- Randomize first index:
-    last_Clippy_advice_index = rand.irange(1, #HELPFUL_ADVICE)
-  else
-    -- Avoiding previous advice index:
-    last_Clippy_advice_index = 1 + ( (last_Clippy_advice_index + rand.irange(1, #HELPFUL_ADVICE - 2)) % #HELPFUL_ADVICE )
-  end
-
-  return HELPFUL_ADVICE[ last_Clippy_advice_index ]
-end
-
 function ob_default_filename()
   -- create a default filename [ WITHOUT any extension ]
 
@@ -1804,8 +1786,6 @@ function ob_build_setup()
   table.merge_missing(PARAM, GLOBAL_PARAMETERS)
 
   -- load all the prefab definitions
-  RANDOMIZE_GROUPS = gui.get_batch_randomize_groups()
-
   if not ob_match_game({game = {wolf=1,spear=1,noah=1,obc=1}}) then
     Naming_init(GAME.NAMES)
   end
@@ -1890,7 +1870,6 @@ local function ob_get_module_refs()
         else
           option_refs[vv.name].tooltip = gui.gettext(vv.tooltip)
         end
-        if vv.randomize_group then option_refs[vv.name].random_group = vv.randomize_group end
         if not v.engine then
           option_refs[vv.name].engine = {}
           table.add_unique(option_refs[vv.name].engine, "ALL")
@@ -2111,10 +2090,6 @@ function ob_print_reference()
           end
         end
       end
-      if (option.random_group) then
-        gui.console_print("\n" .. gui.gettext("randomize_group: ") .. option.random_group)
-        gui.ref_print("\n" .. gui.gettext("randomize_group: ") .. option.random_group)
-      end
       gui.console_print("\n")
       gui.ref_print("\n")
     end
@@ -2231,11 +2206,7 @@ function ob_print_reference_json()
         end
         gui.console_print("    ]")
       end
-      if (option.random_group) then
-        gui.console_print(",\n    \"" .. gui.gettext("randomize_group") .. "\": \"" .. option.random_group .. "\"\n")
-      else
-        gui.console_print("\n")
-      end
+      gui.console_print("\n")
       gui.console_print("  }")
     end
     gui.console_print("  }")

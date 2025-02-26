@@ -439,31 +439,6 @@ int gui_scan_directory(lua_State *L)
     return 1;
 }
 
-// LUA: get_batch_randomize_groups() --> list
-//
-// Note: 'match' parameter must be of the form "*" or "*.xxx"
-//       or must be "DIRS" to return all the sub-directories
-//
-int gui_get_batch_randomize_groups(lua_State *L)
-{
-    lua_newtable(L);
-
-    if (!batch_randomize_groups.empty())
-    {
-        for (unsigned int k = 0; k < batch_randomize_groups.size(); k++)
-        {
-            lua_pushstring(L, batch_randomize_groups[k].c_str());
-            lua_rawseti(L, -2, (int)(k + 1));
-        }
-    }
-    else
-    {
-        lua_pushnil(L);
-    }
-
-    return 1;
-}
-
 // TODO: Have the new GUI use this
 static float plan_progress = 0.0f;
 
@@ -695,8 +670,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"gettext", gui_gettext},
     {"config_line", gui_config_line},
     {"set_colormap", gui_set_colormap},
-
-    {"get_batch_randomize_groups", gui_get_batch_randomize_groups},
 
     {"at_level", gui_at_level},
     {"prog_step", gui_prog_step},
@@ -1180,21 +1153,6 @@ bool ob_mod_enabled(const std::string &module_name)
 std::string ob_default_filename()
 {
     if (!Script_CallFunc("ob_default_filename", 1))
-    {
-        return "";
-    }
-
-    std::string res = luaL_optlstring(LUA_ST, -1, "", NULL);
-
-    // remove result from lua stack
-    lua_pop(LUA_ST, 1);
-
-    return res;
-}
-
-std::string ob_random_advice()
-{
-    if (!Script_CallFunc("ob_random_advice", 1))
     {
         return "";
     }

@@ -59,7 +59,6 @@ OB_MODULES["alt_shape_grammars"] =
       tooltip = _("Sets chance of levels using the Backhalls shape grammar."),
       longtip = _("The true Linear Mode."),
       priority = 103,
-      randomize_group = "architecture",
     },
 
     {
@@ -74,7 +73,6 @@ OB_MODULES["alt_shape_grammars"] =
       tooltip = _("Sets chance of levels using the Boxes of Death shape grammar."),
       longtip = _("It's like that movie Cube, but with .5 less dimensions (if you're a contrarian)."),
       priority = 102,
-      randomize_group = "architecture",
     },
 
     {
@@ -89,7 +87,6 @@ OB_MODULES["alt_shape_grammars"] =
       tooltip = _("Sets chance of levels using the OG shape grammar."),
       longtip = _("These are the shapes from Oblige 7.45, one of the earliest examples of the shape grammar system."),
       priority = 100,
-      randomize_group = "architecture",
     },
 
   },

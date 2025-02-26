@@ -29,25 +29,25 @@ void xoshiro_Reseed(uint64_t newseed)
 
 uint64_t xoshiro_UInt()
 {
-    return xoshiro.xoshiro256p();
+    return xoshiro.xoroshiro128p();
 }
 
 float xoshiro_Float()
 {
-    return xoshiro.xoshiro256p_UNI<float>();
+    return xoshiro.xoroshiro128p_UNI<float>();
 }
 
 double xoshiro_Double()
 {
-    return xoshiro.xoshiro256p_UNI<double>();
+    return xoshiro.xoroshiro128p_UNI<double>();
 }
 
 int xoshiro_Between(int low, int high)
 {
-    return (int)xoshiro.xoshiro256p_Range<float>(low, high);
+    return (int)xoshiro.xoroshiro128p_Range<float>(low, high);
 }
 
 double xoshiro_Between(double low, double high)
 {
-    return xoshiro.xoshiro256p_Range<double>(low, high);
+    return xoshiro.xoroshiro128p_Range<double>(low, high);
 }

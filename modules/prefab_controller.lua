@@ -288,7 +288,7 @@ OB_MODULES["prefab_control"] =
       tooltip = _("Decor prefabs are prefabs placed along the floors such as crates, pillars, and other decorative elements which aren't tied to walls. This directly modifies probabilities on a per-room basis, not the density for decor prefabs in any given room.\n\nNote: DEFAULT actually behaves like Mix-It-Up."),
       default = "fab_default",
       priority = 101,
-      randomize_group="architecture",
+      
     },
 
 
@@ -299,7 +299,7 @@ OB_MODULES["prefab_control"] =
       tooltip = _("Determines the odds for decorated wall junctions in a map versus plain ones."),
       default = "fab_default",
       priority = 100,
-      randomize_group="architecture",
+      
     },
 
 
@@ -311,7 +311,7 @@ OB_MODULES["prefab_control"] =
       default = "fab_heaps",
       priority = 99,
       gap = 1,
-      randomize_group="architecture",
+      
       
     },
 
@@ -329,7 +329,7 @@ OB_MODULES["prefab_control"] =
       default = 1,
       tooltip = _("Determines the maximum number of distinct indoor room themes used per level. Default is 1."),
       priority = 100,
-      randomize_group="architecture",
+      
       
     },
 
@@ -340,7 +340,7 @@ OB_MODULES["prefab_control"] =
       default = 1,
       priority = 48,
       tooltip = _("Attempt to use unique room themes for each generated level, unless the pool of available themes is exhausted."),
-      randomize_group="architecture",
+      
       
     },
 
@@ -355,7 +355,7 @@ OB_MODULES["prefab_control"] =
       default = 2,
       tooltip = _("Determines the maximum number of distinct indoor wall groups used per level. Default is 2."),
       priority = 50,
-      randomize_group="architecture",
+      
       
     },
 
@@ -367,7 +367,7 @@ OB_MODULES["prefab_control"] =
       priority = 48,
       tooltip = _("Attempt to use unique indoor wall groups for each generated level, unless the pool of available groups is exhausted."),
       gap = 1,
-      randomize_group="architecture",
+      
       
     },
     --
@@ -380,7 +380,7 @@ OB_MODULES["prefab_control"] =
       default = 1,
       priority = 48,
       tooltip = _("Attempt to use matched start and exit fabs for a level (if a matched set is possible)."),
-      randomize_group="architecture",
+      
       
     },
 
@@ -397,7 +397,7 @@ OB_MODULES["prefab_control"] =
       tooltip = _("Disables or enables caves with height variations."),
       default = "yes",
       priority = 47,
-      randomize_group="architecture",
+      
     },
 
     --
@@ -410,7 +410,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for fabs with crushing sectors. Default is on."),
       default="1",
       priority = 14,
-      randomize_group="architecture",
+      
     },
 
 
@@ -421,7 +421,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for fabs featuring Chasm-ish navigation. Default is on."),
       default="1",
       priority = 13,
-      randomize_group="architecture",
+      
     },
 
     {
@@ -431,7 +431,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for fabs that may lockout a player on items. Default is on."),
       default="1",
       priority = 12,
-      randomize_group="architecture",
+      
     },
 
 
@@ -442,7 +442,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for cages that unleash its monsters when player is in sight. Default is on."),
       default="1",
       priority = 11,
-      randomize_group="architecture",
+      
     },
 
 
@@ -453,7 +453,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for hell mirror maze closets and joiners."),
       default="1",
       priority = 10,
-      randomize_group="architecture",
+      
     },
 
 
@@ -464,7 +464,7 @@ OB_MODULES["prefab_control"] =
       tooltip=_("Changes probabilities for dark/eye maze joiners in hell theme."),
       default="1",
       priority = 9,
-      randomize_group="architecture",
+      
     },
     
 
@@ -476,7 +476,7 @@ OB_MODULES["prefab_control"] =
       default="1",
       priority = 8,
       gap = 1,
-      randomize_group="architecture",
+      
     },
 
 
@@ -501,7 +501,7 @@ OB_MODULES["prefab_control"] =
       default = "default",
       priority = 5,
       gap = 1,
-      randomize_group="architecture",
+      
     },
 
     --
@@ -525,7 +525,7 @@ OB_MODULES["prefab_control"] =
       default = 1,
       tooltip = _("Ensures that prefabs selected match their intended Theme."),
       priority = 1,
-      randomize_group="architecture",
+      
       
     }
   }
