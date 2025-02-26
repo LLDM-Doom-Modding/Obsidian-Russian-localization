@@ -241,11 +241,7 @@ function ZDOOM_SOUND.merge_frozsoul_sounds(self)
     local dir = "games/doom/data/sounds/"
 
     for _,sound in pairs(ZDOOM_SOUND_DEFS) do
-      if ob_mod_enabled("compress_output") == 1 then
-        gui.pk3_insert_file(dir .. sound.lump .. ".ogg", "sounds/" .. sound.lump .. ".ogg")
-      else
-        gui.wad_insert_file(dir .. sound.lump .. ".ogg", sound.lump)
-      end
+      gui.wad_insert_file(dir .. sound.lump .. ".ogg", sound.lump)
     end
   end
 
@@ -285,7 +281,7 @@ OB_MODULES["zdoom_ambient_sound"] =
       label=_("Merge Frozsoul Sound Pack"),
       valuator = "button",
       default = 1,
-      tooltip = _("Merge Frozsoul Ambient Sound Pack sound into generated WAD/PK3"),
+      tooltip = _("Merge Frozsoul Ambient Sound Pack sound into generated WAD"),
       longtip = _("Merge in the sounds from the Frozsoul Ambient Sound Pack, the default set of sounds which this module is designed for. Not necessary if you plan to include the sound pack separately in your launch order."),
     },
   },

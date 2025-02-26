@@ -27,7 +27,6 @@
 #include "images.h"
 #include "lib_argv.h"
 #include "lib_util.h"
-#include "lib_zip.h"
 #include "m_addons.h"
 #include "m_cookie.h"
 #include "m_lua.h"
@@ -336,7 +335,6 @@ static void Module_Defaults()
     ob_set_mod_option("sky_generator", "self", "1");
     //ob_set_mod_option("armaetus_epic_textures", "self", "1");
     ob_set_mod_option("music_swapper", "self", "1");
-    ob_set_mod_option("compress_output", "self", "1");
 }
 
 //------------------------------------------------------------------------
@@ -399,16 +397,11 @@ bool Build_Cool_Shit()
     }
 
     // Insurance in case the build process errored/cancelled
-    ZIPF_CloseWrite();
     if (!was_ok)
     {
         if (FileExists(game_object->Filename()))
         {
             FileDelete(game_object->Filename());
-        }
-        if (FileExists(game_object->ZIP_Filename()))
-        {
-            FileDelete(game_object->ZIP_Filename());
         }
     }
 

@@ -126,11 +126,7 @@ function BOOM.create_dehacked()
     table.insert(data, "\n");
   end
 
-  if ob_mod_enabled("compress_output") == 1 and OB_CONFIG.port ~= "dsda" then
-    gui.wad_add_text_lump("DEHACKED.txt", data)
-  else
-    gui.wad_add_text_lump("DEHACKED", data)
-  end
+  gui.wad_add_text_lump("DEHACKED", data)
 end
 
 

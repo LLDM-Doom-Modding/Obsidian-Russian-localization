@@ -25,7 +25,6 @@ HERETIC = { }
 gui.import("params")
 
 gui.import("entities")
-gui.import("factory")
 gui.import("monsters")
 gui.import("pickups")
 gui.import("weapons")
@@ -62,7 +61,6 @@ OB_GAMES["heretic"] =
   hooks =
   {
     setup = HERETIC.setup,
-    factory_setup = HERETIC.factory_setup,
     slump_setup = HERETIC.slump_setup,
     get_levels = HERETIC.get_levels,
     all_done   = HERETIC.all_done

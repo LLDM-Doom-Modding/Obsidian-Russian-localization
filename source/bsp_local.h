@@ -435,11 +435,6 @@ Lump_c *CreateGLMarker();
 Lump_c *CreateLevelLump(const char *name, int max_size = -1);
 Lump_c *FindLevelLump(const char *name);
 
-// Zlib compression support
-void ZLibBeginLump(Lump_c *lump);
-void ZLibAppendLump(const void *data, int length);
-void ZLibFinishLump(void);
-
 /* limit flags, to show what went wrong */
 constexpr uint8_t LIMIT_VERTEXES = 0x000001;
 constexpr uint8_t LIMIT_SECTORS  = 0x000002;

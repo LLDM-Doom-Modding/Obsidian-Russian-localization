@@ -26,7 +26,6 @@
 #include <algorithm>
 
 #include "ff_main.h"
-#include "lib_midi.h"
 #include "lib_util.h"
 #include "luaalloc.h"
 #include "m_trans.h"
@@ -613,31 +612,6 @@ int gui_spawn_file_picker(lua_State *L)
 }
 #endif
 
-int generate_midi_track(lua_State *L)
-{
-    const char *midi_config = luaL_checkstring(L, 1);
-    const char *midi_file   = luaL_checkstring(L, 2);
-
-    int value = steve_generate(midi_config, midi_file) ? 1 : 0;
-    lua_pushinteger(L, value);
-
-    return 1;
-}
-
-int remove_temp_file(lua_State *L)
-{
-    std::string path = PathAppend(home_dir, "temp");
-
-    const char *temp_file = luaL_checkstring(L, 1);
-
-    path = PathAppend(path, GetFilename(temp_file));
-
-    if (FileExists(path))
-        FileDelete(path);
-
-    return 0;
-}
-
 //------------------------------------------------------------------------
 
 extern int SPOT_begin(lua_State *L);
@@ -670,8 +644,6 @@ extern int wad_transfer_lump(lua_State *L);
 extern int wad_transfer_map(lua_State *L);
 extern int wad_merge_sections(lua_State *L);
 extern int wad_read_text_lump(lua_State *L);
-
-extern int pk3_insert_file(lua_State *L);
 
 extern int fsky_create(lua_State *L);
 extern int fsky_write(lua_State *L);
@@ -767,8 +739,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"wad_merge_sections", Doom::wad_merge_sections},
     {"wad_read_text_lump", Doom::wad_read_text_lump},
 
-    {"pk3_insert_file", Doom::pk3_insert_file},
-
     {"fsky_create", Doom::fsky_create},
     {"fsky_write", Doom::fsky_write},
     {"fsky_free", Doom::fsky_free},
@@ -819,12 +789,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"v094_add_linedef", Doom::v094_add_linedef},
     {"v094_add_sidedef", Doom::v094_add_sidedef},
     {"v094_add_sector", Doom::v094_add_sector},
-
-    // MIDI generation
-    {"generate_midi_track", generate_midi_track},
-
-    // Miscellany
-    {"remove_temp_file", remove_temp_file},
 
     {NULL, NULL} // the end
 };

@@ -56,11 +56,9 @@ set(OBSIDIAN_SOURCE_FILES
     source/g_doom.cc
     source/lex.yy.c
     source/lib_argv.cc
-    source/lib_midi.cc
     source/lib_tga.cc
     source/lib_util.cc
     source/lib_wad.cc
-    source/lib_zip.cc
     source/lib_parse.cc
     source/m_addons.cc
     source/m_cookie.cc
@@ -104,7 +102,7 @@ if (COPY_FILES)
   add_custom_command(TARGET obsidian POST_BUILD COMMAND_EXPAND_LISTS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COPY_FILES} ${DEST_DIR})
 endif()
 
-set(OBSIDIAN_LINK_LIBRARIES fastPRNG luaalloc minilua miniz physfs-static steve)
+set(OBSIDIAN_LINK_LIBRARIES fastPRNG luaalloc minilua physfs-static)
 
 if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM} MATCHES "BSD")
   set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} pthread)

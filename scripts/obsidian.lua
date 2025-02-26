@@ -1811,7 +1811,6 @@ function ob_build_setup()
   end
 
   ob_invoke_hook("setup")
-  ob_invoke_hook("factory_setup") -- Some historical versions of Oblige use this
 
   Fab_load_all_definitions()
 

@@ -50,7 +50,7 @@ UNFINISHED["noah"] =
 	
 	hooks =
 	{
-      factory_setup = NOAH.factory_setup,
+
 	},
 }
 

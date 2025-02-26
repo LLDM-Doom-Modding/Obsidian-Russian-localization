@@ -173,12 +173,6 @@ class game_interface_c
     virtual void Property(std::string key, std::string value) = 0;
 
     virtual std::string Filename() = 0;
-
-    virtual std::string ZIP_Filename() = 0;
-
-    // likely only useful for Doom, but informs the program if it needs to package
-    // each map in its own native format (WAD, etc)
-    bool file_per_map = false;
 };
 
 extern game_interface_c *game_object;

@@ -52,7 +52,6 @@ class buildinfo_t
 
     bool force_v5;
     bool force_xnod;
-    bool force_compress;
 
     // the GUI can set this to tell the node builder to stop
     bool cancelled;
@@ -67,7 +66,7 @@ class buildinfo_t
 
           do_blockmap(true), do_reject(true),
 
-          force_v5(false), force_xnod(false), force_compress(false),
+          force_v5(false), force_xnod(false),
 
           cancelled(false),
 

@@ -58,11 +58,7 @@ function ScriptMan_assemble_coalhuds_lump()
   end
 
   if coalhuds_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/coal_hud.ec", coalhuds_lines)
-    else
-      add_script_lump("COALHUDS", coalhuds_lines)
-    end
+    add_script_lump("COALHUDS", coalhuds_lines)
   end
 end
 
@@ -74,11 +70,7 @@ function ScriptMan_assemble_ddfthing_lump()
   end
 
   if ddfthing_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/things.ddf", ddfthing_lines)
-    else
-      add_script_lump("DDFTHING", ddfthing_lines)
-    end
+    add_script_lump("DDFTHING", ddfthing_lines)
   end
 end
 
@@ -90,11 +82,7 @@ function ScriptMan_assemble_ddfanim_lump()
   end
 
   if ddfanim_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/anims.ddf", ddfanim_lines)
-    else
-      add_script_lump("DDFANIM", ddfanim_lines)
-    end
+    add_script_lump("DDFANIM", ddfanim_lines)
   end
 end
 
@@ -106,11 +94,7 @@ function ScriptMan_assemble_ddfatk_lump()
   end
 
   if ddfatk_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/attacks.ddf", ddfatk_lines)
-    else
-      add_script_lump("DDFATK", ddfatk_lines)
-    end
+    add_script_lump("DDFATK", ddfatk_lines)
   end
 end
 
@@ -122,11 +106,7 @@ function ScriptMan_assemble_ddfcolm_lump()
   end
 
   if ddfcolm_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/colmap.ddf", ddfcolm_lines)
-    else
-      add_script_lump("DDFCOLM", ddfcolm_lines)
-    end
+    add_script_lump("DDFCOLM", ddfcolm_lines)
   end
 end
 
@@ -138,11 +118,7 @@ function ScriptMan_assemble_ddfflat_lump()
   end
 
   if ddfflat_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("script/flats.ddf", ddfflat_lines)
-    else
-      add_script_lump("DDFFLAT", ddfflat_lines)
-    end
+    add_script_lump("DDFFLAT", ddfflat_lines)
   end
 end
 
@@ -154,11 +130,7 @@ function ScriptMan_assemble_ddffont_lump()
   end
 
   if ddffont_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/fonts.ddf", ddffont_lines)
-    else
-      add_script_lump("DDFFONT", ddffont_lines)
-    end
+    add_script_lump("DDFFONT", ddffont_lines)
   end
 end
 
@@ -170,11 +142,7 @@ function ScriptMan_assemble_ddfgame_lump()
   end
 
   if ddfgame_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/games.ddf", ddfgame_lines)
-    else
-      add_script_lump("DDFGAME", ddfgame_lines)
-    end
+    add_script_lump("DDFGAME", ddfgame_lines)
   end
 end
 
@@ -186,11 +154,7 @@ function ScriptMan_assemble_ddfimage_lump()
   end
 
   if ddfimage_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/images.ddf", ddfimage_lines)
-    else
-      add_script_lump("DDFIMAGE", ddfimage_lines)
-    end
+    add_script_lump("DDFIMAGE", ddfimage_lines)
   end
 end
 
@@ -203,11 +167,7 @@ function ScriptMan_assemble_ddflang_lump()
   end
 
   if ddflang_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/language.ldf", ddflang_lines)
-    else
-      add_script_lump("DDFLANG", ddflang_lines)
-    end
+    add_script_lump("DDFLANG", ddflang_lines)
   end
 end
 
@@ -219,11 +179,7 @@ function ScriptMan_assemble_ddfplay_lump()
   end
 
   if ddfplay_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/playlist.ddf", ddfplay_lines)
-    else
-      add_script_lump("DDFPLAY", ddfplay_lines)
-    end
+    add_script_lump("DDFPLAY", ddfplay_lines)
   end
 end
 
@@ -235,11 +191,7 @@ function ScriptMan_assemble_ddflevl_lump()
   end
 
   if ddflevl_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/levels.ddf", ddflevl_lines)
-    else
-      add_script_lump("DDFLEVL", ddflevl_lines)
-    end
+    add_script_lump("DDFLEVL", ddflevl_lines)
   end
 end
 
@@ -251,11 +203,7 @@ function ScriptMan_assemble_ddfline_lump()
   end
 
   if ddfline_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/lines.ddf", ddfline_lines)
-    else
-      add_script_lump("DDFLINE", ddfline_lines)
-    end
+    add_script_lump("DDFLINE", ddfline_lines)
   end
 end
 
@@ -269,11 +217,7 @@ function ScriptMan_assemble_ddfsect_lump()
   end
 
   if ddfsect_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/sectors.ddf", ddfsect_lines)
-    else
-      add_script_lump("DDFSECT", ddfsect_lines)
-    end
+    add_script_lump("DDFSECT", ddfsect_lines)
   end
 end
 
@@ -285,11 +229,7 @@ function ScriptMan_assemble_ddfsfx_lump()
   end
 
   if ddfsfx_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/sounds.ddf", ddfsfx_lines)
-    else
-      add_script_lump("DDFSFX", ddfsfx_lines)
-    end
+    add_script_lump("DDFSFX", ddfsfx_lines)
   end
 end
 
@@ -301,11 +241,7 @@ function ScriptMan_assemble_ddfstyle_lump()
   end
 
   if ddfstyle_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/styles.ddf", ddfstyle_lines)
-    else
-      add_script_lump("DDFSTYLE", ddfstyle_lines)
-    end
+    add_script_lump("DDFSTYLE", ddfstyle_lines)
   end
 end
 
@@ -317,11 +253,7 @@ function ScriptMan_assemble_ddfswth_lump()
   end
 
   if ddfswth_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/switch.ddf", ddfswth_lines)
-    else
-      add_script_lump("DDFSWTH", ddfswth_lines)
-    end
+    add_script_lump("DDFSWTH", ddfswth_lines)
   end
 end
 
@@ -333,11 +265,7 @@ function ScriptMan_assemble_ddfweap_lump()
   end
 
   if ddfweap_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/weapons.ddf", ddfweap_lines)
-    else
-      add_script_lump("DDFWEAP", ddfweap_lines)
-    end
+    add_script_lump("DDFWEAP", ddfweap_lines)
   end
 end
 
@@ -349,11 +277,7 @@ function ScriptMan_assemble_rscript_lump()
   end
 
   if rscript_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("scripts/rscript.rts", rscript_lines)
-    else
-      add_script_lump("RSCRIPT", rscript_lines)
-    end
+    add_script_lump("RSCRIPT", rscript_lines)
   end
 end
 
@@ -461,11 +385,7 @@ function ScriptMan_assemble_mapinfo_lump()
   end
 
   if mapinfo_lines and #mapinfo_lines > 2 then
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("MAPINFO.txt", mapinfo_lines)
-    else
-      gui.wad_add_text_lump("MAPINFO", mapinfo_lines)
-    end
+    gui.wad_add_text_lump("MAPINFO", mapinfo_lines)
   end
 end
 
@@ -477,11 +397,7 @@ function ScriptMan_assemble_trnslate_lump()
   end
 
   if trnslate_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("TRNSLATE.txt", trnslate_lines)
-    else
-      add_script_lump("TRNSLATE", trnslate_lines)
-    end
+    add_script_lump("TRNSLATE", trnslate_lines)
   end
 end
 
@@ -504,11 +420,7 @@ function ScriptMan_assemble_zscript_lump()
 
   if zscript_lines ~= "" then
     zscript_lines = 'version "4.3"\n' .. zscript_lines
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("ZSCRIPT.txt", zscript_lines)
-    else
-      add_script_lump("ZSCRIPT", zscript_lines)
-    end
+    add_script_lump("ZSCRIPT", zscript_lines)
   end
 end
 
@@ -524,11 +436,7 @@ function ScriptMan_assemble_decorate_lump()
   end
 
   if SCRIPTS.decorate then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("DECORATE.txt", SCRIPTS.decorate)
-    else
-      add_script_lump("DECORATE", SCRIPTS.decorate)
-    end
+    add_script_lump("DECORATE", SCRIPTS.decorate)
   end
 
 end
@@ -551,11 +459,7 @@ function ScriptMan_assemble_sndinfo_lump()
   end
 
   if sndinfo_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("SNDINFO.txt", sndinfo_lines)
-    else
-      add_script_lump("SNDINFO", sndinfo_lines)
-    end
+    add_script_lump("SNDINFO", sndinfo_lines)
   end
 end
 
@@ -584,11 +488,7 @@ function ScriptMan_assemble_gldefs_lump()
   end
 
   if gldefs_lines ~= "" then
-    if ob_mod_enabled("compress_output") == 1 then
-      add_script_lump("GLDEFS.txt", gldefs_lines)
-    else
-      add_script_lump("GLDEFS", gldefs_lines)
-    end
+    add_script_lump("GLDEFS", gldefs_lines)
   end
 end
 
@@ -614,11 +514,7 @@ function ScriptMan_assemble_language_lump()
   end
 
   if #language_lines > 2 then
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("LANGUAGE.txt", language_lines)
-    else
-      gui.wad_add_text_lump("LANGUAGE", language_lines)
-    end
+    gui.wad_add_text_lump("LANGUAGE", language_lines)
   end
 
 end
@@ -634,11 +530,7 @@ function ScriptMan_assemble_acs_loader_lump()
   end
 
   if not table.empty(acs_loader_lines) then
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("LOADACS.txt", acs_loader_lines)
-    else
-      gui.wad_add_text_lump("LOADACS", acs_loader_lines)
-    end
+    gui.wad_add_text_lump("LOADACS", acs_loader_lines)
   end
 end
 
@@ -661,30 +553,18 @@ function ScriptMan_assemble_textures_lump()
 
   if PARAM.obsidian_resource_pack_active then
     table.insert(textures_lump_lines, EPIC_TEXTUREX_LUMP)
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("TEXTURES.txt", textures_lump_lines)
-    else
-      gui.wad_add_text_lump("TEXTURES", textures_lump_lines)
-    end
+    gui.wad_add_text_lump("TEXTURES", textures_lump_lines)
   end
 
   if SCRIPTS.animdefs then
     table.insert(textures_lump_lines, EPIC_TEXTUREX_LUMP)
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("ANIMDEFS.txt", {SCRIPTS.animdefs})
-    else
-      gui.wad_add_text_lump("ANIMDEFS", {SCRIPTS.animdefs})
-    end
+    gui.wad_add_text_lump("ANIMDEFS", {SCRIPTS.animdefs})
   end
 end
 
 function ScriptMan_assemble_terrain_lump()
   if SCRIPTS.terrain then
-    if ob_mod_enabled("compress_output") == 1 then
-      gui.wad_add_text_lump("TERRAIN.txt", {SCRIPTS.terrain})
-    else
-      gui.wad_add_text_lump("TERRAIN", {SCRIPTS.terrain})
-    end
+    gui.wad_add_text_lump("TERRAIN", {SCRIPTS.terrain})
   end
 end
 

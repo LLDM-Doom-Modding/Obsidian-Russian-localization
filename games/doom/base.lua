@@ -25,7 +25,6 @@ DOOM = { }
 gui.import("params")
 
 gui.import("entities")
-gui.import("factory") -- For earlier Oblige versions
 gui.import("monsters")
 gui.import("pickups")
 gui.import("weapons")
@@ -65,7 +64,6 @@ OB_GAMES["doom2"] =
   hooks =
   {
     setup = DOOM.setup,
-    factory_setup = DOOM.factory_setup,
     slump_setup = DOOM.slump_setup,
     get_levels = DOOM.get_levels,
     end_level  = DOOM.end_level,

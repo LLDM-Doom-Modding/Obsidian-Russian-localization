@@ -33,8 +33,6 @@ std::map<std::string, int> initial_enabled_addons;
 
 std::vector<addon_info_t> all_addons;
 
-std::vector<std::string> all_presets;
-
 // Will check install, then home directory (if different)
 void VFS_AddFolder(std::string name)
 {
@@ -101,9 +99,7 @@ void VFS_InitAddons()
     VFS_AddFolder("modules");
     VFS_AddFolder("data");
     VFS_AddFolder("ports");
-    VFS_AddFolder("presets");
     VFS_AddFolder("addons");
-    VFS_AddFolder("temp");
 
     LogPrint("DONE.\n\n");
 }
@@ -159,44 +155,6 @@ void VFS_OptWrite(FILE *fp)
     }
 
     fprintf(fp, "\n");
-}
-
-void VFS_ScanForPresets()
-{
-    LogPrint("Scanning for presets....\n");
-
-    all_presets.clear();
-
-    char **got_names = PHYSFS_enumerateFiles("presets");
-
-    // seems this only happens on out-of-memory error
-    if (!got_names)
-    {
-        LogPrint("DONE (none found)\n");
-    }
-
-    char **p;
-
-    for (p = got_names; *p; p++)
-    {
-        if (GetExtension(*p) == ".txt")
-        {
-            all_presets.push_back(*p);
-        }
-    }
-
-    PHYSFS_freeList(got_names);
-
-    if (all_presets.size() == 0)
-    {
-        LogPrint("DONE (none found)\n");
-    }
-    else
-    {
-        LogPrint("DONE\n");
-    }
-
-    LogPrint("\n");
 }
 
 void VFS_ScanForAddons()

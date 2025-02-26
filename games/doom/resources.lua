@@ -936,13 +936,7 @@ end
 function DOOM.all_done()
   DOOM.make_cool_gfx()
   DOOM.make_episode_gfx()
-
-  if ob_mod_enabled("compress_output") == 1 then
-    gui.pk3_insert_file("data/endoom/ENDOOM.bin", "ENDOOM.bin")
-  else
-    gui.wad_insert_file("data/endoom/ENDOOM.bin", "ENDOOM")
-  end
-
+  gui.wad_insert_file("data/endoom/ENDOOM.bin", "ENDOOM")
   gui.wad_merge_sections("games/doom/data/invisible_wall.wad")
   gui.wad_merge_sections("games/doom/data/lift_flat.wad")
   gui.wad_merge_sections("games/doom/data/vine_dude.wad")

@@ -52,7 +52,7 @@ UNFINISHED["wolf"] =
 	
 	hooks =
 	{
-      factory_setup = WOLF.factory_setup,
+
 	},
 }
 

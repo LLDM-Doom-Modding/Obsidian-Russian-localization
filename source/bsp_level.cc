@@ -20,13 +20,13 @@
 
 #include <limits.h>
 #include <math.h>
+#include <string.h>
 
 #include <algorithm>
 
 #include "bsp_local.h"
 #include "bsp_wad.h"
 #include "lib_parse.h"
-#include "miniz.h"
 #include "raw_def.h"
 #include "sys_assert.h"
 #include "sys_debug.h"
@@ -59,6 +59,8 @@ static uint16_t *block_dups;
 
 static int block_compression;
 static int block_overflowed;
+
+static Lump_c *zout_lump;
 
 static constexpr uint16_t BLOCK_LIMIT = 16000;
 
@@ -2101,8 +2103,6 @@ void SortSegs()
 
 static const uint8_t *lev_XNOD_magic = (uint8_t *)"XNOD";
 static const uint8_t *lev_XGL3_magic = (uint8_t *)"XGL3";
-static const uint8_t *lev_ZGL3_magic = (uint8_t *)"ZGL3";
-static const uint8_t *lev_ZNOD_magic = (uint8_t *)"ZNOD";
 
 void PutZVertices()
 {
@@ -2111,8 +2111,8 @@ void PutZVertices()
     uint32_t orgverts = LE_U32(num_old_vert);
     uint32_t newverts = LE_U32(num_new_vert);
 
-    ZLibAppendLump(&orgverts, 4);
-    ZLibAppendLump(&newverts, 4);
+    zout_lump->Write(&orgverts, 4);
+    zout_lump->Write(&newverts, 4);
 
     for (i = 0, count = 0; i < (int)lev_vertices.size(); i++)
     {
@@ -2126,7 +2126,7 @@ void PutZVertices()
         raw.x = LE_S32(OBSIDIAN_I_ROUND(vert->x * 65536.0));
         raw.y = LE_S32(OBSIDIAN_I_ROUND(vert->y * 65536.0));
 
-        ZLibAppendLump(&raw, sizeof(raw));
+        zout_lump->Write(&raw, sizeof(raw));
 
         count++;
     }
@@ -2138,7 +2138,7 @@ void PutZVertices()
 void PutZSubsecs()
 {
     uint32_t raw_num = LE_U32((int)lev_subsecs.size());
-    ZLibAppendLump(&raw_num, 4);
+    zout_lump->Write(&raw_num, 4);
 
     int cur_seg_index = 0;
 
@@ -2147,7 +2147,7 @@ void PutZSubsecs()
         const subsec_t *sub = lev_subsecs[i];
 
         raw_num = LE_U32(sub->seg_count);
-        ZLibAppendLump(&raw_num, 4);
+        zout_lump->Write(&raw_num, 4);
 
         // sanity check the seg index values
         int count = 0;
@@ -2170,7 +2170,7 @@ void PutZSubsecs()
 void PutZSegs()
 {
     uint32_t raw_num = LE_U32((int)lev_segs.size());
-    ZLibAppendLump(&raw_num, 4);
+    zout_lump->Write(&raw_num, 4);
 
     for (int i = 0; i < (int)lev_segs.size(); i++)
     {
@@ -2185,17 +2185,17 @@ void PutZSegs()
         uint16_t line = LE_U16(seg->linedef->index);
         uint8_t  side = (uint8_t)seg->side;
 
-        ZLibAppendLump(&v1, 4);
-        ZLibAppendLump(&v2, 4);
-        ZLibAppendLump(&line, 2);
-        ZLibAppendLump(&side, 1);
+        zout_lump->Write(&v1, 4);
+        zout_lump->Write(&v2, 4);
+        zout_lump->Write(&line, 2);
+        zout_lump->Write(&side, 1);
     }
 }
 
 void PutXGL3Segs()
 {
     uint32_t raw_num = LE_U32((int)lev_segs.size());
-    ZLibAppendLump(&raw_num, 4);
+    zout_lump->Write(&raw_num, 4);
 
     for (int i = 0; i < (int)lev_segs.size(); i++)
     {
@@ -2209,10 +2209,10 @@ void PutXGL3Segs()
         uint32_t line    = LE_U32(seg->linedef ? seg->linedef->index : -1);
         uint8_t  side    = (uint8_t)seg->side;
 
-        ZLibAppendLump(&v1, 4);
-        ZLibAppendLump(&partner, 4);
-        ZLibAppendLump(&line, 4);
-        ZLibAppendLump(&side, 1);
+        zout_lump->Write(&v1, 4);
+        zout_lump->Write(&partner, 4);
+        zout_lump->Write(&line, 4);
+        zout_lump->Write(&side, 1);
 
 #if DEBUG_BSP
         fprintf(stderr, "SEG[%d] v1=%d partner=%d line=%d side=%d\n", i, v1, partner, line, side);
@@ -2239,10 +2239,10 @@ static void PutOneZNode(node_t *node, bool do_xgl3)
         uint32_t dx = LE_S32(OBSIDIAN_I_ROUND(node->dx * 65536.0));
         uint32_t dy = LE_S32(OBSIDIAN_I_ROUND(node->dy * 65536.0));
 
-        ZLibAppendLump(&x, 4);
-        ZLibAppendLump(&y, 4);
-        ZLibAppendLump(&dx, 4);
-        ZLibAppendLump(&dy, 4);
+        zout_lump->Write(&x, 4);
+        zout_lump->Write(&y, 4);
+        zout_lump->Write(&dx, 4);
+        zout_lump->Write(&dy, 4);
     }
     else
     {
@@ -2251,10 +2251,10 @@ static void PutOneZNode(node_t *node, bool do_xgl3)
         raw.dx = LE_S16(OBSIDIAN_I_ROUND(node->dx));
         raw.dy = LE_S16(OBSIDIAN_I_ROUND(node->dy));
 
-        ZLibAppendLump(&raw.x, 2);
-        ZLibAppendLump(&raw.y, 2);
-        ZLibAppendLump(&raw.dx, 2);
-        ZLibAppendLump(&raw.dy, 2);
+        zout_lump->Write(&raw.x, 2);
+        zout_lump->Write(&raw.y, 2);
+        zout_lump->Write(&raw.dx, 2);
+        zout_lump->Write(&raw.dy, 2);
     }
 
     raw.b1.minx = LE_S16(node->r.bounds.minx);
@@ -2267,8 +2267,8 @@ static void PutOneZNode(node_t *node, bool do_xgl3)
     raw.b2.maxx = LE_S16(node->l.bounds.maxx);
     raw.b2.maxy = LE_S16(node->l.bounds.maxy);
 
-    ZLibAppendLump(&raw.b1, sizeof(raw.b1));
-    ZLibAppendLump(&raw.b2, sizeof(raw.b2));
+    zout_lump->Write(&raw.b1, sizeof(raw.b1));
+    zout_lump->Write(&raw.b2, sizeof(raw.b2));
 
     if (node->r.node)
         raw.right = LE_U32(node->r.node->index);
@@ -2284,8 +2284,8 @@ static void PutOneZNode(node_t *node, bool do_xgl3)
     else
         FatalError("Bad left child in V5 node %d\n", node->index);
 
-    ZLibAppendLump(&raw.right, 4);
-    ZLibAppendLump(&raw.left, 4);
+    zout_lump->Write(&raw.right, 4);
+    zout_lump->Write(&raw.left, 4);
 
 #if DEBUG_BSP
     DebugPrint("PUT Z NODE %08X  Left %08X  Right %08X  "
@@ -2298,7 +2298,7 @@ static void PutOneZNode(node_t *node, bool do_xgl3)
 void PutZNodes(node_t *root, bool do_xgl3)
 {
     uint32_t raw_num = LE_U32((int)lev_nodes.size());
-    ZLibAppendLump(&raw_num, 4);
+    zout_lump->Write(&raw_num, 4);
 
     node_cur_index = 0;
 
@@ -2322,15 +2322,6 @@ static int CalcZDoomNodesSize()
     size += 4 + (int)lev_segs.size() * 11;
     size += 4 + (int)lev_nodes.size() * sizeof(raw_v5_node_t);
 
-    if (cur_info->force_compress)
-    {
-        // according to RFC1951, the zlib compression worst-case
-        // scenario is 5 extra bytes per 32KB (0.015% increase).
-        // we are significantly more conservative!
-
-        size += ((size + 255) >> 5);
-    }
-
     return size;
 }
 
@@ -2344,43 +2335,32 @@ void SaveZDFormat(node_t *root_node)
 
     Lump_c *lump = CreateLevelLump("NODES", max_size);
 
-    if (cur_info->force_compress)
-        lump->Write(lev_ZNOD_magic, 4);
-    else
-        lump->Write(lev_XNOD_magic, 4);
+    lump->Write(lev_XNOD_magic, 4);
 
-    // the ZLibXXX functions do no compression for XNOD format
-    ZLibBeginLump(lump);
+    zout_lump = lump;
 
     PutZVertices();
     PutZSubsecs();
     PutZSegs();
     PutZNodes(root_node, false);
 
-    ZLibFinishLump();
+    zout_lump->Finish();
+    zout_lump = NULL;
 }
 
 void SaveXGL3Format(Lump_c *lump, node_t *root_node)
 {
-    // WISH : compute a max_size
+    lump->Write(lev_XGL3_magic, 4);
 
-    if (cur_info->force_compress)
-    {
-        lump->Write(lev_ZGL3_magic, 4);
-    }
-    else
-    {
-        lump->Write(lev_XGL3_magic, 4);
-    }
-
-    ZLibBeginLump(lump);
+    zout_lump = lump;
 
     PutZVertices();
     PutZSubsecs();
     PutXGL3Segs();
     PutZNodes(root_node, true /* do_xgl3 */);
 
-    ZLibFinishLump();
+    zout_lump->Finish();
+    zout_lump = NULL;
 }
 
 /* ----- whole-level routines --------------------------- */
@@ -2643,108 +2623,6 @@ build_result_e SaveXWA(node_t *root_node)
     xwa_wad->EndWrite();
 
     return BUILD_OK;
-}
-
-//----------------------------------------------------------------------
-
-static Lump_c *zout_lump;
-
-static z_stream zout_stream;
-static Bytef    zout_buffer[1024];
-
-void ZLibBeginLump(Lump_c *lump)
-{
-    zout_lump = lump;
-
-    if (!cur_info->force_compress)
-        return;
-
-    zout_stream.zalloc = (alloc_func)0;
-    zout_stream.zfree  = (free_func)0;
-    zout_stream.opaque = (voidpf)0;
-
-    if (Z_OK != deflateInit(&zout_stream, Z_DEFAULT_COMPRESSION))
-        FatalError("Trouble setting up zlib compression\n");
-
-    zout_stream.next_out  = zout_buffer;
-    zout_stream.avail_out = sizeof(zout_buffer);
-}
-
-void ZLibAppendLump(const void *data, int length)
-{
-    // ASSERT(zout_lump)
-    // ASSERT(length > 0)
-
-    if (!cur_info->force_compress)
-    {
-        zout_lump->Write(data, length);
-        return;
-    }
-
-    zout_stream.next_in  = (Bytef *)data; // const override
-    zout_stream.avail_in = length;
-
-    while (zout_stream.avail_in > 0)
-    {
-        int err = deflate(&zout_stream, Z_NO_FLUSH);
-
-        if (err != Z_OK)
-            FatalError("Trouble compressing %d bytes (zlib)\n", length);
-
-        if (zout_stream.avail_out == 0)
-        {
-            zout_lump->Write(zout_buffer, sizeof(zout_buffer));
-
-            zout_stream.next_out  = zout_buffer;
-            zout_stream.avail_out = sizeof(zout_buffer);
-        }
-    }
-}
-
-void ZLibFinishLump(void)
-{
-    if (!cur_info->force_compress)
-    {
-        zout_lump->Finish();
-        zout_lump = NULL;
-        return;
-    }
-
-    int left_over;
-
-    // ASSERT(zout_stream.avail_out > 0)
-
-    zout_stream.next_in  = Z_NULL;
-    zout_stream.avail_in = 0;
-
-    for (;;)
-    {
-        int err = deflate(&zout_stream, Z_FINISH);
-
-        if (err == Z_STREAM_END)
-            break;
-
-        if (err != Z_OK)
-            FatalError("Trouble finishing compression (zlib)\n");
-
-        if (zout_stream.avail_out == 0)
-        {
-            zout_lump->Write(zout_buffer, sizeof(zout_buffer));
-
-            zout_stream.next_out  = zout_buffer;
-            zout_stream.avail_out = sizeof(zout_buffer);
-        }
-    }
-
-    left_over = sizeof(zout_buffer) - zout_stream.avail_out;
-
-    if (left_over > 0)
-        zout_lump->Write(zout_buffer, left_over);
-
-    deflateEnd(&zout_stream);
-
-    zout_lump->Finish();
-    zout_lump = NULL;
 }
 
 /* ---------------------------------------------------------------- */

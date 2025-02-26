@@ -35,6 +35,6 @@ UNFINISHED["spear"] =
 	
 	hooks =
 	{
-      factory_setup = SPEAR.factory_setup,
+
 	},
 }

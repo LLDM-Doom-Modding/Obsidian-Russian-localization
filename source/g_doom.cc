@@ -30,7 +30,6 @@
 #include "bsp.h"
 #include "lib_util.h"
 #include "lib_wad.h"
-#include "lib_zip.h"
 #include "m_cookie.h"
 #include "m_lua.h"
 #include "m_trans.h"
@@ -324,7 +323,6 @@ bool BuildNodes(std::string filename)
         build_info.do_reject      = false;
         build_info.do_blockmap    = false;
         build_info.force_xnod     = true;
-        build_info.force_compress = true;
     }
 
     if (ajbsp::BuildNodes(filename, &build_info) != 0)
@@ -471,14 +469,7 @@ bool Doom::StartWAD(const std::string &filename)
     ClearSections();
 
     qLump_c *info = BSP_CreateInfoLump();
-    if (game_object->file_per_map)
-    {
-        ZIPF_AddMem("OBSIDATA.txt", (uint8_t *)info->GetBuffer(), info->GetSize());
-    }
-    else
-    {
-        WriteLump("OBSIDATA", info);
-    }
+    WriteLump("OBSIDATA", info);
     delete info;
 
     return true; // OK
@@ -569,15 +560,6 @@ void Doom::EndLevel(const std::string &level_name)
     // in case we need it
     std::string level_wad = PathAppend(home_dir, StringFormat("%s.wad", level_name.c_str()));
 
-    if (game_object->file_per_map)
-    {
-        WAD_CloseWrite();
-        if (!WAD_OpenWrite(level_wad))
-        { // Just stick it in the resource WAD?
-            WAD_OpenWrite(game_object->Filename());
-        }
-    }
-
     WriteLump(level_name, header_lump);
 
     if (UDMF_mode)
@@ -611,25 +593,6 @@ void Doom::EndLevel(const std::string &level_name)
     }
 
     FreeLumps();
-
-    if (game_object->file_per_map)
-    {
-        WAD_CloseWrite();
-        Doom::BuildNodes(level_wad);
-        if (!ZIPF_AddFile(level_wad, "maps"))
-        {
-            FileDelete(level_wad);
-            ZIPF_CloseWrite();
-            FileDelete(game_object->ZIP_Filename());
-            FileDelete(game_object->Filename());
-            FatalError(_("Error writing map WAD to %s\n"), game_object->ZIP_Filename().c_str());
-        }
-        else
-        {
-            FileDelete(level_wad);
-        }
-        WAD_OpenWrite(game_object->Filename());
-    }
 }
 
 int Doom::v094_end_level(lua_State *L)
@@ -1305,11 +1268,9 @@ class game_interface_c : public ::game_interface_c
 {
   private:
     std::string filename;
-    std::string zip_filename;
-    bool        compress_output;
 
   public:
-    game_interface_c() : filename(""), zip_filename(""), compress_output(false)
+    game_interface_c() : filename("")
     {
     }
 
@@ -1320,7 +1281,6 @@ class game_interface_c : public ::game_interface_c
     void        EndLevel();
     void        Property(std::string key, std::string value);
     std::string Filename();
-    std::string ZIP_Filename();
 };
 } // namespace Doom
 
@@ -1333,8 +1293,6 @@ bool Doom::game_interface_c::Start(const char *preset)
     ef_thing_mode  = 0;
 
     current_port    = ob_get_param("port");
-    compress_output = ob_mod_enabled("compress_output");
-    file_per_map    = (compress_output && StringCompare(current_port, "limit_enforcing") != 0);
 
     ob_invoke_hook("pre_setup");
 
@@ -1346,11 +1304,6 @@ bool Doom::game_interface_c::Start(const char *preset)
     {
         filename = PathAppend(CurrentDirectoryGet(), batch_output_file);
     }
-    if (compress_output)
-    {
-        zip_filename = filename;
-        ReplaceExtension(zip_filename, ".pk3");
-    }
 
     if (filename.empty())
     {
@@ -1358,16 +1311,9 @@ bool Doom::game_interface_c::Start(const char *preset)
         return false;
     }
 
-    if (file_per_map)
-    {
-        filename = PathAppend(home_dir, "temp/resources.wad");
-    }
-    else
-    {
-        ReplaceExtension(filename, ".wad");
-    }
+    ReplaceExtension(filename, ".wad");
 
-    if (create_backups && !file_per_map)
+    if (create_backups)
     {
         Main::BackupFile(filename);
     }
@@ -1381,23 +1327,6 @@ bool Doom::game_interface_c::Start(const char *preset)
         ob_build_progress = 0.0f;
         ob_build_step.clear();
         return true;
-    }
-
-    if (compress_output)
-    {
-        if (FileExists(zip_filename))
-        {
-            if (create_backups)
-            {
-                Main::BackupFile(zip_filename);
-            }
-            FileDelete(zip_filename);
-        }
-        if (!ZIPF_OpenWrite(zip_filename))
-        {
-            ProgStatus("%s", _("Error (create PK3/ZIP)"));
-            return false;
-        }
     }
 
     if (!StartWAD(filename))
@@ -1468,32 +1397,6 @@ bool Doom::game_interface_c::Finish(bool build_ok)
         }
     }
     
-    if (build_ok)
-    {
-        if (compress_output)
-        {
-            if (!ZIPF_AddFile(filename, ""))
-            {
-                LogPrint("Adding WAD to PK3 failed! Retaining original "
-                         "WAD.\n");
-                ZIPF_CloseWrite();
-                FileDelete(zip_filename);
-            }
-            else
-            {
-                if (!ZIPF_CloseWrite())
-                {
-                    LogPrint("Corrupt PK3! Retaining original WAD.\n");
-                    FileDelete(zip_filename);
-                }
-                else
-                {
-                    FileDelete(filename);
-                }
-            }
-        }
-    }
-
     return build_ok;
 }
 
@@ -1561,11 +1464,6 @@ void Doom::game_interface_c::Property(std::string key, std::string value)
 std::string Doom::game_interface_c::Filename()
 {
     return filename;
-}
-
-std::string Doom::game_interface_c::ZIP_Filename()
-{
-    return zip_filename;
 }
 
 void Doom::game_interface_c::EndLevel()

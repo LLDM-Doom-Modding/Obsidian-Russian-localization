@@ -50,7 +50,7 @@ UNFINISHED["obc"] =
 	
 	hooks =
 	{
-      factory_setup = OBC.factory_setup,
+
 	},
 }
 
