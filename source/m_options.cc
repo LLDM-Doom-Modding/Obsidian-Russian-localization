@@ -54,14 +54,6 @@ void Parse_Option(const std::string &name, const std::string &value)
     {
         debug_messages = StringToInt(value) ? true : false;
     }
-    else if (StringCompare(name, "limit_break") == 0)
-    {
-        limit_break = StringToInt(value) ? true : false;
-    }
-    else if (StringCompare(name, "preserve_old_config") == 0)
-    {
-        preserve_old_config = StringToInt(value) ? true : false;
-    }
     else if (StringCompare(name, "random_string_seeds") == 0)
     {
         random_string_seeds = StringToInt(value) ? true : false;
@@ -173,8 +165,6 @@ bool Options_Save(const std::string &filename)
     fprintf(option_fp, "create_backups = %d\n", (create_backups ? 1 : 0));
     fprintf(option_fp, "overwrite_warning = %d\n", (overwrite_warning ? 1 : 0));
     fprintf(option_fp, "debug_messages = %d\n", (debug_messages ? 1 : 0));
-    fprintf(option_fp, "limit_break = %d\n", (limit_break ? 1 : 0));
-    fprintf(option_fp, "preserve_old_config = %d\n", (preserve_old_config ? 1 : 0));
     fprintf(option_fp, "random_string_seeds = %d\n", (random_string_seeds ? 1 : 0));
     fprintf(option_fp, "password_mode = %d\n", (password_mode ? 1 : 0));
     fprintf(option_fp, "mature_word_lists = %d\n", (mature_word_lists ? 1 : 0));

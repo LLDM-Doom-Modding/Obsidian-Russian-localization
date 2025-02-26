@@ -1341,7 +1341,7 @@ bool Doom::game_interface_c::Start(const char *preset)
     if (StringCompare(current_port, "zdoom") == 0)
     {
         map_format  = FORMAT_UDMF;
-        build_nodes = ob_mod_enabled("build_nodes");
+        build_nodes = false;
     }
     else if (StringCompare(current_port, "edge") == 0)
     {
@@ -1391,10 +1391,7 @@ bool Doom::game_interface_c::Finish(bool build_ok)
     if (!build_ok)
     {
         // remove the WAD if an error occurred
-        if (!preserve_failures)
-        {
-            FileDelete(filename);
-        }
+        FileDelete(filename);
     }
     
     return build_ok;
