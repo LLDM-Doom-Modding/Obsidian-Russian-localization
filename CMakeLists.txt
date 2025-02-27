@@ -8,7 +8,7 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(OBSIDIAN_GUI OFF)
+set(OBSIDIAN_GUI ON)
 
 if(OBSIDIAN_GUI)
   add_compile_definitions(OBSIDIAN_ENABLE_GUI=1)
@@ -52,9 +52,7 @@ set(OBSIDIAN_SOURCE_FILES
     source/csg_spots.cc
     source/dm_extra.cc
     source/dm_prefab.cc
-    source/ff_main.cc
     source/g_doom.cc
-    source/lex.yy.c
     source/lib_argv.cc
     source/lib_tga.cc
     source/lib_util.cc

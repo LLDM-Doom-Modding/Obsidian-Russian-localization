@@ -1454,42 +1454,18 @@ function ob_default_filename()
   if OB_CONFIG.filename_prefix == "none" then
     return str
   else
-    local formatstring
-    local levelcount
     
-    if OB_CONFIG.length == "single" then
-      levelcount = "1"
-    elseif OB_CONFIG.length == "few" then
-      levelcount = "4"
-    elseif OB_CONFIG.length == "episode" then
-      if ob_match_game({game = {doom2=1,tnt=1,plutonia=1,hacx=1}}) then
-        levelcount = "11"
-      else
-        levelcount = "9"
-      end
-    else
-     levelcount = "FULL"
-    end
-        
+    local formatstring
+
     if OB_CONFIG.filename_prefix == "datetime" then
       formatstring = ob_datetime_format_string() .. "_"
-    elseif OB_CONFIG.filename_prefix == "numlevels" then
-      formatstring = "ob" .. levelcount .. "_"
     elseif OB_CONFIG.filename_prefix == "game" then
       formatstring = OB_CONFIG.game .. "_"
-    elseif OB_CONFIG.filename_prefix == "port" then
-      formatstring = OB_CONFIG.port .. "_"
-    elseif OB_CONFIG.filename_prefix == "theme" then
-      formatstring = OB_CONFIG.theme .. "_"   
-    elseif OB_CONFIG.filename_prefix == "version" then
-      formatstring = "%v_"
-    elseif OB_CONFIG.filename_prefix == "custom" then
-      formatstring = "custom"
-   end
+    end
    
-   return gui.format_prefix(levelcount, OB_CONFIG.game, OB_CONFIG.port, OB_CONFIG.theme, formatstring) .. str .. ".wad"
+    return formatstring .. str .. ".wad"
    
- end
+  end
  
  ::continue::
  
@@ -1681,15 +1657,6 @@ function ob_transfer_ui_options()
         OB_CONFIG[opt.name] = opt.value or "UNSET"
       end
     end
-  end
-
-  -- fixes for backwards compatibility
-  if OB_CONFIG.length == "full" then
-     OB_CONFIG.length = "game"
-  end
-
-  if OB_CONFIG.theme == "mixed" then
-     OB_CONFIG.theme = "epi"
   end
 end
 

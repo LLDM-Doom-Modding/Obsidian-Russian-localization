@@ -25,7 +25,6 @@
 
 #include <algorithm>
 
-#include "ff_main.h"
 #include "lib_util.h"
 #include "luaalloc.h"
 #include "m_trans.h"
@@ -61,40 +60,6 @@ void Script_Load(std::string script_name);
 
 // color maps
 color_mapping_t color_mappings[MAX_COLOR_MAPS];
-
-// LUA: format_prefix(levelcount, OB_CONFIG.game, OB_CONFIG.theme, formatstring)
-//
-int gui_format_prefix(lua_State *L)
-{
-    const char *levelcount = luaL_checkstring(L, 1);
-    const char *game       = luaL_checkstring(L, 2);
-    const char *port       = luaL_checkstring(L, 3);
-    const char *theme      = luaL_checkstring(L, 4);
-    std::string format     = luaL_checkstring(L, 5);
-
-    SYS_ASSERT(levelcount && game && theme && (!format.empty()));
-
-    if (StringCompare(format, "custom") == 0)
-    {
-        format = custom_prefix.c_str();
-    }
-
-    std::string result = ff_main(levelcount, game, port, theme, OBSIDIAN_SHORT_VERSION, format.c_str());
-
-    if (result.empty())
-    {
-        lua_pushstring(L, "FF_ERROR_"); // Will help people notice issues
-        return 1;
-    }
-    else
-    {
-        lua_pushstring(L, result.c_str());
-        return 1;
-    }
-
-    // Hopefully we don't get here
-    return 0;
-}
 
 // LUA: console_print(str)
 //
@@ -638,7 +603,6 @@ extern int wadfab_get_thing_hexen(lua_State *L);
 
 static const luaL_Reg gui_script_funcs[] = {
 
-    {"format_prefix", gui_format_prefix},
     {"console_print", gui_console_print},
     {"raw_log_print", gui_raw_log_print},
     {"raw_debug_print", gui_raw_debug_print},
