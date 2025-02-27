@@ -1081,19 +1081,36 @@ std::string ob_game_format()
     return res;
 }
 
-std::string ob_get_param(const std::string &parameter)
+std::string ob_get_string_param(const std::string &parameter)
 {
-    if (!Script_CallFunc("ob_get_param", 1, {parameter}))
+    std::string ret = "";
+
+    if (!Script_CallFunc("ob_get_string_param", 1, {parameter}))
     {
-        return "";
+        return ret;
     }
 
-    std::string param = luaL_optlstring(LUA_ST, -1, "", NULL);
+    ret = luaL_optlstring(LUA_ST, -1, "", NULL);
 
     // remove result from lua stack
     lua_pop(LUA_ST, 1);
 
-    return param;
+    return ret;
+}
+
+bool ob_get_bool_param(const std::string &parameter)
+{
+    if (!Script_CallFunc("ob_get_bool_param", 1, {parameter}))
+    {
+        return false;
+    }
+
+    int param = luaL_checkinteger(LUA_ST, -1);
+
+    // remove result from lua stack
+    lua_pop(LUA_ST, 1);
+
+    return param == 1 ? true : false;
 }
 
 bool ob_hexen_ceiling_check(int thing_id)

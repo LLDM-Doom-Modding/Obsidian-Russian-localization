@@ -1292,7 +1292,7 @@ bool Doom::game_interface_c::Start(const char *preset)
     ef_liquid_type = 0;
     ef_thing_mode  = 0;
 
-    current_port    = ob_get_param("port");
+    current_port    = ob_get_string_param("port");
 
     ob_invoke_hook("pre_setup");
 

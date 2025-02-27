@@ -94,7 +94,6 @@ OB_MODULES["ui_arch"] =
   side = "left",
   priority = 104,
   engine = "!idtech_0",
-  port = "!limit_enforcing",
   where = "arch",
 
   hooks = 

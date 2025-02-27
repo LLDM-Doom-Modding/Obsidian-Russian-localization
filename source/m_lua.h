@@ -47,7 +47,8 @@ bool ob_set_mod_option(const std::string &module, const std::string &option, con
 
 bool ob_read_all_config(std::vector<std::string> *lines, bool need_full);
 
-std::string ob_get_param(const std::string &parameter);
+std::string ob_get_string_param(const std::string &parameter);
+bool        ob_get_bool_param(const std::string &parameter);
 bool        ob_mod_enabled(const std::string &module_name);
 bool        ob_hexen_ceiling_check(int thing_id);
 void        ob_invoke_hook(const std::string &hookname);

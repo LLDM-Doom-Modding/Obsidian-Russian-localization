@@ -898,31 +898,12 @@ function ob_read_all_config(need_full, log_only)
       do_line("")
 
       for _,opt in pairs(def.options) do
-        if string.match(opt.name, "header_") then goto skipoption end
-        if string.match(opt.name, "url_") then goto skipoption end
-        if string.match(opt.name, "float_") then
-          if OB_CONFIG[opt.name] then
-            do_value(opt.name, OB_CONFIG[opt.name])
-          else
-            do_value(opt.name, opt.default)
-            ob_set_config(opt.name, opt.default)
-          end
-        elseif string.match(opt.name, "bool_") then
-          if OB_CONFIG[opt.name] then
-            do_value(opt.name, OB_CONFIG[opt.name])
-          else
-            do_value(opt.name, opt.default)
-            ob_set_config(opt.name, opt.default)
-          end
+        if OB_CONFIG[opt.name] then
+          do_value(opt.name, OB_CONFIG[opt.name])
         else
-          if OB_CONFIG[opt.name] then
-            do_value(opt.name, OB_CONFIG[opt.name])
-          else
-            do_value(opt.name, opt.default)
-            ob_set_config(opt.name, opt.default)
-          end
+          do_value(opt.name, opt.default)
+          ob_set_config(opt.name, opt.default)
         end
-        ::skipoption::
       end
 
       do_line("")
@@ -946,55 +927,20 @@ function ob_read_all_config(need_full, log_only)
       if def.options and not table.empty(def.options) then
         if def.options[1] then
           for _,opt in pairs(def.options) do
-            if string.match(opt.name, "header_") then goto skipoption end
-            if string.match(opt.name, "url_") then goto skipoption end
-            if string.match(opt.name, "float_") then
-              if OB_CONFIG[opt.name] then
-                do_mod_value(opt.name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(opt.name, opt.default)
-                ob_set_config(opt.name, opt.default)
-              end
-            elseif string.match(opt.name, "bool_") then
-              if OB_CONFIG[opt.name] then
-                do_mod_value(opt.name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(opt.name, opt.default)
-                ob_set_config(opt.name, opt.default)
-              end
+            if OB_CONFIG[opt.name] then
+              do_mod_value(opt.name, OB_CONFIG[opt.name])
             else
-              if OB_CONFIG[opt.name] then
-                do_mod_value(opt.name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(opt.name, opt.default)
-                ob_set_config(opt.name, opt.default)
-              end
+              do_mod_value(opt.name, opt.default)
+              ob_set_config(opt.name, opt.default)
             end
-            ::skipoption::
           end
         else
           for o_name,opt in pairs(def.options) do
-            if string.match(o_name, "float_") then
-              if OB_CONFIG[opt.name] then
-                do_mod_value(o_name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(o_name, opt.default)
-                ob_set_config(o_name, opt.default)
-              end
-            elseif string.match(o_name, "bool_") then
-              if OB_CONFIG[opt.name] then
-                do_mod_value(o_name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(o_name, opt.default)
-                ob_set_config(o_name, opt.default)
-              end
+            if OB_CONFIG[opt.name] then
+              do_mod_value(o_name, OB_CONFIG[opt.name])
             else
-              if OB_CONFIG[opt.name] then
-                do_mod_value(o_name, OB_CONFIG[opt.name])
-              else
-                do_mod_value(o_name, opt.default)
-                ob_set_config(o_name, opt.default)
-              end
+              do_mod_value(o_name, opt.default)
+              ob_set_config(o_name, opt.default)
             end
           end
         end
@@ -1269,15 +1215,7 @@ function ob_init()
         end
 
         for _,opt in pairs(list) do
-          assert(opt.label)
-          if string.match(opt.name, "header_") then
-            goto skipoption
-          end
-          if string.match(opt.name, "url_") then
-            assert(opt.url)
-            goto skipoption
-          end
-          
+          assert(opt.label)        
           assert(opt.choices)
                   
           -- select a default value
@@ -1298,7 +1236,6 @@ function ob_init()
             opt.avail_choices[id] = 1
           end
           opt.value = opt.default
-          ::skipoption::
         end -- for opt
       end
     end -- for mod
@@ -1341,7 +1278,7 @@ function ob_game_format()
   return assert(game.format)
 end
 
-function ob_get_param(parameter)
+function ob_get_string_param(parameter)
 
   assert(parameter)
 
@@ -1350,13 +1287,33 @@ function ob_get_param(parameter)
   if OB_CONFIG[parameter] then
     param = OB_CONFIG[parameter]
   else
-    print("MISSING PARAMETER: " .. parameter)
+    error("ob_get_string_param: MISSING PARAMETER " .. parameter)
   end
   
   if type(param) == "string" then
     return param
   else
     return tostring(param)
+  end
+  
+end
+
+function ob_get_bool_param(parameter)
+
+  assert(parameter)
+
+  local param
+
+  if OB_CONFIG[parameter] then
+    param = OB_CONFIG[parameter]
+  end
+  
+  assert(param and (param == "yes" or param == "no"))
+
+  if param == "yes" then
+    return 1
+  else
+    return 0
   end
   
 end

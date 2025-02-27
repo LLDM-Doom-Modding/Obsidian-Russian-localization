@@ -1383,10 +1383,7 @@ config *get_config(const std::string &filename)
     answer->sthemecount           = 0;
     answer->secret_themes         = SLUMP_FALSE;
     answer->lock_themes           = SLUMP_TRUE;
-    std::string nukage            = ob_get_param("bool_major_nukage_slump");
-    if (nukage.empty())
-        nukage = "0";
-    answer->major_nukage = StringToInt(nukage) ? SLUMP_TRUE : SLUMP_FALSE;
+    answer->major_nukage = ob_get_bool_param("major_nukage_slump") ? SLUMP_TRUE : SLUMP_FALSE;
     if (ob_mod_enabled("slump_all_nazis"))
     {
         answer->required_monster_bits  = SLUMP_SPECIAL;
@@ -1394,7 +1391,7 @@ config *get_config(const std::string &filename)
     }
     else
     {
-        std::string monvariety = ob_get_param("slump_mons");
+        std::string monvariety = ob_get_string_param("slump_mons");
         if (StringCompare(monvariety, "normal") == 0)
         {
             answer->required_monster_bits  = 0;
@@ -1416,18 +1413,18 @@ config *get_config(const std::string &filename)
             answer->forbidden_monster_bits = SLUMP_SPECIAL;
         }
     }
-    std::string levelsize = ob_get_param("float_minrooms_slump");
-    if (StringCompare(levelsize, ob_gettext("Mix It Up")) == 0)
+    std::string levelsize = ob_get_string_param("level_size");
+    if (levelsize == "epi" || levelsize == "prog" || levelsize == "mixed")
     {
-        int low          = StringToInt(ob_get_param("float_minrooms_slump_lb"));
-        int high         = StringToInt(ob_get_param("float_minrooms_slump_ub"));
+        int low          = StringToInt(ob_get_string_param("level_size_lower_bound"));
+        int high         = StringToInt(ob_get_string_param("level_size_upper_bound"));
         answer->minrooms = xoshiro_Between(OBSIDIAN_MIN(low, high), OBSIDIAN_MAX(low, high));
     }
     else
     {
         answer->minrooms = StringToInt(levelsize);
     }
-    std::string current_game = ob_get_param("game");
+    std::string current_game = ob_get_string_param("game");
     if (StringCompare(current_game, "doom1") == 0 || StringCompare(current_game, "ultdoom") == 0)
     {
         answer->gamemask = (SLUMP_DOOM1_BIT | SLUMP_DOOMI_BIT);
@@ -1485,7 +1482,7 @@ config *get_config(const std::string &filename)
         answer->mission  = 0;
     }
     answer->last_mission  = SLUMP_FALSE;
-    std::string wadlength = ob_get_param("length");
+    std::string wadlength = ob_get_string_param("length");
     if (StringCompare(wadlength, "single") == 0)
     {
         answer->levelcount = 1;
@@ -1532,10 +1529,7 @@ config *get_config(const std::string &filename)
     answer->force_biggest   = SLUMP_FALSE;
     answer->do_music        = 0;
     answer->secret_monsters = SLUMP_FALSE;
-    std::string dm_starts   = ob_get_param("bool_dm_starts_slump");
-    if (dm_starts.empty())
-        dm_starts = "0";
-    answer->do_dm             = StringToInt(dm_starts);
+    answer->do_dm             = ob_get_bool_param("slump_dm_starts") ? SLUMP_TRUE : SLUMP_FALSE;
     answer->do_slinfo         = SLUMP_TRUE;
     answer->produce_null_lmps = SLUMP_FALSE;
     answer->do_seclevels = (StringCompare(current_game, "chex1") == 0 || StringCompare(current_game, "harmony") == 0 ||
@@ -1545,10 +1539,7 @@ config *get_config(const std::string &filename)
     answer->force_secret = SLUMP_FALSE;
     answer->minlight     = 115;
     /* Is this the right place for all these? */
-    std::string quiet_start = ob_get_param("bool_quiet_start_slump");
-    if (quiet_start.empty())
-        quiet_start = "1";
-    answer->immediate_monsters = StringToInt(quiet_start) ? SLUMP_FALSE : rollpercent(20);
+    answer->immediate_monsters = ob_get_bool_param("quiet_start") ? SLUMP_FALSE : rollpercent(20);
     answer->p_hole_ends_level  = 0;
     if (rollpercent(8))
         answer->p_hole_ends_level = 100;
@@ -1621,10 +1612,11 @@ config *get_config(const std::string &filename)
     answer->clights             = rollpercent(50);
     answer->machoh              = (float)1;
     answer->machou              = (float)1;
-    std::string bigify          = ob_get_param("float_bigify_slump");
-    if (bigify.empty())
-        bigify = "50";
-    answer->p_bigify = StringToInt(bigify);
+    //std::string bigify          = ob_get_param("float_bigify_slump");
+    //if (bigify.empty())
+    //    bigify = "50";
+    //answer->p_bigify = StringToInt(bigify);
+    answer->p_bigify = 50;
 
     /* Initial defaults; at each level, some chance of turning on */
     answer->big_weapons = rollpercent(50);
@@ -1669,10 +1661,11 @@ config *get_config(const std::string &filename)
     if (answer->force_secret)
         secretize_config(answer);
 
-    std::string forky = ob_get_param("float_forkiness_slump");
-    if (forky.empty())
-        forky = "75";
-    answer->forkiness = StringToInt(forky);
+    //std::string forky = ob_get_param("float_forkiness_slump");
+    //if (forky.empty())
+    //    forky = "75";
+    //answer->forkiness = StringToInt(forky);
+    answer->forkiness = 75;
 
     /* And finally compact out any unneeded/dangerous stuff */
     compact_config(answer);
@@ -9659,7 +9652,7 @@ boolean isAdequate(level *l, linedef *ld, style *ThisStyle, config *c)
 /* Make the config-file data accessible */
 void load_obsidian_config(config *c)
 {
-    std::string  obsidian_theme = ob_get_param("slump_config");
+    std::string  obsidian_theme = ob_get_string_param("slump_config");
     char         thisline[200];
     char        *inc;
     const char  *ot_charpointer = obsidian_theme.c_str();
