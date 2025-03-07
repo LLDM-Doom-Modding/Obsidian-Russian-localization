@@ -250,39 +250,245 @@ nk_sdl_handle_event(SDL_Event *evt)
             {
                 int down = evt->type == SDL_EVENT_KEY_DOWN;
                 const bool *state = SDL_GetKeyboardState(NULL);
-                switch(evt->key.key)
+                switch (evt->key.scancode) 
                 {
-                    case SDLK_RSHIFT: /* RSHIFT & LSHIFT share same routine */
-                    case SDLK_LSHIFT:    nk_input_key(ctx, NK_KEY_SHIFT, down); break;
-                    case SDLK_DELETE:    nk_input_key(ctx, NK_KEY_DEL, down); break;
-                    case SDLK_RETURN:    nk_input_key(ctx, NK_KEY_ENTER, down); break;
-                    case SDLK_TAB:       nk_input_key(ctx, NK_KEY_TAB, down); break;
-                    case SDLK_BACKSPACE: nk_input_key(ctx, NK_KEY_BACKSPACE, down); break;
-                    case SDLK_HOME:      nk_input_key(ctx, NK_KEY_TEXT_START, down);
-                                         nk_input_key(ctx, NK_KEY_SCROLL_START, down); break;
-                    case SDLK_END:       nk_input_key(ctx, NK_KEY_TEXT_END, down);
-                                         nk_input_key(ctx, NK_KEY_SCROLL_END, down); break;
-                    case SDLK_PAGEDOWN:  nk_input_key(ctx, NK_KEY_SCROLL_DOWN, down); break;
-                    case SDLK_PAGEUP:    nk_input_key(ctx, NK_KEY_SCROLL_UP, down); break;
-                    case SDLK_Z:         nk_input_key(ctx, NK_KEY_TEXT_UNDO, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_R:         nk_input_key(ctx, NK_KEY_TEXT_REDO, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_C:         nk_input_key(ctx, NK_KEY_COPY, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_V:         nk_input_key(ctx, NK_KEY_PASTE, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_X:         nk_input_key(ctx, NK_KEY_CUT, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_B:         nk_input_key(ctx, NK_KEY_TEXT_LINE_START, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_E:         nk_input_key(ctx, NK_KEY_TEXT_LINE_END, down && state[SDL_SCANCODE_LCTRL]); break;
-                    case SDLK_UP:        nk_input_key(ctx, NK_KEY_UP, down); break;
-                    case SDLK_DOWN:      nk_input_key(ctx, NK_KEY_DOWN, down); break;
-                    case SDLK_LEFT:
+                    case SDL_SCANCODE_LSHIFT:                                   
+                    case SDL_SCANCODE_RSHIFT:
+                        nk_input_key(ctx, NK_KEY_SHIFT, down);
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_DELETE:
+                        nk_input_key(ctx, NK_KEY_DEL, down);
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_RETURN:
+                    case SDL_SCANCODE_KP_ENTER:
+                        nk_input_key(ctx, NK_KEY_ENTER, down);
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_TAB:                                
+                    case SDL_SCANCODE_KP_TAB:
+                        nk_input_key(ctx, NK_KEY_TAB, down);
+                        return 1;  
+                        break;
+                    case SDL_SCANCODE_BACKSPACE:                        
+                    case SDL_SCANCODE_KP_BACKSPACE:
+                        nk_input_key(ctx, NK_KEY_BACKSPACE, down); 
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_HOME:
+                        nk_input_key(ctx, NK_KEY_TEXT_START, down);
+                        nk_input_key(ctx, NK_KEY_SCROLL_START, down);
+                        return 1;  
+                        break;
+                    case SDL_SCANCODE_END:
+                        nk_input_key(ctx, NK_KEY_TEXT_END, down);
+                        nk_input_key(ctx, NK_KEY_SCROLL_END, down); 
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_PAGEDOWN:
+                        nk_input_key(ctx, NK_KEY_SCROLL_DOWN, down);
+                        return 1;  
+                        break;  
+                    case SDL_SCANCODE_PAGEUP:
+                        nk_input_key(ctx, NK_KEY_SCROLL_UP, down); 
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_UP:
+                        nk_input_key(ctx, NK_KEY_UP, down); 
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_DOWN:
+                        nk_input_key(ctx, NK_KEY_DOWN, down); 
+                        return 1; 
+                        break;
+                    case SDL_SCANCODE_LEFT:
+                    {
                         if (state[SDL_SCANCODE_LCTRL])
                             nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, down);
-                        else nk_input_key(ctx, NK_KEY_LEFT, down);
+                        else 
+                            nk_input_key(ctx, NK_KEY_LEFT, down);
+                        return 1; 
                         break;
-                    case SDLK_RIGHT:
+                    }
+                    case SDL_SCANCODE_RIGHT:
+                    {
                         if (state[SDL_SCANCODE_LCTRL])
                             nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, down);
-                        else nk_input_key(ctx, NK_KEY_RIGHT, down);
+                        else 
+                            nk_input_key(ctx, NK_KEY_RIGHT, down);
+                        return 1; 
                         break;
+                    }         
+                    case SDL_SCANCODE_CAPSLOCK:
+                    case SDL_SCANCODE_F1:
+                    case SDL_SCANCODE_F2:
+                    case SDL_SCANCODE_F3:
+                    case SDL_SCANCODE_F4:
+                    case SDL_SCANCODE_F5:
+                    case SDL_SCANCODE_F6:
+                    case SDL_SCANCODE_F7:
+                    case SDL_SCANCODE_F8:
+                    case SDL_SCANCODE_F9:
+                    case SDL_SCANCODE_F10:
+                    case SDL_SCANCODE_F11:
+                    case SDL_SCANCODE_F12:
+                    case SDL_SCANCODE_PRINTSCREEN:
+                    case SDL_SCANCODE_SCROLLLOCK:
+                    case SDL_SCANCODE_PAUSE:
+                    case SDL_SCANCODE_INSERT:
+                    case SDL_SCANCODE_NUMLOCKCLEAR:
+                    case SDL_SCANCODE_KP_DIVIDE:
+                    case SDL_SCANCODE_KP_MULTIPLY:
+                    case SDL_SCANCODE_KP_MINUS:
+                    case SDL_SCANCODE_KP_PLUS:
+                    case SDL_SCANCODE_KP_1:
+                    case SDL_SCANCODE_KP_2:
+                    case SDL_SCANCODE_KP_3:
+                    case SDL_SCANCODE_KP_4:
+                    case SDL_SCANCODE_KP_5:
+                    case SDL_SCANCODE_KP_6:
+                    case SDL_SCANCODE_KP_7:
+                    case SDL_SCANCODE_KP_8:
+                    case SDL_SCANCODE_KP_9:
+                    case SDL_SCANCODE_KP_0:
+                    case SDL_SCANCODE_KP_PERIOD:
+                    case SDL_SCANCODE_APPLICATION:
+                    case SDL_SCANCODE_POWER:
+                    case SDL_SCANCODE_KP_EQUALS:
+                    case SDL_SCANCODE_F13:
+                    case SDL_SCANCODE_F14:
+                    case SDL_SCANCODE_F15:
+                    case SDL_SCANCODE_F16:
+                    case SDL_SCANCODE_F17:
+                    case SDL_SCANCODE_F18:
+                    case SDL_SCANCODE_F19:
+                    case SDL_SCANCODE_F20:
+                    case SDL_SCANCODE_F21:
+                    case SDL_SCANCODE_F22:
+                    case SDL_SCANCODE_F23:
+                    case SDL_SCANCODE_F24:
+                    case SDL_SCANCODE_EXECUTE:
+                    case SDL_SCANCODE_HELP:
+                    case SDL_SCANCODE_MENU:
+                    case SDL_SCANCODE_SELECT:
+                    case SDL_SCANCODE_STOP:
+                    case SDL_SCANCODE_AGAIN:
+                    case SDL_SCANCODE_UNDO:
+                    case SDL_SCANCODE_CUT:
+                    case SDL_SCANCODE_COPY:
+                    case SDL_SCANCODE_PASTE:
+                    case SDL_SCANCODE_FIND:
+                    case SDL_SCANCODE_MUTE:
+                    case SDL_SCANCODE_VOLUMEUP:
+                    case SDL_SCANCODE_VOLUMEDOWN:
+                    case SDL_SCANCODE_KP_COMMA:
+                    case SDL_SCANCODE_KP_EQUALSAS400:
+                    case SDL_SCANCODE_ALTERASE:
+                    case SDL_SCANCODE_SYSREQ:
+                    case SDL_SCANCODE_CANCEL:
+                    case SDL_SCANCODE_CLEAR:
+                    case SDL_SCANCODE_PRIOR:
+                    case SDL_SCANCODE_RETURN2:
+                    case SDL_SCANCODE_SEPARATOR:
+                    case SDL_SCANCODE_OUT:
+                    case SDL_SCANCODE_OPER:
+                    case SDL_SCANCODE_CLEARAGAIN:
+                    case SDL_SCANCODE_CRSEL:
+                    case SDL_SCANCODE_EXSEL:
+                    case SDL_SCANCODE_KP_00:                              
+                    case SDL_SCANCODE_KP_000:
+                    case SDL_SCANCODE_THOUSANDSSEPARATOR:                               
+                    case SDL_SCANCODE_DECIMALSEPARATOR:                                
+                    case SDL_SCANCODE_CURRENCYUNIT:                                
+                    case SDL_SCANCODE_CURRENCYSUBUNIT:                                
+                    case SDL_SCANCODE_KP_LEFTPAREN:                                
+                    case SDL_SCANCODE_KP_RIGHTPAREN:                                
+                    case SDL_SCANCODE_KP_LEFTBRACE:                                
+                    case SDL_SCANCODE_KP_RIGHTBRACE:                             
+                    case SDL_SCANCODE_KP_A:                                
+                    case SDL_SCANCODE_KP_B:                                
+                    case SDL_SCANCODE_KP_C:                                
+                    case SDL_SCANCODE_KP_D:                                
+                    case SDL_SCANCODE_KP_E:                                
+                    case SDL_SCANCODE_KP_F:                                
+                    case SDL_SCANCODE_KP_XOR:                                
+                    case SDL_SCANCODE_KP_POWER:                                
+                    case SDL_SCANCODE_KP_PERCENT:                                
+                    case SDL_SCANCODE_KP_LESS:                                
+                    case SDL_SCANCODE_KP_GREATER:                                
+                    case SDL_SCANCODE_KP_AMPERSAND:                                
+                    case SDL_SCANCODE_KP_DBLAMPERSAND:                                
+                    case SDL_SCANCODE_KP_VERTICALBAR:                                
+                    case SDL_SCANCODE_KP_DBLVERTICALBAR:                                
+                    case SDL_SCANCODE_KP_COLON:                                
+                    case SDL_SCANCODE_KP_HASH:                                
+                    case SDL_SCANCODE_KP_SPACE:                                
+                    case SDL_SCANCODE_KP_AT:                                
+                    case SDL_SCANCODE_KP_EXCLAM:                                
+                    case SDL_SCANCODE_KP_MEMSTORE:                                
+                    case SDL_SCANCODE_KP_MEMRECALL:                                
+                    case SDL_SCANCODE_KP_MEMCLEAR:                                
+                    case SDL_SCANCODE_KP_MEMADD:                                
+                    case SDL_SCANCODE_KP_MEMSUBTRACT:                                
+                    case SDL_SCANCODE_KP_MEMMULTIPLY:                                
+                    case SDL_SCANCODE_KP_MEMDIVIDE:                                
+                    case SDL_SCANCODE_KP_PLUSMINUS:                                
+                    case SDL_SCANCODE_KP_CLEAR:                                
+                    case SDL_SCANCODE_KP_CLEARENTRY:                                
+                    case SDL_SCANCODE_KP_BINARY:                                
+                    case SDL_SCANCODE_KP_OCTAL:                                
+                    case SDL_SCANCODE_KP_DECIMAL:                                
+                    case SDL_SCANCODE_KP_HEXADECIMAL:                                
+                    case SDL_SCANCODE_LCTRL:                                                            
+                    case SDL_SCANCODE_LALT:                                
+                    case SDL_SCANCODE_LGUI:                                
+                    case SDL_SCANCODE_RCTRL:                       
+                    case SDL_SCANCODE_RALT:                                
+                    case SDL_SCANCODE_RGUI:                                
+                    case SDL_SCANCODE_MODE:                                
+                    case SDL_SCANCODE_SLEEP:                                
+                    case SDL_SCANCODE_WAKE:                                
+                    case SDL_SCANCODE_CHANNEL_INCREMENT:                                
+                    case SDL_SCANCODE_CHANNEL_DECREMENT:                                
+                    case SDL_SCANCODE_MEDIA_PLAY:                                
+                    case SDL_SCANCODE_MEDIA_PAUSE:                                
+                    case SDL_SCANCODE_MEDIA_RECORD:                                
+                    case SDL_SCANCODE_MEDIA_FAST_FORWARD:                                
+                    case SDL_SCANCODE_MEDIA_REWIND:                                
+                    case SDL_SCANCODE_MEDIA_NEXT_TRACK:                                
+                    case SDL_SCANCODE_MEDIA_PREVIOUS_TRACK:                                
+                    case SDL_SCANCODE_MEDIA_STOP:                                
+                    case SDL_SCANCODE_MEDIA_EJECT:                                
+                    case SDL_SCANCODE_MEDIA_PLAY_PAUSE:                                
+                    case SDL_SCANCODE_MEDIA_SELECT:                                
+                    case SDL_SCANCODE_AC_NEW:                                
+                    case SDL_SCANCODE_AC_OPEN:                                
+                    case SDL_SCANCODE_AC_CLOSE:                                
+                    case SDL_SCANCODE_AC_EXIT:                                
+                    case SDL_SCANCODE_AC_SAVE:                                
+                    case SDL_SCANCODE_AC_PRINT:                                
+                    case SDL_SCANCODE_AC_PROPERTIES:                                
+                    case SDL_SCANCODE_AC_SEARCH:                                
+                    case SDL_SCANCODE_AC_HOME:                                
+                    case SDL_SCANCODE_AC_BACK:                                
+                    case SDL_SCANCODE_AC_FORWARD:                                
+                    case SDL_SCANCODE_AC_STOP:                                
+                    case SDL_SCANCODE_AC_REFRESH:                                
+                    case SDL_SCANCODE_AC_BOOKMARKS:                                
+                    case SDL_SCANCODE_SOFTLEFT:                                
+                    case SDL_SCANCODE_SOFTRIGHT:                                
+                    case SDL_SCANCODE_CALL:                                
+                    case SDL_SCANCODE_ENDCALL:                            
+                    case SDL_SCANCODE_UNKNOWN:
+                        return 1;
+                        break;
+                }
+                if (down)
+                {
+                    nk_glyph glyph;
+                    memcpy(glyph, &evt->key.key, NK_UTF_SIZE);
+                    nk_input_glyph(ctx, glyph);
                 }
             }
             return 1;

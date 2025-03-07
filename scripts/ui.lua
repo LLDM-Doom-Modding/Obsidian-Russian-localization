@@ -1399,7 +1399,7 @@ function ob_gui_frame(width, height)
 
    nk.style_from_table(OB_NK_CTX, colortable["blue"])
 
-   if nk.window_begin(OB_NK_CTX, "Overview", {10, 10, width, height}, window_flags) then
+   if nk.window_begin(OB_NK_CTX, OB_CONFIG.seed, {10, 10, width, height}, window_flags) then
       if show_menu then Menubar(OB_NK_CTX) end
       if show_app_about then About(OB_NK_CTX) end
       WindowFlagsCheckbox(OB_NK_CTX)
@@ -1415,6 +1415,90 @@ function ob_gui_frame(width, height)
       Chart(OB_NK_CTX)
       Popup(OB_NK_CTX)
       Layout(OB_NK_CTX)
+   end
+
+   nk.window_end(OB_NK_CTX)
+   return "ok"
+end
+
+-------------------------------------------------------------------------------
+
+function ob_gui_frame_new(width, height)
+   if OB_NK_CTX == nil then return "quit" end
+
+   nk.style_from_table(OB_NK_CTX, colortable["blue"])
+
+   if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
+      if show_menu then Menubar(OB_NK_CTX) end
+      if show_app_about then About(OB_NK_CTX) end
+      -- Header 
+      nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
+      nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
+      nk.layout_row_begin(OB_NK_CTX, 'static', 20, 3)
+      for _, name in ipairs(layout.tab_names) do
+         local f = OB_NK_CTX:font()
+         -- make sure button perfectly fits text 
+         local text_width = f:width(f:height(), name)
+         local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
+         nk.layout_row_push(OB_NK_CTX, widget_width)
+         if layout.current_tab == name then
+            -- active tab gets highlighted 
+            local button_color = nk.style_get_style_item(OB_NK_CTX, "button.normal")
+            local act = nk.style_get_style_item(OB_NK_CTX, "button.active")
+            nk.style_set_style_item(OB_NK_CTX, "button.normal", nk.style_get_style_item(OB_NK_CTX, "button.active"))
+            layout.current_tab = nk.button(OB_NK_CTX, nil, name) and name or layout.current_tab
+            nk.style_set_style_item(OB_NK_CTX, "button.normal", button_color)
+         else 
+            layout.current_tab = nk.button(OB_NK_CTX, nil, name) and name or layout.current_tab
+         end
+      end
+      nk.style_pop_float(OB_NK_CTX)
+      nk.style_pop_vec2(OB_NK_CTX)
+      -- Body 
+      nk.layout_row_dynamic(OB_NK_CTX, 140, 1)
+      if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
+         if layout.current_tab == "Lines" then
+            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
+            local bounds = nk.widget_bounds(OB_NK_CTX)
+            if nk.chart_begin(OB_NK_CTX, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255, 0, 0}) then
+               nk.chart_add_slot(OB_NK_CTX, 'lines',32, -1.0, 1.0, {0, 0, 1}, {0, 0,150/255})
+               local id = 0
+               for i = 1, 32 do
+                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
+                  nk.chart_push(OB_NK_CTX, cos(id), 2)
+                  id = id + STEP
+               end
+            end 
+            nk.chart_end(OB_NK_CTX)
+         elseif layout.current_tab == "Columns" then
+            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
+            local bounds = nk.widget_bounds(OB_NK_CTX)
+            if nk.chart_begin(OB_NK_CTX, 'column', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
+               local id = 0
+               for i = 1, 32 do
+                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
+                  id = id + STEP
+               end
+            end
+            nk.chart_end(OB_NK_CTX)
+         elseif layout.current_tab == "Mixed" then
+            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
+            local bounds = nk.widget_bounds(OB_NK_CTX)
+            if nk.chart_begin(OB_NK_CTX, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
+               nk.chart_add_slot(OB_NK_CTX, 'lines',32, -1.0, 1.0, {0,0,1}, {0,0,150/255})
+               nk.chart_add_slot(OB_NK_CTX, 'column', 32, 0.0, 1.0, {0,1,0}, {0,150/255,0})
+               local id = 0
+               for i = 1, 32 do
+                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
+                  nk.chart_push(OB_NK_CTX, abs(cos(id)), 2)
+                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 3)
+                  id = id + STEP
+               end
+            end
+            nk.chart_end(OB_NK_CTX)
+         end
+         nk.group_end(OB_NK_CTX)
+      end
    end
 
    nk.window_end(OB_NK_CTX)

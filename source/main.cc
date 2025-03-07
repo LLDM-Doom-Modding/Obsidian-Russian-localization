@@ -584,6 +584,8 @@ int main(int argc, char **argv)
         batch_output_file = ob_default_filename();
     }
 
+    Main_SetSeed();
+
 #ifdef OBSIDIAN_ENABLE_GUI
     /* Platform */
     SDL_Window *win;
@@ -669,7 +671,6 @@ int main(int argc, char **argv)
             if (!in_file_dialog)
                 nk_sdl_handle_event(&evt);
         }
-        nk_sdl_handle_grab(); /* optional grabbing behavior */
         nk_input_end(ctx);
 
         SDL_GetCurrentRenderOutputSize(renderer, &render_w, &render_h);
@@ -691,7 +692,6 @@ cleanup:
     SDL_Quit();
     return 0;
 #else
-    Main_SetSeed();
     if (!Build_Cool_Shit())
     {
         FatalError("FAILED!\n");
