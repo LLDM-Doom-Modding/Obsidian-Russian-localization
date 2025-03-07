@@ -36,7 +36,7 @@ end
 local op = 'Doom'
 local value = 0.6
 
---[[function ob_gui_frame(width, height)
+function ob_gui_frame_old(width, height)
   if OB_NK_CTX == nil then return "quit" end
 
   if nk.window_begin(OB_NK_CTX, "Build", {0, 0, width, height}, 0) then
@@ -82,7 +82,7 @@ local value = 0.6
   end
   nk.window_end(OB_NK_CTX)
   return "ok"
-end]]--
+end
 
 local colortable = {}
 local rgba = nk.color_from_bytes
@@ -733,9 +733,9 @@ local function Input(ctx)
       input.box = nk.edit_string(ctx, nk.EDIT_BOX, input.box, 512, 'default')
       nk.layout_row(ctx, 'static', 25, ratio)
       input.submit, input.flags = 
-         nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'ascii')
+         nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'decimal')
       if nk.button(ctx, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
-         input.box = input.box..input.submit..'\n'
+         OB_CONFIG.seed = tonumber(input.submit)
          input.submit = ""
       end
       nk.tree_pop(ctx)
@@ -1386,7 +1386,7 @@ end
 
 -------------------------------------------------------------------------------
 
-function ob_gui_frame(width, height)
+function ob_gui_frame_demo(width, height)
    if OB_NK_CTX == nil then return "quit" end
    window_flags = 0
    nk.style_set_flags(OB_NK_CTX, "window.header.align", nk.HEADER_RIGHT)
@@ -1423,22 +1423,47 @@ end
 
 -------------------------------------------------------------------------------
 
-function ob_gui_frame_new(width, height)
+
+local ratio = {120, 150}
+
+local module_categories = 
+{
+   "arch", "combat", "pickup", "other", "experimental", "debug"
+}
+
+local module_category_labels = 
+{
+   ["arch"] = _("Architecture"),
+   ["combat"] = _("Combat"),
+   ["pickup"] = _("Pickups"),
+   ["other"] = _("Miscellaneous"),
+   ["debug"] = _("Debugging"),
+   ["experimental"] = _("Experimental")   
+}
+
+function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
    nk.style_from_table(OB_NK_CTX, colortable["blue"])
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
-      if show_menu then Menubar(OB_NK_CTX) end
-      if show_app_about then About(OB_NK_CTX) end
+      --if show_menu then Menubar(OB_NK_CTX) end
+      --if show_app_about then About(OB_NK_CTX) end
+      --nk.layout_row(OB_NK_CTX, 'static', 25, ratio)
+      --input.submit, input.flags = 
+         --nk.edit_string(OB_NK_CTX, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'decimal')
+      --if nk.button(OB_NK_CTX, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
+      --   OB_CONFIG.seed = tonumber(input.submit)
+      --   input.submit = ""
+      --end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
       nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
-      nk.layout_row_begin(OB_NK_CTX, 'static', 20, 3)
-      for _, name in ipairs(layout.tab_names) do
+      nk.layout_row_begin(OB_NK_CTX, 'static', 20, 6)
+      for _, name in ipairs(module_categories) do
          local f = OB_NK_CTX:font()
          -- make sure button perfectly fits text 
-         local text_width = f:width(f:height(), name)
+         local text_width = f:width(f:height(), module_category_labels[name])
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
          nk.layout_row_push(OB_NK_CTX, widget_width)
          if layout.current_tab == name then
@@ -1446,18 +1471,38 @@ function ob_gui_frame_new(width, height)
             local button_color = nk.style_get_style_item(OB_NK_CTX, "button.normal")
             local act = nk.style_get_style_item(OB_NK_CTX, "button.active")
             nk.style_set_style_item(OB_NK_CTX, "button.normal", nk.style_get_style_item(OB_NK_CTX, "button.active"))
-            layout.current_tab = nk.button(OB_NK_CTX, nil, name) and name or layout.current_tab
+            layout.current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or layout.current_tab
             nk.style_set_style_item(OB_NK_CTX, "button.normal", button_color)
          else 
-            layout.current_tab = nk.button(OB_NK_CTX, nil, name) and name or layout.current_tab
+            layout.current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or layout.current_tab
          end
       end
       nk.style_pop_float(OB_NK_CTX)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body 
-      nk.layout_row_dynamic(OB_NK_CTX, 140, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height, 1)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
-         if layout.current_tab == "Lines" then
+         for _,mod in pairs(OB_MODULES) do
+            if mod.where == layout.current_tab then
+               for _,opt in pairs(mod.options) do
+                  nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
+                  nk.layout_row_push(OB_NK_CTX, width)
+                  nk.label(OB_NK_CTX, "Name: " .. opt.label , nk.TEXT_LEFT)
+                  nk.layout_row_end(OB_NK_CTX)
+                              -- default combobox ---------------------------------
+                  nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
+                  local choice_names = {}
+                  local choice_labels = {}
+                  for i = 1,#opt.choices,2 do
+                     table.add_unique(choice_names, opt.choices[i])
+                     table.add_unique(choice_labels, opt.choices[i+1])
+                  end
+                  opt.choice_selection = nk.combo(OB_NK_CTX, choice_labels, opt.choice_selection or 1, 25, {200,200})
+                  OB_CONFIG[opt.name] = choice_names[opt.choice_selection]
+               end
+            end
+          end
+         --[[if layout.current_tab == "Lines" then
             nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
             local bounds = nk.widget_bounds(OB_NK_CTX)
             if nk.chart_begin(OB_NK_CTX, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255, 0, 0}) then
@@ -1496,7 +1541,7 @@ function ob_gui_frame_new(width, height)
                end
             end
             nk.chart_end(OB_NK_CTX)
-         end
+         end]]--
          nk.group_end(OB_NK_CTX)
       end
    end
