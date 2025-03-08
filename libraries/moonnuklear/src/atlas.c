@@ -36,6 +36,15 @@ static int freefont_atlas(lua_State *L, ud_t *ud)
     return 0;
     }
 
+static int freefont_atlas_from_ptr(lua_State *L, ud_t *ud)
+    {
+    ud->handle = NULL;
+    freechildren(L, FONT_MT, ud);
+    freechildren(L, CURSOR_MT, ud);
+    if(!freeuserdata(L, ud, "atlas")) return 0;
+    return 0;
+    }
+
 static int Init(lua_State *L)
     {
     ud_t *ud;
@@ -56,7 +65,7 @@ static int InitFromPtr(lua_State *L)
     nk_atlas_t *atlas = (nk_atlas_t*)checklightuserdata(L, 1);
     ud = newuserdata(L, atlas, ATLAS_MT, "atlas");
     ud->parent_ud = NULL;
-    ud->destructor = freefont_atlas;
+    ud->destructor = freefont_atlas_from_ptr;
     MarkBorrowed(ud);
     return 1;
     }

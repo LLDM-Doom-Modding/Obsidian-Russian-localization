@@ -704,12 +704,22 @@ function ob_set_mod_option(name, option, value)
 
   -- this can only happen while parsing the CONFIG.TXT file
   -- (containing some no-longer-used value).
-  if not opt.avail_choices[value] then
+  if not table.has_elem(opt.avail_choices, value) then
     warning("invalid choice: %s (for option %s.%s)\n", value, name, option)
     return
   end
 
   opt.value = value
+  if nk ~= nil then
+    for index,name in ipairs(opt.avail_choices) do
+      if opt.value == name then
+        opt.choice_selection = index
+        goto continue
+      end
+    end
+    error("Option value " .. opt.value .. " not in available choices for " .. opt.name .. "!\n")
+    ::continue::
+  end
   
   -- no need to call ob_update_all
   -- (nothing ever depends on custom options)
@@ -1228,14 +1238,29 @@ function ob_init()
             end
           end
           opt.avail_choices = {}
+          if nk ~= nil then
+            opt.avail_labels  = {}
+          end
 
           for i = 1,#opt.choices,2 do
             local id    = opt.choices[i]
             local label = opt.choices[i+1]
-
-            opt.avail_choices[id] = 1
+            opt.avail_choices[#opt.avail_choices+1] = id
+            if nk ~= nil then
+              opt.avail_labels[#opt.avail_labels+1] = label
+            end
           end
           opt.value = opt.default
+          if nk ~= nil then
+            for index,name in ipairs(opt.avail_choices) do
+              if opt.value == name then
+                opt.choice_selection = index
+                goto continue
+              end
+            end
+            error("Option value " .. opt.value .. " not in available choices for " .. opt.name .. "!\n")
+            ::continue::
+          end
         end -- for opt
       end
     end -- for mod
@@ -1649,25 +1674,12 @@ function ob_invoke_hook_with_table(name, local_table)
   end
 end
 
-
-function ob_transfer_ui_options()
-  for _,mod in pairs(OB_MODULES) do
-    if ob_check_ui_module(mod) then
-      for _,opt in pairs(mod.options) do
-        OB_CONFIG[opt.name] = opt.value or "UNSET"
-      end
-    end
-  end
-end
-
 function ob_build_setup()
   ob_clean_up()
 
   if OB_CONFIG.title then
     GAME.title = OB_CONFIG.title
   end
-
-  ob_transfer_ui_options()
 
   ob_sort_modules()
 
@@ -1779,7 +1791,6 @@ function ob_build_cool_shit()
 
   if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
     ob_clean_up()
-    ob_transfer_ui_options()
     ob_sort_modules()
     ob_add_current_game()
     ob_add_current_port()

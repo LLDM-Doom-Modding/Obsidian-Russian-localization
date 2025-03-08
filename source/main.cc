@@ -667,7 +667,10 @@ int main(int argc, char **argv)
         nk_input_begin(ctx);
         while (SDL_PollEvent(&evt)) {
             if (evt.type == SDL_EVENT_QUIT)
+            {
+                nk_input_end(ctx);
                 goto cleanup;
+            }
             if (!in_file_dialog)
                 nk_sdl_handle_event(&evt);
         }
@@ -686,8 +689,8 @@ int main(int argc, char **argv)
     }
 
 cleanup:
-    nk_sdl_shutdown();
     Main::Shutdown(false);
+    nk_sdl_shutdown();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);
     SDL_Quit();

@@ -222,7 +222,6 @@ OB_MODULES["ui_mons"] =
       label=_("Monster Variety"),
       choices=STYLE_CHOICES,
       tooltip= _("Affects how many different monster types can appear in each room.\nSetting this to NONE will make each level use a single monster type"),
-      
     },
     {
       name="mon_variety_jumpstart",

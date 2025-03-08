@@ -71,16 +71,16 @@ UI_ARCH.RAMP_FACTOR =
 {
   "0.5",  _("Very Fast Curve"),
   "0.66", _("Fast Curve"),
-  "1",    _("Linear"),
+  "1.0",  _("Linear"),
   "1.5",  _("Slow Curve"),
-  "2",    _("Very Slow Curve"),
+  "2.0",  _("Very Slow Curve"),
 }
 
 UI_ARCH.LIGHT_FACTOR =
 {
   "0.5",  _("Doom 3"),
   "0.75", _("Darker"),
-  "1",    _("Default"),
+  "1.0",  _("Default"),
   "1.25", _("Brighter"),
   "1.5",  _("GG Retinas"),
 }

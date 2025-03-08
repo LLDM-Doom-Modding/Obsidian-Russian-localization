@@ -1426,6 +1426,8 @@ end
 
 local ratio = {120, 150}
 
+local current_tab = "arch"
+
 local module_categories = 
 {
    "arch", "combat", "pickup", "other", "experimental", "debug"
@@ -1461,20 +1463,20 @@ function ob_gui_frame(width, height)
       nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
       nk.layout_row_begin(OB_NK_CTX, 'static', 20, 6)
       for _, name in ipairs(module_categories) do
-         local f = OB_NK_CTX:font()
+         local f = normal_font
          -- make sure button perfectly fits text 
          local text_width = f:width(f:height(), module_category_labels[name])
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
          nk.layout_row_push(OB_NK_CTX, widget_width)
-         if layout.current_tab == name then
+         if current_tab == name then
             -- active tab gets highlighted 
             local button_color = nk.style_get_style_item(OB_NK_CTX, "button.normal")
             local act = nk.style_get_style_item(OB_NK_CTX, "button.active")
             nk.style_set_style_item(OB_NK_CTX, "button.normal", nk.style_get_style_item(OB_NK_CTX, "button.active"))
-            layout.current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or layout.current_tab
+            current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or current_tab
             nk.style_set_style_item(OB_NK_CTX, "button.normal", button_color)
          else 
-            layout.current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or layout.current_tab
+            current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or current_tab
          end
       end
       nk.style_pop_float(OB_NK_CTX)
@@ -1483,65 +1485,20 @@ function ob_gui_frame(width, height)
       nk.layout_row_dynamic(OB_NK_CTX, height, 1)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          for _,mod in pairs(OB_MODULES) do
-            if mod.where == layout.current_tab then
+            if mod.where == current_tab then
                for _,opt in pairs(mod.options) do
                   nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
                   nk.layout_row_push(OB_NK_CTX, width)
-                  nk.label(OB_NK_CTX, "Name: " .. opt.label , nk.TEXT_LEFT)
+                  nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
                   nk.layout_row_end(OB_NK_CTX)
-                              -- default combobox ---------------------------------
                   nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
-                  local choice_names = {}
-                  local choice_labels = {}
-                  for i = 1,#opt.choices,2 do
-                     table.add_unique(choice_names, opt.choices[i])
-                     table.add_unique(choice_labels, opt.choices[i+1])
-                  end
-                  opt.choice_selection = nk.combo(OB_NK_CTX, choice_labels, opt.choice_selection or 1, 25, {200,200})
-                  OB_CONFIG[opt.name] = choice_names[opt.choice_selection]
+                  gui.printf("OPT NAME: " .. opt.name .. "\n")
+                  opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                  opt.value = opt.avail_choices[opt.choice_selection]
+                  OB_CONFIG[opt.name] = opt.value
                end
             end
-          end
-         --[[if layout.current_tab == "Lines" then
-            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
-            local bounds = nk.widget_bounds(OB_NK_CTX)
-            if nk.chart_begin(OB_NK_CTX, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255, 0, 0}) then
-               nk.chart_add_slot(OB_NK_CTX, 'lines',32, -1.0, 1.0, {0, 0, 1}, {0, 0,150/255})
-               local id = 0
-               for i = 1, 32 do
-                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
-                  nk.chart_push(OB_NK_CTX, cos(id), 2)
-                  id = id + STEP
-               end
-            end 
-            nk.chart_end(OB_NK_CTX)
-         elseif layout.current_tab == "Columns" then
-            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
-            local bounds = nk.widget_bounds(OB_NK_CTX)
-            if nk.chart_begin(OB_NK_CTX, 'column', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
-               local id = 0
-               for i = 1, 32 do
-                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
-                  id = id + STEP
-               end
-            end
-            nk.chart_end(OB_NK_CTX)
-         elseif layout.current_tab == "Mixed" then
-            nk.layout_row_dynamic(OB_NK_CTX, 100, 1)
-            local bounds = nk.widget_bounds(OB_NK_CTX)
-            if nk.chart_begin(OB_NK_CTX, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
-               nk.chart_add_slot(OB_NK_CTX, 'lines',32, -1.0, 1.0, {0,0,1}, {0,0,150/255})
-               nk.chart_add_slot(OB_NK_CTX, 'column', 32, 0.0, 1.0, {0,1,0}, {0,150/255,0})
-               local id = 0
-               for i = 1, 32 do
-                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 1)
-                  nk.chart_push(OB_NK_CTX, abs(cos(id)), 2)
-                  nk.chart_push(OB_NK_CTX, abs(sin(id)), 3)
-                  id = id + STEP
-               end
-            end
-            nk.chart_end(OB_NK_CTX)
-         end]]--
+         end
          nk.group_end(OB_NK_CTX)
       end
    end
