@@ -8,10 +8,15 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(OBSIDIAN_GUI ON)
+option(OBSIDIAN_DEBUG_LUA "Enable Lua debugging" OFF)
+option(OBSIDIAN_GUI "Build SDL3+Nuklear GUI" ON)
+
+if(OBSIDIAN_DEBUG_LUA)
+  add_compile_definitions(OBSIDIAN_DEBUG_LUA)
+endif()
 
 if(OBSIDIAN_GUI)
-  add_compile_definitions(OBSIDIAN_ENABLE_GUI=1)
+  add_compile_definitions(OBSIDIAN_ENABLE_GUI)
 endif()
 
 string(TIMESTAMP BUILD_TIMESTAMP "%Y.%m.%d" UTC)
@@ -61,6 +66,7 @@ set(OBSIDIAN_SOURCE_FILES
     source/m_addons.cc
     source/m_cookie.cc
     source/m_lua.cc
+    source/m_luadbg.cc
     source/m_options.cc
     source/m_trans.cc
     source/main.cc
@@ -100,7 +106,7 @@ if (COPY_FILES)
   add_custom_command(TARGET obsidian POST_BUILD COMMAND_EXPAND_LISTS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COPY_FILES} ${DEST_DIR})
 endif()
 
-set(OBSIDIAN_LINK_LIBRARIES fastPRNG luaalloc minilua physfs-static)
+set(OBSIDIAN_LINK_LIBRARIES fastPRNG minilua physfs-static)
 
 if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM} MATCHES "BSD")
   set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} pthread)

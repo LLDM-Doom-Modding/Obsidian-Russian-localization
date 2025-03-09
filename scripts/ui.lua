@@ -1482,7 +1482,7 @@ function ob_gui_frame(width, height)
       nk.style_pop_float(OB_NK_CTX)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body 
-      nk.layout_row_dynamic(OB_NK_CTX, height, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - normal_font:height(), 1)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          for _,mod in pairs(OB_MODULES) do
             if mod.where == current_tab then
@@ -1492,7 +1492,6 @@ function ob_gui_frame(width, height)
                   nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
                   nk.layout_row_end(OB_NK_CTX)
                   nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
-                  gui.printf("OPT NAME: " .. opt.name .. "\n")
                   opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
                   opt.value = opt.avail_choices[opt.choice_selection]
                   OB_CONFIG[opt.name] = opt.value

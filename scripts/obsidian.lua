@@ -52,6 +52,8 @@ if nk ~= nil then
   gui.import("ui")
 end
 
+gui.import("debugger")
+
 gui.set_import_dir("data/text/")
 
 gui.import("random_words_en.lua")

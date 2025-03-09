@@ -26,9 +26,9 @@
 #include <algorithm>
 
 #include "lib_util.h"
-#include "luaalloc.h"
 #include "m_trans.h"
 #include "main.h"
+#include "m_luadbg.h"
 #include "minilua.h"
 #include "physfs.h"
 #include "sys_assert.h"
@@ -521,7 +521,6 @@ static void gui_file_picker_callback(void *userdata, const char * const *filelis
 
 int gui_spawn_file_picker(lua_State *L)
 {
-    //const char *picked = tinyfd_openFileDialog("PICK FILE", install_dir.c_str(), 0, NULL, NULL, 0);
     picker_filename.clear();
     in_file_dialog = true;
     SDL_ShowOpenFileDialog(gui_file_picker_callback, &in_file_dialog, NULL, NULL, 0, install_dir.c_str(), false);
@@ -712,6 +711,22 @@ static const luaL_Reg bit_functions[] = {
     {NULL, NULL} // the end
 };
 
+// NOP dbg() for when debugger is disabled and someone has left some breakpoints
+// in code
+static bool dbg_nop_warn = false;
+static int  p_lua_nop(lua_State *L)
+{
+    (void)L;
+    if (!dbg_nop_warn)
+    {
+        dbg_nop_warn = true;
+        LogPrint("LUA: dbg() called without lua_debug being set.  Please check that "
+                   "a stray dbg call didn't get left "
+                   "in source.");
+    }
+    return 0;
+}
+
 static int p_init_lua(lua_State *L)
 {
     /* stop collector during initialization */
@@ -725,6 +740,14 @@ static int p_init_lua(lua_State *L)
 #ifdef OBSIDIAN_ENABLE_GUI
         luaopen_moonnuklear(L);
         lua_setglobal(L, "nk");
+#endif
+#ifdef OBSIDIAN_DEBUG_LUA
+        lua_newtable(L);
+        lua_setglobal(L, "__ob_debugger_source");
+        dbg_setup_default(L);
+#else
+        lua_pushcfunction(L, p_lua_nop);
+        lua_setglobal(L, "dbg");
 #endif
     }
     lua_gc(L, LUA_GCRESTART, 0);
@@ -897,8 +920,7 @@ void Script_Open()
     LogPrint("\n--- OPENING LUA VM ---\n\n");
 
     // create Lua state
-
-    LUA_ST = lua_newstate(luaalloc, luaalloc_create(NULL, NULL));
+    LUA_ST = luaL_newstate();
 
     if (!LUA_ST)
     {
