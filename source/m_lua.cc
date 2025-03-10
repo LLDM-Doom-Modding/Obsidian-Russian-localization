@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "lib_util.h"
+#include "luaalloc.h"
 #include "m_trans.h"
 #include "main.h"
 #include "m_luadbg.h"
@@ -920,7 +921,7 @@ void Script_Open()
     LogPrint("\n--- OPENING LUA VM ---\n\n");
 
     // create Lua state
-    LUA_ST = luaL_newstate();
+    LUA_ST = lua_newstate(luaalloc, luaalloc_create(NULL, NULL));
 
     if (!LUA_ST)
     {
