@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12..3.20)
+cmake_minimum_required(VERSION 3.25)
 
 project(
   obsidian
@@ -9,7 +9,7 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(OBSIDIAN_DEBUG_LUA "Enable Lua debugging" OFF)
-option(OBSIDIAN_GUI "Build SDL3+Nuklear GUI" ON)
+option(OBSIDIAN_GUI "Build Sokol+Nuklear GUI" ON)
 
 if(OBSIDIAN_DEBUG_LUA)
   add_compile_definitions(OBSIDIAN_DEBUG_LUA)
@@ -41,6 +41,8 @@ endif()
 if(APPLE OR ${CMAKE_SYSTEM} MATCHES "BSD")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/include")
 endif()
+
+find_package(OpenGL REQUIRED)
 
 add_subdirectory(libraries)
 
@@ -113,7 +115,7 @@ if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM} MATCHES "BSD")
 endif()
 
 if (OBSIDIAN_GUI)
-  set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} SDL3::Headers SDL3::SDL3-static moonnuklear nuklear)
+  set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} moonnuklear nuklear sokol)
 endif()
 
 target_link_libraries(obsidian PRIVATE ${OBSIDIAN_LINK_LIBRARIES})

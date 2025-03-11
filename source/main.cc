@@ -35,20 +35,20 @@
 #include "sys_xoshiro.h"
 
 #ifdef OBSIDIAN_ENABLE_GUI
-#include <SDL3/SDL.h>
-
+#include "sokol_app.h"
+#include "sokol_gfx.h"
+#include "sokol_log.h"
+#include "sokol_glue.h"
+// include nuklear.h before the sokol_nuklear.h implementation
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_SDL_RENDERER_SDL_H <SDL3/SDL.h>
-#define NK_SDL_RENDERER_IMPLEMENTATION
+#define NK_INCLUDE_STANDARD_VARARGS
 #include "nuklear.h"
-#include "nuklear_sdl_renderer.h"
+#include "sokol_nuklear.h"
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
@@ -74,7 +74,7 @@ struct UpdateKv
 UpdateKv update_kv;
 
 std::string OBSIDIAN_TITLE     = "OBSIDIAN Level Maker";
-std::string OBSIDIAN_CODE_NAME = "Unstable";
+std::string OBSIDIAN_CODE_NAME = "Tabs of Terror";
 
 int screen_w;
 int screen_h;
@@ -156,15 +156,6 @@ static void ShowVersion()
     fflush(stdout);
 }
 
-void Determine_WorkingPath()
-{
-#ifdef _WIN32
-    home_dir = PHYSFS_getBaseDir();
-#else
-    home_dir = PHYSFS_getPrefDir("Obsidian Team", "Obsidian");
-#endif
-}
-
 std::string Resolve_DefaultOutputPath()
 {
     if (default_output_path.empty())
@@ -187,26 +178,6 @@ static bool Verify_InstallDir(const std::string &path)
     const std::string filename = PathAppend(path, "scripts/obsidian.lua");
 
     return FileExists(filename);
-}
-
-void Determine_InstallDir()
-{
-    install_dir = PHYSFS_getBaseDir();
-}
-
-void Determine_ConfigFile()
-{
-    config_file = PathAppend(home_dir, CONFIG_FILENAME);
-}
-
-void Determine_OptionsFile()
-{
-    options_file = PathAppend(home_dir, OPTIONS_FILENAME);
-}
-
-void Determine_LoggingFile()
-{
-    logging_file = PathAppend(home_dir, LOG_FILENAME);
 }
 
 bool Main::BackupFile(const std::string &filename)
@@ -342,7 +313,111 @@ bool Build_Cool_Shit()
 
 /* ----- main program ----------------------------- */
 
+#ifdef OBSIDIAN_ENABLE_GUI
+static struct nk_context *ctx = NULL;
+static struct nk_colorf bg = { 0.10f, 0.18f, 0.24f, 1.0f };
+static struct sg_image font_img;
+static struct snk_image_t font_nk_img;
+static bool running = true;
+
+void init(void) 
+{
+    // setup sokol-gfx and sokol-nuklear
+    sg_desc desc = {0};
+    desc.environment = sglue_environment();
+    desc.logger.func = slog_func;
+    sg_setup(&desc);
+
+    // use sokol-nuklear with all default-options (we're not doing
+    // multi-sampled rendering or using non-default pixel formats)
+    snk_desc_t desc2 = {0};
+    desc2.enable_set_mouse_cursor = true;
+    desc2.no_default_font = true;
+    desc2.dpi_scale = sapp_dpi_scale();
+    desc2.logger.func = slog_func;
+    snk_setup(&desc2);
+
+    // setup nuklear context and moonnuklear integration
+    ctx = snk_get_context();
+
+    if (!ob_gui_init_ctx(ctx))
+    {
+        // ???
+    }
+
+    {
+        struct nk_font_atlas *atlas = snk_get_atlas();
+
+        /* set up the font atlas and add desired font; note that font sizes are
+         * multiplied by font_scale to produce better results at higher DPIs */
+        nk_font_atlas_init_default(atlas);
+        nk_font_atlas_begin(atlas);
+
+        if (ob_gui_init_fonts(atlas, sapp_dpi_scale()))
+        {
+            const void *image; int w, h;
+            image = nk_font_atlas_bake(atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
+            sg_image_desc img_desc = {0};
+            img_desc.width = w;
+            img_desc.height = h;
+            img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+            img_desc.data.subimage[0][0] = {
+                .ptr = image,
+                .size = (size_t)(w * h) * sizeof(uint32_t)
+            };
+            img_desc.label = "sokol-nuklear-font";
+            font_img = sg_make_image(&img_desc);
+            snk_image_desc_t img_desc2 = {0};
+            img_desc2.image = font_img;
+            img_desc2.sampler = snk_get_font_sampler();
+            font_nk_img = snk_make_image(&img_desc2);
+            nk_font_atlas_end(atlas, snk_nkhandle(font_nk_img), 0);
+        }
+        else
+        {
+            // fatal error
+        }
+    }
+}
+
+void frame(void) 
+{
+    ctx = snk_new_frame();
+
+    running = ob_gui_frame(sapp_width(), sapp_height());
+
+    // the sokol_gfx draw pass
+    sg_pass pass = {0};
+    pass.action.colors[0] = {
+            .load_action = SG_LOADACTION_CLEAR, .clear_value = { bg.r, bg.g, bg.b, bg.a }
+        };
+    pass.swapchain = sglue_swapchain();
+    sg_begin_pass(&pass);
+    snk_render(sapp_width(), sapp_height());
+    sg_end_pass();
+    sg_commit();
+
+    // quit if not running?
+}
+
+void cleanup(void) 
+{
+    Main::Shutdown(false);
+    snk_destroy_image(font_nk_img);
+    sg_destroy_image(font_img);
+    snk_shutdown();
+    sg_shutdown();
+}
+
+void input(const sapp_event* event) 
+{
+    snk_handle_event(event);
+}
+
+sapp_desc sokol_main(int argc, char* argv[]) 
+#else
 int main(int argc, char **argv)
+#endif
 {
     // initialise argument parser (skipping program name)
 
@@ -407,12 +482,21 @@ int main(int argc, char **argv)
         update_kv.value   = argv::list[update_arg + 3];
     }
 
-    Determine_WorkingPath();
-    Determine_InstallDir();
+    install_dir = PHYSFS_getBaseDir();
+    if (!Verify_InstallDir(install_dir))
+    {
+        FatalError("OBSIDIAN ERROR: Could not verify install directory!\n");
+        exit(EXIT_FAILURE);
+    }
+#ifdef _WIN32
+    home_dir = PHYSFS_getBaseDir();
+#else
+    home_dir = PHYSFS_getPrefDir("Obsidian Team", "Obsidian");
+#endif
     Trans_Init();
-    Determine_ConfigFile();
-    Determine_OptionsFile();
-    Determine_LoggingFile();
+    config_file = PathAppend(home_dir, CONFIG_FILENAME);
+    options_file = PathAppend(home_dir, OPTIONS_FILENAME);
+    logging_file = PathAppend(home_dir, LOG_FILENAME);
 
     Options_Load(options_file);
     Resolve_DefaultOutputPath();
@@ -486,7 +570,7 @@ int main(int argc, char **argv)
         Options_Save(options_file);
         Cookie_Save(config_file);
         Main::Shutdown(false);
-        return 0;
+        exit(EXIT_SUCCESS);
     }
 
     if (batch_output_file.empty())
@@ -527,126 +611,20 @@ int main(int argc, char **argv)
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
-    /* Platform */
-    SDL_Window *win = NULL;
-    SDL_Renderer *renderer = NULL;
-    SDL_Surface *icon = NULL;
-    bool running = true;
-    float font_scale = 1;
-    int render_w = 0;
-    int render_h = 0;
-
-    /* GUI */
-    struct nk_context *ctx;
-    struct nk_colorf bg;
-
-    /* SDL setup */
-    SDL_Init(SDL_INIT_VIDEO);
-
     std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE.c_str(), OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
-
-    win = SDL_CreateWindow(win_title.c_str(), WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY|SDL_WINDOW_RESIZABLE);
-
-    if (win == NULL) 
-    {
-        SDL_Log("Error SDL_CreateWindow %s", SDL_GetError());
-        exit(-1);
-    }
-
-    icon = SDL_CreateSurfaceFrom(64, 64, SDL_PIXELFORMAT_RGB24, (void *)obsidian_icon, 64 * 3);
-
-    // If this doesn't work, not a big deal (may not work with
-    // things like Wayland, for instance)
-    if (icon)
-        SDL_SetWindowIcon(win, icon);
-
-    renderer = SDL_CreateRenderer(win, NULL);
-
-    if (renderer == NULL) 
-    {
-        SDL_Log("Error SDL_CreateRenderer %s", SDL_GetError());
-        exit(-1);
-    }
-
-    /* scale the renderer output for High-DPI displays */
-    {
-        int render_w, render_h;
-        int window_w, window_h;
-        float scale_x, scale_y;
-        SDL_GetCurrentRenderOutputSize(renderer, &render_w, &render_h);
-        SDL_GetWindowSize(win, &window_w, &window_h);
-        scale_x = (float)(render_w) / (float)(window_w);
-        scale_y = (float)(render_h) / (float)(window_h);
-        SDL_SetRenderScale(renderer, scale_x, scale_y);
-        font_scale = scale_y;
-    }
-
-    /* GUI */
-    ctx = nk_sdl_init(win, renderer);
-
-    if (!ob_gui_init_ctx(ctx))
-    {
-        goto cleanup;
-    }
-
-    {
-        struct nk_font_atlas *atlas;
-
-        /* set up the font atlas and add desired font; note that font sizes are
-         * multiplied by font_scale to produce better results at higher DPIs */
-        nk_sdl_font_stash_begin(&atlas);
-
-        if (!ob_gui_init_fonts(atlas, font_scale))
-        {
-            // Fallback to default font
-            struct nk_font_config config = nk_font_config(0);
-            struct nk_font *font = nk_font_atlas_add_default(atlas, 22 * font_scale, &config);
-            nk_sdl_font_stash_end();
-            font->handle.height /= font_scale;
-            nk_style_set_font(ctx, &font->handle);
-        }
-        else
-            nk_sdl_font_stash_end();
-    }
-
-    bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
-    while (running)
-    {
-        /* Input */
-        SDL_Event evt;
-        nk_input_begin(ctx);
-        while (SDL_PollEvent(&evt)) {
-            if (evt.type == SDL_EVENT_QUIT)
-            {
-                nk_input_end(ctx);
-                goto cleanup;
-            }
-            if (!in_file_dialog)
-                nk_sdl_handle_event(&evt);
-        }
-        nk_input_end(ctx);
-
-        SDL_GetCurrentRenderOutputSize(renderer, &render_w, &render_h);
-
-        running = ob_gui_frame(render_w, render_h);
-
-        SDL_SetRenderDrawColor(renderer, bg.r * 255, bg.g * 255, bg.b * 255, bg.a * 255);
-        SDL_RenderClear(renderer);
-
-        nk_sdl_render(NK_ANTI_ALIASING_ON);
-
-        SDL_RenderPresent(renderer);
-    }
-
-cleanup:
-    Main::Shutdown(false);
-    nk_sdl_shutdown();
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(win);
-    if (icon)
-        SDL_DestroySurface(icon);
-    SDL_Quit();
-    return 0;
+    sapp_desc app = {0};
+    app.init_cb = init;
+    app.frame_cb = frame;
+    app.cleanup_cb = cleanup;
+    app.event_cb = input;
+    app.enable_clipboard = true;
+    app.width = 1024;
+    app.height = 768;
+    app.window_title = CStringDup(win_title.c_str());
+    app.ios_keyboard_resizes_canvas = true;
+    app.icon.sokol_default = true;
+    app.logger.func = slog_func;
+    return app;
 #else
     if (!Build_Cool_Shit())
     {

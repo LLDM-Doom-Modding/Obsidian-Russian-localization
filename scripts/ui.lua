@@ -685,21 +685,23 @@ end
 
 local ratio = {120, 150}
 
-local current_tab = "arch"
+local current_tab = "build"
 
 local module_categories = 
 {
-   "arch", "combat", "pickup", "other", "experimental", "debug"
+   "build", "arch", "combat", "pickup", "other", "experimental", "debug", "options"
 }
 
 local module_category_labels = 
 {
+   ["build"] = _("Build"),
    ["arch"] = _("Architecture"),
    ["combat"] = _("Combat"),
    ["pickup"] = _("Pickups"),
    ["other"] = _("Miscellaneous"),
    ["debug"] = _("Debugging"),
-   ["experimental"] = _("Experimental")   
+   ["experimental"] = _("Experimental"),
+   ["options"] = _("Options")
 }
 
 function ob_gui_frame(width, height)
@@ -734,7 +736,7 @@ function ob_gui_frame(width, height)
       nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
       nk.layout_row_begin(OB_NK_CTX, 'static', 20, 6)
       for _, name in ipairs(module_categories) do
-         local f = normal_font
+         local f = OB_NK_CTX:font()
          -- make sure button perfectly fits text 
          local text_width = f:width(f:height(), module_category_labels[name])
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
@@ -752,20 +754,22 @@ function ob_gui_frame(width, height)
       end
       nk.style_pop_float(OB_NK_CTX)
       nk.style_pop_vec2(OB_NK_CTX)
-      -- Body 
+      -- Body
       nk.layout_row_dynamic(OB_NK_CTX, height - normal_font:height(), 1)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
-         for _,mod in pairs(OB_MODULES) do
-            if mod.valid == true and mod.where == current_tab then
-               for _,opt in pairs(mod.options) do
-                  nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
-                  nk.layout_row_push(OB_NK_CTX, width)
-                  nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                  nk.layout_row_end(OB_NK_CTX)
-                  nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
-                  opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                  opt.value = opt.avail_choices[opt.choice_selection]
-                  OB_CONFIG[opt.name] = opt.value
+         if current_tab ~= "build" and current_tab ~= "options" then
+            for _,mod in pairs(OB_MODULES) do
+               if mod.valid == true and mod.where == current_tab then
+                  for _,opt in pairs(mod.options) do
+                     nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
+                     nk.layout_row_push(OB_NK_CTX, width)
+                     nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
+                     nk.layout_row_end(OB_NK_CTX)
+                     nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
+                     opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                     opt.value = opt.avail_choices[opt.choice_selection]
+                     OB_CONFIG[opt.name] = opt.value
+                  end
                end
             end
          end
