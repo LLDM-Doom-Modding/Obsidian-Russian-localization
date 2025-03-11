@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -128,6 +128,11 @@ bool X11_InitXinput2(SDL_VideoDevice *_this)
     XIEventMask eventmask;
     unsigned char mask[4] = { 0, 0, 0, 0 };
     int event, err;
+
+    /* XInput2 is required for relative mouse mode, so you probably want to leave this enabled */
+    if (!SDL_GetHintBoolean("SDL_VIDEO_X11_XINPUT2", true)) {
+        return false;
+    }
 
     /*
      * Initialize XInput 2
@@ -279,7 +284,7 @@ static SDL_XInput2DeviceInfo *xinput2_get_device_info(SDL_VideoData *videodata, 
 void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
 {
 #ifdef SDL_VIDEO_DRIVER_X11_XINPUT2
-    SDL_VideoData *videodata = (SDL_VideoData *)_this->internal;
+    SDL_VideoData *videodata = _this->internal;
 
     if (cookie->extension != xinput2_opcode) {
         return;
@@ -319,19 +324,11 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
         double coords[2];
         double processed_coords[2];
         int i;
+        Uint64 timestamp = X11_GetEventTimestamp(rawev->time);
 
         videodata->global_mouse_changed = true;
         if (is_pen) {
             break; // Pens check for XI_Motion instead
-        }
-
-        if (!mouse->relative_mode || mouse->relative_mode_warp) {
-            break;
-        }
-
-        // Relative mouse motion is delivered to the window with keyboard focus
-        if (!SDL_GetKeyboardFocus()) {
-            break;
         }
 
         devinfo = xinput2_get_device_info(videodata, rawev->deviceid);
@@ -350,7 +347,11 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
             }
         }
 
-        SDL_SendMouseMotion(0, mouse->focus, (SDL_MouseID)rawev->sourceid, true, (float)processed_coords[0], (float)processed_coords[1]);
+        // Relative mouse motion is delivered to the window with keyboard focus
+        if (mouse->relative_mode && SDL_GetKeyboardFocus()) {
+            SDL_SendMouseMotion(timestamp, mouse->focus, (SDL_MouseID)rawev->sourceid, true, (float)processed_coords[0], (float)processed_coords[1]);
+        }
+
         devinfo->prev_coords[0] = coords[0];
         devinfo->prev_coords[1] = coords[1];
     } break;
@@ -430,7 +431,7 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
                 X11_HandleButtonPress(_this, windowdata, (SDL_MouseID)xev->sourceid, button,
                                       (float)xev->event_x, (float)xev->event_y, xev->time);
             } else {
-                X11_HandleButtonRelease(_this, windowdata, (SDL_MouseID)xev->sourceid, button);
+                X11_HandleButtonRelease(_this, windowdata, (SDL_MouseID)xev->sourceid, button, xev->time);
             }
         }
     } break;
@@ -448,13 +449,13 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
 
         videodata->global_mouse_changed = true;
 
-        if (xev->deviceid != xev->sourceid) {
-            // Discard events from "Master" devices to avoid duplicates.
-            break;
-        }
-
         X11_PenHandle *pen = X11_FindPenByDeviceID(xev->deviceid);
         if (pen) {
+            if (xev->deviceid != xev->sourceid) {
+                // Discard events from "Master" devices to avoid duplicates.
+                break;
+            }
+
             SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
             SDL_SendPenMotion(0, pen->pen, window, (float) xev->event_x, (float) xev->event_y);
 
@@ -466,13 +467,14 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
                     SDL_SendPenAxis(0, pen->pen, window, (SDL_PenAxis) i, axes[i]);
                 }
             }
-        } else if (!pointer_emulated) {
+        } else if (!pointer_emulated && xev->deviceid == videodata->xinput_master_pointer_device) {
+            // Use the master device for non-relative motion, as the slave devices can seemingly lag behind.
             SDL_Mouse *mouse = SDL_GetMouse();
-            if (!mouse->relative_mode || mouse->relative_mode_warp) {
+            if (!mouse->relative_mode) {
                 SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
                 if (window) {
                     X11_ProcessHitTest(_this, window->internal, (float)xev->event_x, (float)xev->event_y, false);
-                    SDL_SendMouseMotion(0, window, (SDL_MouseID)xev->sourceid, false, (float)xev->event_x, (float)xev->event_y);
+                    SDL_SendMouseMotion(0, window, SDL_GLOBAL_MOUSE_ID, false, (float)xev->event_x, (float)xev->event_y);
                 }
             }
         }
@@ -485,7 +487,7 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
         float x, y;
         SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
         xinput2_normalize_touch_coordinates(window, xev->event_x, xev->event_y, &x, &y);
-        SDL_SendTouch(0, xev->sourceid, xev->detail, window, true, x, y, 1.0);
+        SDL_SendTouch(0, xev->sourceid, xev->detail, window, SDL_EVENT_FINGER_DOWN, x, y, 1.0);
     } break;
 
     case XI_TouchEnd:
@@ -494,7 +496,7 @@ void X11_HandleXinput2Event(SDL_VideoDevice *_this, XGenericEventCookie *cookie)
         float x, y;
         SDL_Window *window = xinput2_get_sdlwindow(videodata, xev->event);
         xinput2_normalize_touch_coordinates(window, xev->event_x, xev->event_y, &x, &y);
-        SDL_SendTouch(0, xev->sourceid, xev->detail, window, false, x, y, 1.0);
+        SDL_SendTouch(0, xev->sourceid, xev->detail, window, SDL_EVENT_FINGER_UP, x, y, 1.0);
     } break;
 
     case XI_TouchUpdate:
@@ -553,10 +555,10 @@ bool X11_Xinput2IsInitialized(void)
 
 bool X11_Xinput2SelectMouseAndKeyboard(SDL_VideoDevice *_this, SDL_Window *window)
 {
-    SDL_WindowData *windowdata = (SDL_WindowData *)window->internal;
+    SDL_WindowData *windowdata = window->internal;
 
 #ifdef SDL_VIDEO_DRIVER_X11_XINPUT2
-    const SDL_VideoData *data = (SDL_VideoData *)_this->internal;
+    const SDL_VideoData *data = _this->internal;
 
     if (X11_Xinput2IsInitialized()) {
         XIEventMask eventmask;
@@ -587,7 +589,7 @@ bool X11_Xinput2SelectMouseAndKeyboard(SDL_VideoDevice *_this, SDL_Window *windo
         XISetMask(mask, XI_PropertyEvent); // E.g., when swapping tablet pens
 
         if (X11_XISelectEvents(data->display, windowdata->xwindow, &eventmask, 1) != Success) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_INPUT, "Could not enable XInput2 event handling\n");
+            SDL_LogWarn(SDL_LOG_CATEGORY_INPUT, "Could not enable XInput2 event handling");
             windowdata->xinput2_keyboard_enabled = false;
             windowdata->xinput2_mouse_enabled = false;
         }
@@ -753,6 +755,8 @@ void X11_Xinput2UpdateDevices(SDL_VideoDevice *_this, bool initial_check)
             }
             break;
         case XIMasterPointer:
+            data->xinput_master_pointer_device = dev->deviceid;
+            SDL_FALLTHROUGH;
         case XISlavePointer:
             {
                 SDL_MouseID mouseID = (SDL_MouseID)dev->deviceid;

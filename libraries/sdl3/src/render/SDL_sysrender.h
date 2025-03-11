@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -65,8 +65,15 @@ typedef struct SDL_RenderViewState
     SDL_Rect pixel_clip_rect;
     bool clipping_enabled;
     SDL_FPoint scale;
+
+    // Support for logical output coordinates
+    SDL_RendererLogicalPresentation logical_presentation_mode;
+    int logical_w, logical_h;
+    SDL_FRect logical_src_rect;
+    SDL_FRect logical_dst_rect;
     SDL_FPoint logical_scale;
     SDL_FPoint logical_offset;
+
     SDL_FPoint current_scale;  // this is just `scale * logical_scale`, precalculated, since we use it a lot.
 } SDL_RenderViewState;
 
@@ -203,7 +210,7 @@ struct SDL_Renderer
     bool (*UpdateTexture)(SDL_Renderer *renderer, SDL_Texture *texture,
                          const SDL_Rect *rect, const void *pixels,
                          int pitch);
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     bool (*UpdateTextureYUV)(SDL_Renderer *renderer, SDL_Texture *texture,
                             const SDL_Rect *rect,
                             const Uint8 *Yplane, int Ypitch,
@@ -248,17 +255,8 @@ struct SDL_Renderer
     Uint64 simulate_vsync_interval_ns;
     Uint64 last_present;
 
-    // Support for logical output coordinates
-    SDL_RendererLogicalPresentation logical_presentation_mode;
-    int logical_w, logical_h;
-    SDL_FRect logical_src_rect;
-    SDL_FRect logical_dst_rect;
-
     SDL_RenderViewState *view;
     SDL_RenderViewState main_view;
-
-    // Cache the output size in pixels
-    int output_pixel_w, output_pixel_h;
 
     // The window pixel to point coordinate scale
     SDL_FPoint dpi_scale;

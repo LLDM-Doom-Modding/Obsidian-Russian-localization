@@ -33,57 +33,6 @@ function ob_gui_init_fonts(font_scale)
   return "groovy"
 end
 
-local op = 'Doom'
-local value = 0.6
-
-function ob_gui_frame_old(width, height)
-  if OB_NK_CTX == nil then return "quit" end
-
-  if nk.window_begin(OB_NK_CTX, "Build", {0, 0, width, height}, 0) then
-
-    -- fixed widget pixel width
-    nk.layout_row_static(OB_NK_CTX, 30, 150, 1)
-
-    if nk.button(OB_NK_CTX, nil, "File Picker Test") then
-        OB_NK_PICKED_FILE = nil
-        gui.spawn_file_picker()
-    end
-
-    -- fixed widget window ratio width
-    nk.layout_row_dynamic(OB_NK_CTX, 30, 2)
-    if nk.option(OB_NK_CTX, 'Doom', op == 'Doom') then op = 'Doom' end
-    if nk.option(OB_NK_CTX, 'Heretic', op == 'Heretic') then op = 'Heretic' end
-
-    for _,mod in pairs(OB_MODULES) do
-      for _,opt in pairs(mod.options) do
-        nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
-        nk.layout_row_push(OB_NK_CTX, width)
-        nk.label(OB_NK_CTX, "Name: " .. opt.label , nk.TEXT_LEFT)
-        nk.layout_row_end(OB_NK_CTX)
-        nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
-        nk.layout_row_push(OB_NK_CTX, width)
-        nk.label(OB_NK_CTX, "Value: " .. opt.value, nk.TEXT_LEFT)
-        nk.layout_row_end(OB_NK_CTX)
-      end
-    end
-
-    -- custom widget pixel width
-    nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
-    nk.layout_row_push(OB_NK_CTX, 50)
-    nk.label(OB_NK_CTX, "Size:", nk.TEXT_LEFT)
-    nk.layout_row_push(OB_NK_CTX, 110)
-    value = nk.slider(OB_NK_CTX, 0, value, 1.0, 0.1)
-    nk.layout_row_end(OB_NK_CTX)
-    if OB_NK_PICKED_FILE ~= nil then
-      nk.layout_row_push(OB_NK_CTX, 512)
-      nk.label(OB_NK_CTX, OB_NK_PICKED_FILE, nk.TEXT_LEFT)
-      nk.layout_row_end(OB_NK_CTX)
-    end
-  end
-  nk.window_end(OB_NK_CTX)
-  return "ok"
-end
-
 local colortable = {}
 local rgba = nk.color_from_bytes
 
@@ -255,50 +204,9 @@ local function Menubar(ctx)
       menu1.check = nk.checkbox(ctx, "check", menu1.check)
       nk.menu_end(ctx)
    end
-   -- menu #2 -----------------------------------
-   nk.layout_row_push(ctx, 60)
-   if nk.menu_begin(ctx, nil, "ADVANCED", LEFT, {200, 600}) then
-      if nk.tree_state_push(ctx, 'tab', "FILE", state=='FILE' and 'maximized' or 'minimized') then
-         state = 'FILE'
-         nk.menu_item(ctx, nil, "New", LEFT)
-         nk.menu_item(ctx, nil, "Open", LEFT)
-         nk.menu_item(ctx, nil, "Save", LEFT)
-         nk.menu_item(ctx, nil, "Close", LEFT)
-         nk.menu_item(ctx, nil, "Exit", LEFT)
-         nk.tree_pop(ctx)
-      elseif state == 'FILE' then state = 'NONE'
-      elseif nk.tree_state_push(ctx, 'tab', "EDIT", state=='EDIT' and 'maximized' or 'minimized') then
-         state = 'EDIT'
-         nk.menu_item(ctx, nil, "Copy", LEFT)
-         nk.menu_item(ctx, nil, "Delete", LEFT)
-         nk.menu_item(ctx, nil, "Cut", LEFT)
-         nk.menu_item(ctx, nil, "Paste", LEFT)
-         nk.tree_pop(ctx)
-      elseif state == 'EDIT' then state = 'NONE'
-      elseif nk.tree_state_push(ctx, 'tab', "VIEW", state=='VIEW' and 'maximized' or 'minimized') then
-         state = 'VIEW'
-         nk.menu_item(ctx, nil, "About", LEFT)
-         nk.menu_item(ctx, nil, "Options", LEFT)
-         nk.menu_item(ctx, nil, "Customize", LEFT)
-         nk.tree_pop(ctx)
-      elseif state == 'VIEW' then state = 'NONE'
-      elseif nk.tree_state_push(ctx, 'tab', "CHART", state=='CHART' and 'maximized' or 'minimized') then
-         state = 'CHART'
-         local values = menu2.values
-         nk.layout_row_dynamic(ctx, 150, 1)
-         nk.chart_begin(ctx, 'column', #values, 0, 50)
-         for i = 1, #values do nk.chart_push(ctx, values[i]) end
-         nk.chart_end(ctx)
-         nk.tree_pop(ctx)
-      elseif state == 'VIEW' then state = 'NONE' 
-      end
-      nk.menu_end(ctx)
-   end
    -- menu widgets ------------------------------
    nk.layout_row_push(ctx, 70)
    menuwidgets.prog = nk.progress(ctx, menuwidgets.prog, 100, 'modifiable')
-   menuwidgets.slider = nk.slider(ctx, 0, menuwidgets.slider, 16, 1)
-   menuwidgets.check = nk.checkbox(ctx, "check", menuwidgets.check)
    ----------------------------------------------
    menu2.state = state
    nk.menubar_end(ctx)
@@ -318,380 +226,6 @@ local function About(ctx)
       nk.popup_end(ctx)
    else 
       show_app_about = false
-   end
-end
-
--------------------------------------------------------------------------------
--- Checkbox
--------------------------------------------------------------------------------
-
-local function WindowFlagsCheckbox(ctx)
-   if nk.tree_push(ctx, 'tab', "Window", 'minimized', 'window_flags_checkbox') then
-      nk.layout_row_dynamic(ctx, 30, 2)
-      titlebar = nk.checkbox(ctx, "Titlebar", titlebar)
-      show_menu = nk.checkbox(ctx, "Menu", show_menu)
-      border = nk.checkbox(ctx, "Border", border)
-      resize = nk.checkbox(ctx, "Resizable", resize)
-      movable = nk.checkbox(ctx, "Movable", movable)
-      no_scrollbar = nk.checkbox(ctx, "No Scrollbar", no_scrollbar)
-      minimizable = nk.checkbox(ctx, "Minimizable", minimizable)
-      scale_left = nk.checkbox(ctx, "Scale Left", scale_left)
-      nk.tree_pop(ctx)
-   end
-end
- 
--------------------------------------------------------------------------------
--- Widgets
--------------------------------------------------------------------------------
-
-local function Text(ctx)
-   if nk.tree_push(ctx, 'node', "Text", 'minimized', 'widgets text') then 
-      nk.layout_row_dynamic(ctx, 20, 1)
-      nk.label(ctx, "Label aligned left", LEFT)
-      nk.label(ctx, "Label aligned centered", CENTERED)
-      nk.label(ctx, "Label aligned right", RIGHT)
-      nk.label(ctx, "Blue text", LEFT, {0, 0 , 1, 1}) -- colored
-      nk.label(ctx, "Yellow text", LEFT, {1,1,0}) -- colored
-      nk.label(ctx, "Text without /0", RIGHT)
-      nk.layout_row_static(ctx, 100, 200, 1)
-      nk.label_wrap(ctx, "This is a very long line to hopefully get this text to be wrapped into multiple lines to show line wrapping")
-      nk.layout_row_dynamic(ctx, 100, 1)
-      nk.label_wrap(ctx, "This is another long text to show dynamic window changes on multiline text")
-      nk.tree_pop(ctx)
-   end
-end
-
--------------------------------------------------
-
-local function Buttons(ctx)
-   if nk.tree_push(ctx, 'node', "Button", 'minimized', 'widgets buttons') then
-      nk.layout_row_static(ctx, 30, 100, 3)
-      if nk.button(ctx, nil, "Button") then print("Button pressed!") end
-      nk.button_set_behavior(ctx, 'repeater')
-      if nk.button(ctx, nil, "Repeater") then print("Repeater is being pressed!") end
-      nk.button_set_behavior(ctx, 'default')
-      nk.button(ctx, {0, 0, 1, 1})
-      nk.layout_row_static(ctx, 25, 25, 8)
-      nk.button(ctx, 'circle solid')
-      nk.button(ctx, 'circle outline')
-      nk.button(ctx, 'rect solid')
-      nk.button(ctx, 'rect outline')
-      nk.button(ctx, 'triangle up')
-      nk.button(ctx, 'triangle down')
-      nk.button(ctx, 'triangle left')
-      nk.button(ctx, 'triangle right')
-      nk.layout_row_static(ctx, 30, 100, 2)
-      nk.button(ctx, 'triangle left', "prev", RIGHT)
-      nk.button(ctx, 'triangle right', "next", LEFT)
-      nk.tree_pop(ctx)
-   end
-end
-
--------------------------------------------------
-
-local basic = { -- state for basic widgets
-   checkbox = false,
-   option = 'A', -- 'A'|'B'|'C'
-   int_slider = 5, float_slider = 2.5,
-   prog_value = 40, property_float = 2, property_int = 10, property_neg = 10,
-   range_float_min = 0, range_float_max = 100, range_float_value = 50,
-   range_int_min = 0, range_int_value = 2048, range_int_max = 4096,
-   ratio = {120, 150},
-}
-
-local function Basic(ctx)
-   if nk.tree_push(ctx, 'node', "Basic", 'minimized', 'widgets basic') then
-      nk.layout_row_static(ctx, 30, 100, 1)
-      basic.checkbox = nk.checkbox(ctx, "Checkbox", basic.checkbox)
-      nk.layout_row_static(ctx, 30, 80, 3)
-      basic.option = nk.option(ctx, "optionA", basic.option=='A') and 'A' or basic.option
-      basic.option = nk.option(ctx, "optionB", basic.option=='B') and 'B' or basic.option
-      basic.option = nk.option(ctx, "optionC", basic.option=='C') and 'C' or basic.option
-      nk.layout_row(ctx, 'static', 30, basic.ratio)
-      nk.label(ctx, "Slider int", LEFT)
-      basic.int_slider = nk.slider(ctx, 0, basic.int_slider, 10, 1)
-      nk.label(ctx, "Slider float", LEFT)
-      basic.float_slider = nk.slider(ctx, 0, basic.float_slider, 5.0, 0.5)
-      nk.label(ctx, fmt("Progressbar: %u" , basic.prog_value), LEFT)
-      basic.prog_value = nk.progress(ctx, basic.prog_value, 100, 'modifiable')
-      nk.layout_row(ctx, 'static', 25, basic.ratio)
-      nk.label(ctx, "Property float:", LEFT)
-      basic.property_float = nk.property(ctx, "Float:", 0, basic.property_float, 64.0, 0.1, 0.2)
-      nk.label(ctx, "Property int:", LEFT)
-      basic.property_int = nk.property(ctx, "Int:", 0, basic.property_int, 100.0, 1, 1)
-      nk.label(ctx, "Property neg:", LEFT)
-      basic.property_neg = nk.property(ctx, "Neg:", -10, basic.property_neg, 10, 1, 1)
-      nk.layout_row_dynamic(ctx, 25, 1)
-      nk.label(ctx, "Range:", LEFT)
-      nk.layout_row_dynamic(ctx, 25, 3)
-      basic.range_float_min = nk.property(ctx, "#min:", 
-               0, basic.range_float_min, basic.range_float_max, 1.0, 0.2)
-      basic.range_float_value = nk.property(ctx, "#float:", 
-            basic.range_float_min, basic.range_float_value, basic.range_float_max, 1.0, 0.2)
-      basic.range_float_max = nk.property(ctx, "#max:", 
-            basic.range_float_min, basic.range_float_max, 100, 1.0, 0.2)
-      basic.range_int_min = nk.property(ctx, "#min:", 
-               -2^31, basic.range_int_min, basic.range_int_max, 1, 10)
-      basic.range_int_value = nk.property(ctx, "#neg:", 
-            basic.range_int_min, basic.range_int_value, basic.range_int_max, 1, 10)
-      basic.range_int_max = nk.property(ctx, "#max:", 
-            basic.range_int_min, basic.range_int_max, 2^31-1, 1, 10)
-      nk.tree_pop(ctx)
-   end
-end
-
--------------------------------------------------
-
-local selectable_list = {false, false, true, false}
-local selectable_grid = {
-   true,false,false,false,
-   false,true,false,false,
-   false,false,true,false,
-   false,false,false,true
-}
-
-local function Selectable(ctx)
-   if nk.tree_push(ctx, 'node', "Selectable", 'minimized', 'widgets selectable') then
-      if nk.tree_push(ctx, 'node', "List", 'minimized', 'widgets selectable list') then
-         nk.layout_row_static(ctx, 18, 100, 1)
-         selectable_list[1] = nk.selectable(ctx, nil, "Selectable", LEFT, selectable_list[1])
-         selectable_list[2] = nk.selectable(ctx, nil, "Selectable", LEFT, selectable_list[2])
-         nk.label(ctx, "Not Selectable", LEFT)
-         selectable_list[3] = nk.selectable(ctx, nil, "Selectable", LEFT, selectable_list[3])
-         selectable_list[4] = nk.selectable(ctx, nil, "Selectable", LEFT, selectable_list[4])
-         nk.tree_pop(ctx)
-      end
-      if nk.tree_push(ctx, 'node', "Grid", 'minimized', 'widgtes selectable grid') then
-         nk.layout_row_static(ctx, 50, 50, 4)
-         for i = 0, 15 do
-            local changed
-            selectable_grid[i+1], changed = nk.selectable(ctx, nil, "Z", CENTERED, selectable_grid[i+1])
-            if changed then
-               local x, y = i%4, floor(i/4)
-               if x > 0 then selectable_grid[i] = not selectable_grid[i] end
-               if x < 3 then selectable_grid[i+2] = not selectable_grid[i+2] end
-               if y > 0 then selectable_grid[i-3] = not selectable_grid[i-3] end
-               if y < 3 then selectable_grid[i+5] = not selectable_grid[i+5] end
-            end
-         end
-         nk.tree_pop(ctx)
-      end 
-      nk.tree_pop(ctx)
-   end
-end
-
--------------------------------------------------
-
-local MONTH = {"January", "February", "March", "April", "May", "June", "July", 
-            "August", "September", "October", "November", "December"}
-local DAY = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"}
-local MONTH_DAYS = {31,28,31,30,31,30,31,31,30,31,30,31}
-
-local function firstdayof(year, month)
--- Returns the index (1-7, 1=Sun) for the first day of the given month (1-12) of the year (YYYY)
-   local year = month < 3 and year-1 or year
-   local y, c = year%100, floor(year/100)
-   local y4, c4 = floor(y/4), floor(c/4)
-   local m = floor(floor(2.6*((month+9)%12+1)) -.2)
-   return ((2+m+y+y4+c4-2*c)%7+7)%7 + 1
-end
-
-local combo = {
-   weapons = {"Fist","Pistol","Shotgun","Plasma","BFG"},
-   current_weapon = 1, -- index in weapons
-   color = nk.color_from_bytes(130, 50, 50, 255),
-   color2 = {0.509, 0.705, 0.2, 1.0},
-   col_mode = 'RGB',
-   prog_a =  20, prog_b = 40, prog_c = 10, prog_d = 90,
-   check_values = {false, false, false, false, false},
-   position = {0, 0, 0},
-   time_selected = false,
-   date_selected = false,
-   date = os.date("*t"),
-   chart_selection = 8.0,
-   chart_values = {26.0,13.0,30.0,15.0,25.0,10.0,20.0,40.0, 12.0, 8.0, 22.0, 28.0, 5.0},
-}
-
-local function Combo(ctx)
--- Combobox Widgets
--- In this library comboboxes are not limited to being a popup list of 
--- selectable text. Instead it is a abstract concept of having something 
--- that is *selected* or displayed, a popup window which opens if something
--- needs to be modified and the content of the popup which causes the 
--- *selected* or displayed value to change or if wanted close the combobox.
---
--- While strange at first handling comboboxes in a abstract way solves the
--- problem of overloaded window content. For example changing a color value
--- requires 4 value modifier (slider, property,...) for RGBA then you need
--- a label and ways to display the current color.
--- If you want to go fancy you even add rgb and hsv ratio boxes.
--- While fine for one color if you have a lot of them it because tedious to
--- look at and quite wasteful in space. You could add a popup which modifies
--- the color but this does not solve the fact that it still requires a lot 
--- of cluttered space to do.
---
--- In these kind of instance abstract comboboxes are quite handy. All value
--- modifiers are hidden inside the combobox popup and only the color is shown
--- if not open. This combines the clarity of the popup with the ease of use 
--- of just using the space for modifiers.
--- 
--- Other instances are for example time and especially date picker, which only
--- show the currently activated time/data and hide the selection logic inside
--- the combobox popup.
-                 
-   if nk.tree_push(ctx, 'node', "Combo", 'minimized', 'widgets combo') then
-      -- default combobox ---------------------------------
-      nk.layout_row_static(ctx, 25, 200, 1)
-      combo.current_weapon = nk.combo(ctx, combo.weapons, combo.current_weapon, 25, {200,200})
-      -- slider color combobox 
-      if nk.combo_begin(ctx, combo.color, nil, {200,200}) then
-         nk.layout_row(ctx, 'dynamic', 30, {0.15, 0.85})
-         local r, g, b, a = table.unpack(combo.color)
-         nk.label(ctx, "R:", LEFT)
-         r = nk.slider(ctx, 0, r, 1.0, 5/255)
-         nk.label(ctx, "G:", LEFT)
-         g = nk.slider(ctx, 0, g, 1.0, 5/255)
-         nk.label(ctx, "B:", LEFT)
-         b = nk.slider(ctx, 0, b, 1.0, 5/255)
-         nk.label(ctx, "A:", LEFT)
-         a = nk.slider(ctx, 0, a, 1.0, 5/255)
-         combo.color = {r, g, b, a}
-         nk.combo_end(ctx)
-      end
-      -- complex color combobox ---------------------------
-      if nk.combo_begin(ctx, combo.color2, nil, {200,400}) then
-         nk.layout_row_dynamic(ctx, 120, 1)
-         combo.color2 = nk.color_picker(ctx, combo.color2, 'rgba')
-         nk.layout_row_dynamic(ctx, 25, 2)
-         combo.col_mode = nk.option(ctx, "RGB", combo.col_mode == 'RGB') and 'RGB' or combo.col_mode
-         combo.col_mode = nk.option(ctx, "HSV", combo.col_mode == 'HSV') and 'HSV' or combo.col_mode
-         nk.layout_row_dynamic(ctx, 25, 1)
-         if combo.col_mode == 'RGB' then
-            local r, g, b, a = table.unpack(combo.color2)
-            r = nk.property(ctx, "#R:", 0, r, 1.0, 0.01,0.005)
-            g = nk.property(ctx, "#G:", 0, g, 1.0, 0.01,0.005)
-            b = nk.property(ctx, "#B:", 0, b, 1.0, 0.01,0.005)
-            a = nk.property(ctx, "#A:", 0, a, 1.0, 0.01,0.005)
-            combo.color2 = { r, g, b, a }
-         else
-            local h, s, v, a = table.unpack(nk.rgba_to_hsva(combo.color2))
-            h = nk.property(ctx, "#H:", 0, h, 1.0, 0.01,0.05)
-            s = nk.property(ctx, "#S:", 0, s, 1.0, 0.01,0.05)
-            v = nk.property(ctx, "#V:", 0, v, 1.0, 0.01,0.05)
-            a = nk.property(ctx, "#A:", 0, a, 1.0, 0.01,0.05)
-            combo.color2 = nk.hsva_to_rgba({h, s, v, a})
-         end
-         nk.combo_end(ctx)
-      end
-      -- progressbar combobox -----------------------------
-      local sum = combo.prog_a + combo.prog_b + combo.prog_c + combo.prog_d
-      if nk.combo_begin(ctx, nil, fmt("%u", sum), {200,200}) then
-         nk.layout_row_dynamic(ctx, 30, 1)
-         combo.prog_a = nk.progress(ctx, combo.prog_a, 100, 'modifiable')
-         combo.prog_b = nk.progress(ctx, combo.prog_b, 100, 'modifiable')
-         combo.prog_c = nk.progress(ctx, combo.prog_c, 100, 'modifiable')
-         combo.prog_d = nk.progress(ctx, combo.prog_d, 100, 'modifiable')
-         nk.combo_end(ctx)
-      end
-
-      -- checkbox combobox --------------------------------
-      sum = 0
-      for i, val in ipairs(combo.check_values) do if val then sum = sum + 1 end end
-      if nk.combo_begin(ctx, nil, fmt("%u", sum), {200,200}) then
-         nk.layout_row_dynamic(ctx, 30, 1)
-         combo.check_values[1] = nk.checkbox(ctx, combo.weapons[1], combo.check_values[1])
-         combo.check_values[2] = nk.checkbox(ctx, combo.weapons[2], combo.check_values[2])
-         combo.check_values[3] = nk.checkbox(ctx, combo.weapons[3], combo.check_values[3])
-         combo.check_values[4] = nk.checkbox(ctx, combo.weapons[4], combo.check_values[4])
-         nk.combo_end(ctx)
-      end
-      -- complex text combobox ----------------------------
-      local x, y, z = table.unpack(combo.position)
-      if nk.combo_begin(ctx, nil, fmt("%.2f, %.2f, %.2f", x, y, z), {200,200}) then
-         nk.layout_row_dynamic(ctx, 25, 1)
-         x = nk.property(ctx, "#X:", -1024.0, x, 1024.0, 1,0.5)
-         y = nk.property(ctx, "#Y:", -1024.0, y, 1024.0, 1,0.5)
-         z = nk.property(ctx, "#Z:", -1024.0, z, 1024.0, 1,0.5)
-         combo.position = {x, y, z}
-         nk.combo_end(ctx)
-      end
-      -- chart combobox -----------------------------------
-      if nk.combo_begin(ctx, nil, fmt("%.1f", combo.chart_selection), {200,250}) then
-         nk.layout_row_dynamic(ctx, 150, 1)
-         nk.chart_begin(ctx, 'column', #combo.chart_values, 0, 50)
-            for i, value in ipairs(combo.chart_values) do
-               local flags = nk.chart_push(ctx, value)
-                  if flags & nk.CHART_CLICKED ~= 0 then
-                     combo.chart_selection = value
-                     nk.combo_close(ctx)
-                  end
-            end
-         nk.chart_end(ctx)
-         nk.combo_end(ctx)
-      end
-
-      local date, now = combo.date, os.date("*t")
-      if not combo.time_selected then
-         date.hour, date.min, date.sec = now.hour, now.min, now.sec
-      end
-      if not combo.date_selected then
-         date.year, date.month, date.day = now.year, now.month, now.day
-      end
-      -- time combobox ------------------------------------
-      local text = fmt("%02d:%02d:%02d", date.hour, date.min, date.sec)
-      if nk.combo_begin(ctx, nil, text, {200,250}) then
-         combo.time_selected = true
-         nk.layout_row_dynamic(ctx, 25, 1)
-         date.sec = nk.property(ctx, "#S:", 0, date.sec, 59, 1, 1)
-         date.min = nk.property(ctx, "#M:", 0, date.min, 59, 1, 1)
-         date.hour = nk.property(ctx, "#H:", 0, date.hour, 23, 1, 1)
-         nk.combo_end(ctx)
-      end
-      -- date combobox ------------------------------------
-      text = fmt("%02d-%02d-%02d", date.day, date.month, date.year)
-      if nk.combo_begin(ctx, nil, text, {350,400}) then
-         local days, year = MONTH_DAYS[date.month], date.year
-         if date.month == 2 and ((year%4 == 0 and year%100 ~= 0) or (year%400 == 0)) then
-            days = days + 1 -- leap year
-         end
-         -- header with month and year 
-         combo.date_selected = true
-         nk.layout_row_begin(ctx, 'dynamic', 20, 3)
-         nk.layout_row_push(ctx, 0.05)
-         if nk.button(ctx, 'triangle left') then
-            if date.month == 1 then
-               date.month, date.year = 12, math.max(0, date.year-1)
-            else
-               date.month = date.month - 1
-            end
-         end
-         nk.layout_row_push(ctx, 0.9)
-         nk.label(ctx, fmt("%s %d", MONTH[date.month], date.year), CENTERED)
-         nk.layout_row_push(ctx, 0.05)
-         if nk.button(ctx, 'triangle right') then
-            if date.month == 12 then
-               date.month, date.year = 1, date.year+1
-            else
-               date.month = date.month + 1
-            end
-         end
-         nk.layout_row_end(ctx)
-         -- weekdays
-         local week_day = firstdayof(date.year, date.month)
-         nk.layout_row_dynamic(ctx, 35, 7)
-         for i = 1, 7 do
-            nk.label(ctx, DAY[i], CENTERED)
-         end
-         if week_day > 1 then nk.spacing(ctx, week_day-1) end
-         for i = 1, days do
-            if nk.button(ctx, nil, fmt("%d", i)) then
-               date.day = i
-               nk.combo_close(ctx)
-            end
-         end
-      nk.combo_end(ctx)
-   end
-   nk.tree_pop(ctx)
    end
 end
 
@@ -1386,7 +920,7 @@ end
 
 -------------------------------------------------------------------------------
 
-function ob_gui_frame_demo(width, height)
+function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
    window_flags = 0
    nk.style_set_flags(OB_NK_CTX, "window.header.align", nk.HEADER_RIGHT)
@@ -1449,15 +983,22 @@ function ob_gui_frame(width, height)
    nk.style_from_table(OB_NK_CTX, colortable["blue"])
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
-      --if show_menu then Menubar(OB_NK_CTX) end
-      --if show_app_about then About(OB_NK_CTX) end
-      --nk.layout_row(OB_NK_CTX, 'static', 25, ratio)
-      --input.submit, input.flags = 
-         --nk.edit_string(OB_NK_CTX, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'decimal')
-      --if nk.button(OB_NK_CTX, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
-      --   OB_CONFIG.seed = tonumber(input.submit)
-      --   input.submit = ""
-      --end
+      if show_menu then Menubar(OB_NK_CTX) end
+      if show_app_about then About(OB_NK_CTX) end
+      nk.layout_row(OB_NK_CTX, 'static', 25, ratio)
+      input.submit, input.flags = 
+         nk.edit_string(OB_NK_CTX, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'decimal')
+      if nk.button(OB_NK_CTX, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
+         OB_CONFIG.seed = tonumber(input.submit)
+         input.submit = ""
+      end
+      if nk.button(OB_NK_CTX, nil, "Build") then
+         OB_NK_PICKED_FILE = nil
+         gui.spawn_file_picker()
+      end
+      if OB_NK_PICKED_FILE ~= nil then
+         nk.label(OB_NK_CTX, OB_NK_PICKED_FILE, nk.TEXT_LEFT)
+      end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
       nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
@@ -1485,7 +1026,7 @@ function ob_gui_frame(width, height)
       nk.layout_row_dynamic(OB_NK_CTX, height - normal_font:height(), 1)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          for _,mod in pairs(OB_MODULES) do
-            if mod.where == current_tab then
+            if mod.valid == true and mod.where == current_tab then
                for _,opt in pairs(mod.options) do
                   nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
                   nk.layout_row_push(OB_NK_CTX, width)

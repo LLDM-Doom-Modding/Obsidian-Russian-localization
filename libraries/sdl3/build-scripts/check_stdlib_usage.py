@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 #  Simple DirectMedia Layer
-#  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+#  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 #
 #  This software is provided 'as-is', without any express or implied
 #  warranty.  In no event will the authors be held liable for any damages
@@ -161,6 +161,7 @@ def find_symbols_in_file(file: pathlib.Path) -> int:
         "src/libm",
         "src/hidapi",
         "src/video/khronos",
+        "src/video/stb_image.h",
         "include/SDL3",
         "build-scripts/gen_audio_resampler_filter.c",
         "build-scripts/gen_audio_channel_conversion.c",

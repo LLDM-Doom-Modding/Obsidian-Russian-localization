@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,9 +23,11 @@
 
 #ifdef SDL_VIDEO_DRIVER_KMSDRM
 
-/* include this here before SDL_sysvideo.h to avoid vulkan type
- * redefinition errors.  it already includes SDL_sysvideo.h.  */
-#include "SDL_kmsdrmvulkan.h"
+/* Include this first, as some system headers may pull in EGL headers that
+ * define EGL types as native types for other enabled platforms, which can
+ * result in type-mismatch warnings when building with LTO.
+ */
+#include "../SDL_egl_c.h"
 
 // SDL internals
 #include "../../events/SDL_events_c.h"
@@ -44,6 +46,7 @@
 #include "SDL_kmsdrmmouse.h"
 #include "SDL_kmsdrmvideo.h"
 #include "SDL_kmsdrmopengles.h"
+#include "SDL_kmsdrmvulkan.h"
 #include <dirent.h>
 #include <errno.h>
 #include <poll.h>
@@ -95,7 +98,7 @@ static int get_driindex(void)
     }
 
     SDL_strlcpy(device + kmsdrm_dri_pathsize, kmsdrm_dri_devname,
-                sizeof(device) - kmsdrm_dri_devnamesize);
+                sizeof(device) - kmsdrm_dri_pathsize);
     while((res = readdir(folder)) != NULL && available < 0) {
         if (SDL_memcmp(res->d_name, kmsdrm_dri_devname,
                        kmsdrm_dri_devnamesize) == 0) {
@@ -160,7 +163,7 @@ static int get_driindex(void)
                 close(drm_fd);
             } else {
                 SDL_LogDebug(SDL_LOG_CATEGORY_VIDEO,
-                             "Failed to open KMSDRM device %s, errno: %d\n", device, errno);
+                             "Failed to open KMSDRM device %s, errno: %d", device, errno);
             }
         }
     }
@@ -329,7 +332,8 @@ VideoBootStrap KMSDRM_bootstrap = {
     "kmsdrm",
     "KMS/DRM Video Driver",
     KMSDRM_CreateDevice,
-    NULL // no ShowMessageBox implementation
+    NULL, // no ShowMessageBox implementation
+    false
 };
 
 static void KMSDRM_FBDestroyCallback(struct gbm_bo *bo, void *data)

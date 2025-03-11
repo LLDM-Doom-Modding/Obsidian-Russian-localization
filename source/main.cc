@@ -174,8 +174,6 @@ void Determine_WorkingPath()
 #else
     home_dir = PHYSFS_getPrefDir("Obsidian Team", "Obsidian");
 #endif
-    // ensure scratch folder exists
-    MakeDirectory(PathAppend(home_dir, "temp"));
 }
 
 std::string Resolve_DefaultOutputPath()
@@ -450,6 +448,7 @@ int main(int argc, char **argv)
     Determine_LoggingFile();
 
     Options_Load(options_file);
+    Resolve_DefaultOutputPath();
 
     LogInit(logging_file);
 

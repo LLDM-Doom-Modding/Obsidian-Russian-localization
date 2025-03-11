@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,13 +22,12 @@
 
 /* Regenerate the shaders with testgpu/build-shaders.sh */
 #include "testgpu/testgpu_spirv.h"
-#include "testgpu/testgpu_dxbc.h"
 #include "testgpu/testgpu_dxil.h"
 #include "testgpu/testgpu_metallib.h"
 
 #define TESTGPU_SUPPORTED_FORMATS (SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXBC | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_METALLIB)
 
-#define CHECK_CREATE(var, thing) { if (!(var)) { SDL_Log("Failed to create %s: %s\n", thing, SDL_GetError()); quit(2); } }
+#define CHECK_CREATE(var, thing) { if (!(var)) { SDL_Log("Failed to create %s: %s", thing, SDL_GetError()); quit(2); } }
 
 static Uint32 frames = 0;
 
@@ -153,7 +152,7 @@ perspective_matrix(float fovy, float aspect, float znear, float zfar, float *r)
  * major. In-place multiplication is supported.
  */
 static void
-multiply_matrix(float *lhs, float *rhs, float *r)
+multiply_matrix(const float *lhs, const float *rhs, float *r)
 {
     int i, j, k;
     float tmp[16];
@@ -342,20 +341,20 @@ Render(SDL_Window *window, const int windownum)
         SDL_Log("Failed to acquire command buffer :%s", SDL_GetError());
         quit(2);
     }
-    if (!SDL_AcquireGPUSwapchainTexture(cmd, state->windows[windownum], &swapchainTexture, &drawablew, &drawableh)) {
+    if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd, state->windows[windownum], &swapchainTexture, &drawablew, &drawableh)) {
         SDL_Log("Failed to acquire swapchain texture: %s", SDL_GetError());
         quit(2);
     }
 
     if (swapchainTexture == NULL) {
-        /* No swapchain was acquired, probably too many frames in flight */
-        SDL_SubmitGPUCommandBuffer(cmd);
+        /* Swapchain is unavailable, cancel work */
+        SDL_CancelGPUCommandBuffer(cmd);
         return;
     }
 
     /*
     * Do some rotation with Euler angles. It is not a fixed axis as
-    * quaterions would be, but the effect is cool.
+    * quaternions would be, but the effect is cool.
     */
     rotate_matrix((float)winstate->angle_x, 1.0f, 0.0f, 0.0f, matrix_modelview);
     rotate_matrix((float)winstate->angle_y, 0.0f, 1.0f, 0.0f, matrix_rotate);
@@ -471,12 +470,7 @@ load_shader(bool is_vertex)
     createinfo.props = 0;
 
     SDL_GPUShaderFormat format = SDL_GetGPUShaderFormats(gpu_device);
-    if (format & SDL_GPU_SHADERFORMAT_DXBC) {
-        createinfo.format = SDL_GPU_SHADERFORMAT_DXBC;
-        createinfo.code = is_vertex ? D3D11_CubeVert : D3D11_CubeFrag;
-        createinfo.code_size = is_vertex ? SDL_arraysize(D3D11_CubeVert) : SDL_arraysize(D3D11_CubeFrag);
-        createinfo.entrypoint = is_vertex ? "VSMain" : "PSMain";
-    } else if (format & SDL_GPU_SHADERFORMAT_DXIL) {
+    if (format & SDL_GPU_SHADERFORMAT_DXIL) {
         createinfo.format = SDL_GPU_SHADERFORMAT_DXIL;
         createinfo.code = is_vertex ? D3D12_CubeVert : D3D12_CubeFrag;
         createinfo.code_size = is_vertex ? SDL_arraysize(D3D12_CubeVert) : SDL_arraysize(D3D12_CubeFrag);
@@ -544,23 +538,25 @@ init_render_state(int msaa)
 
     buffer_desc.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
     buffer_desc.size = sizeof(vertex_data);
-    buffer_desc.props = 0;
+    buffer_desc.props = SDL_CreateProperties();
+    SDL_SetStringProperty(buffer_desc.props, SDL_PROP_GPU_BUFFER_CREATE_NAME_STRING, "космонавт");
     render_state.buf_vertex = SDL_CreateGPUBuffer(
         gpu_device,
         &buffer_desc
     );
     CHECK_CREATE(render_state.buf_vertex, "Static vertex buffer")
-
-    SDL_SetGPUBufferName(gpu_device, render_state.buf_vertex, "космонавт");
+    SDL_DestroyProperties(buffer_desc.props);
 
     transfer_buffer_desc.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
     transfer_buffer_desc.size = sizeof(vertex_data);
-    transfer_buffer_desc.props = 0;
+    transfer_buffer_desc.props = SDL_CreateProperties();
+    SDL_SetStringProperty(transfer_buffer_desc.props, SDL_PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING, "Transfer Buffer");
     buf_transfer = SDL_CreateGPUTransferBuffer(
         gpu_device,
         &transfer_buffer_desc
     );
     CHECK_CREATE(buf_transfer, "Vertex transfer buffer")
+    SDL_DestroyProperties(transfer_buffer_desc.props);
 
     /* We just need to upload the static data once. */
     map = SDL_MapGPUTransferBuffer(gpu_device, buf_transfer, false);
@@ -645,7 +641,7 @@ init_render_state(int msaa)
 
     window_states = (WindowState *) SDL_calloc(state->num_windows, sizeof (WindowState));
     if (!window_states) {
-        SDL_Log("Out of memory!\n");
+        SDL_Log("Out of memory!");
         quit(2);
     }
 
@@ -733,7 +729,7 @@ main(int argc, char *argv[])
     }
 
     mode = SDL_GetCurrentDisplayMode(SDL_GetDisplayForWindow(state->windows[0]));
-    SDL_Log("Screen bpp: %d\n", SDL_BITSPERPIXEL(mode->format));
+    SDL_Log("Screen bpp: %d", SDL_BITSPERPIXEL(mode->format));
 
     init_render_state(msaa);
 
@@ -753,7 +749,7 @@ main(int argc, char *argv[])
     /* Print out some timing information */
     now = SDL_GetTicks();
     if (now > then) {
-        SDL_Log("%2.2f frames per second\n",
+        SDL_Log("%2.2f frames per second",
                ((double) frames * 1000) / (now - then));
     }
 #if !defined(__ANDROID__)

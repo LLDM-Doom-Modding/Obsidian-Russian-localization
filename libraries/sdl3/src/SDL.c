@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -51,10 +51,12 @@
 #include "sensor/SDL_sensor_c.h"
 #include "stdlib/SDL_getenv_c.h"
 #include "thread/SDL_thread_c.h"
+#include "tray/SDL_tray_utils.h"
 #include "video/SDL_pixels_c.h"
 #include "video/SDL_surface_c.h"
 #include "video/SDL_video_c.h"
 #include "filesystem/SDL_filesystem_c.h"
+#include "io/SDL_asyncio_c.h"
 #ifdef SDL_PLATFORM_ANDROID
 #include "core/android/SDL_android.h"
 #endif
@@ -182,6 +184,7 @@ static bool SDL_MainIsReady = false;
 #else
 static bool SDL_MainIsReady = true;
 #endif
+static SDL_ThreadID SDL_MainThreadID = 0;
 static bool SDL_bInMainQuit = false;
 static Uint8 SDL_SubsystemRefCount[32];
 
@@ -249,6 +252,22 @@ static bool SDL_InitOrIncrementSubsystem(Uint32 subsystem)
 void SDL_SetMainReady(void)
 {
     SDL_MainIsReady = true;
+
+    if (SDL_MainThreadID == 0) {
+        SDL_MainThreadID = SDL_GetCurrentThreadID();
+    }
+}
+
+bool SDL_IsMainThread(void)
+{
+    if (SDL_MainThreadID == 0) {
+        // Not initialized yet?
+        return true;
+    }
+    if (SDL_MainThreadID == SDL_GetCurrentThreadID()) {
+        return true;
+    }
+    return false;
 }
 
 // Initialize all the subsystems that require initialization before threads start
@@ -329,10 +348,17 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
                 goto quit_and_error;
             }
 
+            // We initialize video on the main thread
+            // On Apple platforms this is a requirement.
+            // On other platforms, this is the definition.
+            SDL_MainThreadID = SDL_GetCurrentThreadID();
+
             SDL_IncrementSubsystemRefCount(SDL_INIT_VIDEO);
             if (!SDL_VideoInit(NULL)) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_VIDEO);
+                SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
+                SDL_PopError();
                 goto quit_and_error;
             }
         } else {
@@ -357,7 +383,9 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             SDL_IncrementSubsystemRefCount(SDL_INIT_AUDIO);
             if (!SDL_InitAudio(NULL)) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_AUDIO);
+                SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
+                SDL_PopError();
                 goto quit_and_error;
             }
         } else {
@@ -382,7 +410,9 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             SDL_IncrementSubsystemRefCount(SDL_INIT_JOYSTICK);
             if (!SDL_InitJoysticks()) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_JOYSTICK);
+                SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
+                SDL_PopError();
                 goto quit_and_error;
             }
         } else {
@@ -406,7 +436,9 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             SDL_IncrementSubsystemRefCount(SDL_INIT_GAMEPAD);
             if (!SDL_InitGamepads()) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_GAMEPAD);
+                SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+                SDL_PopError();
                 goto quit_and_error;
             }
         } else {
@@ -469,7 +501,9 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
             SDL_IncrementSubsystemRefCount(SDL_INIT_CAMERA);
             if (!SDL_CameraInit(NULL)) {
                 SDL_DecrementSubsystemRefCount(SDL_INIT_CAMERA);
+                SDL_PushError();
                 SDL_QuitSubSystem(SDL_INIT_EVENTS);
+                SDL_PopError();
                 goto quit_and_error;
             }
         } else {
@@ -487,7 +521,11 @@ bool SDL_InitSubSystem(SDL_InitFlags flags)
     return SDL_ClearError();
 
 quit_and_error:
-    SDL_QuitSubSystem(flags_initialized);
+    {
+        SDL_PushError();
+        SDL_QuitSubSystem(flags_initialized);
+        SDL_PopError();
+    }
     return false;
 }
 
@@ -619,12 +657,14 @@ void SDL_Quit(void)
     SDL_HelperWindowDestroy();
 #endif
     SDL_QuitSubSystem(SDL_INIT_EVERYTHING);
+    SDL_CleanupTrays();
 
 #ifdef SDL_USE_LIBDBUS
     SDL_DBus_Quit();
 #endif
 
     SDL_QuitTimers();
+    SDL_QuitAsyncIO();
 
     SDL_SetObjectsInvalid();
     SDL_AssertionsQuit();
@@ -718,8 +758,6 @@ const char *SDL_GetPlatform(void)
     return "PlayStation Portable";
 #elif defined(SDL_PLATFORM_VITA)
     return "PlayStation Vita";
-#elif defined(SDL_PLATFORM_NGAGE)
-    return "Nokia N-Gage";
 #elif defined(SDL_PLATFORM_3DS)
     return "Nintendo 3DS";
 #elif defined(__managarm__)

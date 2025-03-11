@@ -500,11 +500,13 @@ int gui_bit_not(lua_State *L)
 static void gui_file_picker_callback(void *userdata, const char * const *filelist, int filter)
 {
     bool *in_dialog = (bool *)userdata;
-    if (!filelist) {
+    if (!filelist) 
+    {
         LogPrint("An error occured: %s", SDL_GetError());
         *in_dialog = false;
         return;
-    } else if (!*filelist) {
+    } else if (!*filelist) 
+    {
         LogPrint("The user did not select any file.");
         LogPrint("Most likely, the dialog was canceled.");
         *in_dialog = false;
@@ -524,7 +526,7 @@ int gui_spawn_file_picker(lua_State *L)
 {
     picker_filename.clear();
     in_file_dialog = true;
-    SDL_ShowOpenFileDialog(gui_file_picker_callback, &in_file_dialog, NULL, NULL, 0, install_dir.c_str(), false);
+    SDL_ShowOpenFolderDialog(gui_file_picker_callback, &in_file_dialog, NULL, default_output_path.c_str(), false);
     return 0;
 }
 #endif

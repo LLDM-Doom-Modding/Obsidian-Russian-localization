@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -85,7 +85,7 @@ static void DrawOnViewport(SDL_Renderer *renderer)
     /* Add a box at the top */
     rect.w = 8.0f;
     rect.h = 8.0f;
-    rect.x = (float)((viewport.w - rect.w) / 2);
+    rect.x = (viewport.w - rect.w) / 2;
     rect.y = 0.0f;
     SDL_RenderFillRect(renderer, &rect);
 
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     now = SDL_GetTicks();
     if (now > then) {
         double fps = ((double)frames * 1000) / (now - then);
-        SDL_Log("%2.2f frames per second\n", fps);
+        SDL_Log("%2.2f frames per second", fps);
     }
     quit(0);
     return 0;

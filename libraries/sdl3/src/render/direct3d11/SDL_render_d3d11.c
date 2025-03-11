@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -125,7 +125,7 @@ typedef struct
     D3D11_FILTER scaleMode;
     D3D11_Shader shader;
     const float *YCbCr_matrix;
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     // YV12 texture support
     bool yuv;
     ID3D11Texture2D *mainTextureU;
@@ -231,11 +231,14 @@ SDL_PixelFormat D3D11_DXGIFormatToSDLPixelFormat(DXGI_FORMAT dxgiFormat)
     case DXGI_FORMAT_B8G8R8A8_UNORM:
     case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
         return SDL_PIXELFORMAT_ARGB8888;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+        return SDL_PIXELFORMAT_ABGR8888;
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
         return SDL_PIXELFORMAT_XRGB8888;
     case DXGI_FORMAT_R10G10B10A2_UNORM:
-        return SDL_PIXELFORMAT_XBGR2101010;
+        return SDL_PIXELFORMAT_ABGR2101010;
     case DXGI_FORMAT_R16G16B16A16_FLOAT:
         return SDL_PIXELFORMAT_RGBA64_FLOAT;
     default:
@@ -248,13 +251,18 @@ static DXGI_FORMAT SDLPixelFormatToDXGITextureFormat(Uint32 format, Uint32 outpu
     switch (format) {
     case SDL_PIXELFORMAT_RGBA64_FLOAT:
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
-    case SDL_PIXELFORMAT_XBGR2101010:
+    case SDL_PIXELFORMAT_ABGR2101010:
         return DXGI_FORMAT_R10G10B10A2_UNORM;
     case SDL_PIXELFORMAT_ARGB8888:
         if (output_colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
             return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
         }
         return DXGI_FORMAT_B8G8R8A8_UNORM;
+    case SDL_PIXELFORMAT_ABGR8888:
+        if (output_colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        }
+        return DXGI_FORMAT_R8G8B8A8_UNORM;
     case SDL_PIXELFORMAT_XRGB8888:
         if (output_colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
             return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
@@ -278,13 +286,18 @@ static DXGI_FORMAT SDLPixelFormatToDXGIMainResourceViewFormat(Uint32 format, Uin
     switch (format) {
     case SDL_PIXELFORMAT_RGBA64_FLOAT:
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
-    case SDL_PIXELFORMAT_XBGR2101010:
+    case SDL_PIXELFORMAT_ABGR2101010:
         return DXGI_FORMAT_R10G10B10A2_UNORM;
     case SDL_PIXELFORMAT_ARGB8888:
         if (colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
             return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
         }
         return DXGI_FORMAT_B8G8R8A8_UNORM;
+    case SDL_PIXELFORMAT_ABGR8888:
+        if (colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
+            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        }
+        return DXGI_FORMAT_R8G8B8A8_UNORM;
     case SDL_PIXELFORMAT_XRGB8888:
         if (colorspace == SDL_COLORSPACE_SRGB_LINEAR) {
             return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
@@ -997,7 +1010,7 @@ static HRESULT D3D11_CreateWindowSizeDependentResources(SDL_Renderer *renderer)
      */
     SDL_GetWindowSizeInPixels(renderer->window, &w, &h);
     data->rotation = D3D11_GetCurrentRotation();
-    // SDL_Log("%s: windowSize={%d,%d}, orientation=%d\n", __FUNCTION__, w, h, (int)data->rotation);
+    // SDL_Log("%s: windowSize={%d,%d}, orientation=%d", __FUNCTION__, w, h, (int)data->rotation);
     if (D3D11_IsDisplayRotated90Degrees(data->rotation)) {
         int tmp = w;
         w = h;
@@ -1078,14 +1091,15 @@ static bool D3D11_HandleDeviceLost(SDL_Renderer *renderer)
         SUCCEEDED(D3D11_CreateWindowSizeDependentResources(renderer))) {
         recovered = true;
     } else {
-        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Renderer couldn't recover from device lost: %s\n", SDL_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Renderer couldn't recover from device lost: %s", SDL_GetError());
         D3D11_ReleaseAll(renderer);
     }
 
     // Let the application know that the device has been reset or lost
     SDL_Event event;
+    SDL_zero(event);
     event.type = recovered ? SDL_EVENT_RENDER_DEVICE_RESET : SDL_EVENT_RENDER_DEVICE_LOST;
-    event.common.timestamp = 0;
+    event.render.windowID = SDL_GetWindowID(SDL_GetRenderWindow(renderer));
     SDL_PushEvent(&event);
 
     return recovered;
@@ -1214,7 +1228,7 @@ static bool D3D11_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture, SD
         }
     }
     SDL_SetPointerProperty(SDL_GetTextureProperties(texture), SDL_PROP_TEXTURE_D3D11_TEXTURE_POINTER, textureData->mainTexture);
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (texture->format == SDL_PIXELFORMAT_YV12 ||
         texture->format == SDL_PIXELFORMAT_IYUV) {
         textureData->yuv = true;
@@ -1288,7 +1302,7 @@ static bool D3D11_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture, SD
     if (FAILED(result)) {
         return WIN_SetErrorFromHRESULT(SDL_COMPOSE_ERROR("ID3D11Device1::CreateShaderResourceView"), result);
     }
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (textureData->yuv) {
         result = ID3D11Device_CreateShaderResourceView(rendererData->d3dDevice,
                                                        (ID3D11Resource *)textureData->mainTextureU,
@@ -1357,7 +1371,7 @@ static void D3D11_DestroyTexture(SDL_Renderer *renderer,
     SAFE_RELEASE(data->mainTextureResourceView);
     SAFE_RELEASE(data->mainTextureRenderTargetView);
     SAFE_RELEASE(data->stagingTexture);
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     SAFE_RELEASE(data->mainTextureU);
     SAFE_RELEASE(data->mainTextureResourceViewU);
     SAFE_RELEASE(data->mainTextureV);
@@ -1472,7 +1486,7 @@ static bool D3D11_UpdateTextureInternal(D3D11_RenderData *rendererData, ID3D11Te
     return true;
 }
 
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
 static bool D3D11_UpdateTextureNV(SDL_Renderer *renderer, SDL_Texture *texture,
                                  const SDL_Rect *rect,
                                  const Uint8 *Yplane, int Ypitch,
@@ -1496,7 +1510,7 @@ static bool D3D11_UpdateTexture(SDL_Renderer *renderer, SDL_Texture *texture,
         return SDL_SetError("Texture is not currently available");
     }
 
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (textureData->nv12) {
         const Uint8 *Yplane = (const Uint8 *)srcPixels;
         const Uint8 *UVplane = Yplane + rect->h * srcPitch;
@@ -1524,7 +1538,7 @@ static bool D3D11_UpdateTexture(SDL_Renderer *renderer, SDL_Texture *texture,
     return true;
 }
 
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
 static bool D3D11_UpdateTextureYUV(SDL_Renderer *renderer, SDL_Texture *texture,
                                   const SDL_Rect *rect,
                                   const Uint8 *Yplane, int Ypitch,
@@ -1676,7 +1690,7 @@ static bool D3D11_LockTexture(SDL_Renderer *renderer, SDL_Texture *texture,
     if (!textureData) {
         return SDL_SetError("Texture is not currently available");
     }
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (textureData->yuv || textureData->nv12) {
         // It's more efficient to upload directly...
         if (!textureData->pixels) {
@@ -1753,7 +1767,7 @@ static void D3D11_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture)
     if (!textureData) {
         return;
     }
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (textureData->yuv || textureData->nv12) {
         const SDL_Rect *rect = &textureData->locked_rect;
         void *pixels =
@@ -1989,7 +2003,7 @@ static bool D3D11_UpdateViewport(SDL_Renderer *renderer)
          * SDL_CreateRenderer is calling it, and will call it again later
          * with a non-empty viewport.
          */
-        // SDL_Log("%s, no viewport was set!\n", __FUNCTION__);
+        // SDL_Log("%s, no viewport was set!", __FUNCTION__);
         return false;
     }
 
@@ -2056,7 +2070,7 @@ static bool D3D11_UpdateViewport(SDL_Renderer *renderer)
     d3dviewport.Height = orientationAlignedViewport.h;
     d3dviewport.MinDepth = 0.0f;
     d3dviewport.MaxDepth = 1.0f;
-    // SDL_Log("%s: D3D viewport = {%f,%f,%f,%f}\n", __FUNCTION__, d3dviewport.TopLeftX, d3dviewport.TopLeftY, d3dviewport.Width, d3dviewport.Height);
+    // SDL_Log("%s: D3D viewport = {%f,%f,%f,%f}", __FUNCTION__, d3dviewport.TopLeftX, d3dviewport.TopLeftY, d3dviewport.Width, d3dviewport.Height);
     ID3D11DeviceContext_RSSetViewports(data->d3dContext, 1, &d3dviewport);
 
     data->viewportDirty = false;
@@ -2314,7 +2328,7 @@ static bool D3D11_SetCopyState(SDL_Renderer *renderer, const SDL_RenderCommand *
             textureSampler = rendererData->samplers[D3D11_SAMPLER_NEAREST_WRAP];
             break;
         default:
-            return SDL_SetError("Unknown texture address mode: %d\n", cmd->data.draw.texture_address_mode);
+            return SDL_SetError("Unknown texture address mode: %d", cmd->data.draw.texture_address_mode);
         }
         break;
     case D3D11_FILTER_MIN_MAG_MIP_LINEAR:
@@ -2326,13 +2340,13 @@ static bool D3D11_SetCopyState(SDL_Renderer *renderer, const SDL_RenderCommand *
             textureSampler = rendererData->samplers[D3D11_SAMPLER_LINEAR_WRAP];
             break;
         default:
-            return SDL_SetError("Unknown texture address mode: %d\n", cmd->data.draw.texture_address_mode);
+            return SDL_SetError("Unknown texture address mode: %d", cmd->data.draw.texture_address_mode);
         }
         break;
     default:
-        return SDL_SetError("Unknown scale mode: %d\n", textureData->scaleMode);
+        return SDL_SetError("Unknown scale mode: %d", textureData->scaleMode);
     }
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     if (textureData->yuv) {
         ID3D11ShaderResourceView *shaderResources[3];
 
@@ -2692,7 +2706,7 @@ static bool D3D11_CreateRenderer(SDL_Renderer *renderer, SDL_Window *window, SDL
     renderer->SupportsBlendMode = D3D11_SupportsBlendMode;
     renderer->CreateTexture = D3D11_CreateTexture;
     renderer->UpdateTexture = D3D11_UpdateTexture;
-#if SDL_HAVE_YUV
+#ifdef SDL_HAVE_YUV
     renderer->UpdateTextureYUV = D3D11_UpdateTextureYUV;
     renderer->UpdateTextureNV = D3D11_UpdateTextureNV;
 #endif
@@ -2717,8 +2731,9 @@ static bool D3D11_CreateRenderer(SDL_Renderer *renderer, SDL_Window *window, SDL
 
     renderer->name = D3D11_RenderDriver.name;
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_ARGB8888);
+    SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_ABGR8888);
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_XRGB8888);
-    SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_XBGR2101010);
+    SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_ABGR2101010);
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_RGBA64_FLOAT);
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_YV12);
     SDL_AddSupportedTextureFormat(renderer, SDL_PIXELFORMAT_IYUV);

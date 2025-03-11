@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -168,7 +168,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
                 SDL3.audioContext = new webkitAudioContext();
             }
             if (SDL3.audioContext) {
-                if ((typeof navigator.userActivation) === 'undefined') {  // Firefox doesn't have this (as of August 2023), use autoResumeAudioContext instead.
+                if ((typeof navigator.userActivation) === 'undefined') {
                     autoResumeAudioContext(SDL3.audioContext);
                 }
             }
@@ -190,6 +190,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
 
     // limit to native freq
     device->spec.freq = EM_ASM_INT({ return Module['SDL3'].audioContext.sampleRate; });
+    device->sample_frames = SDL_GetDefaultSampleFramesFromFreq(device->spec.freq) * 2;  // double the buffer size, some browsers need more, and we'll just have to live with the latency.
 
     SDL_UpdatedAudioDeviceFormat(device);
 
@@ -233,7 +234,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
                     if ((SDL3 === undefined) || (SDL3.audio_recording === undefined)) { return; }
                     audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0);
                     SDL3.audio_recording.currentRecordingBuffer = audioProcessingEvent.inputBuffer;
-                    dynCall('ii', $2, [$3]);
+                    dynCall('ip', $2, [$3]);
                 };
                 SDL3.audio_recording.mediaStreamNode.connect(SDL3.audio_recording.scriptProcessorNode);
                 SDL3.audio_recording.scriptProcessorNode.connect(SDL3.audioContext.destination);
@@ -249,7 +250,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
             SDL3.audio_recording.silenceBuffer.getChannelData(0).fill(0.0);
             var silence_callback = function() {
                 SDL3.audio_recording.currentRecordingBuffer = SDL3.audio_recording.silenceBuffer;
-                dynCall('ii', $2, [$3]);
+                dynCall('ip', $2, [$3]);
             };
 
             SDL3.audio_recording.silenceTimer = setInterval(silence_callback, ($1 / SDL3.audioContext.sampleRate) * 1000);
@@ -274,7 +275,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
                     SDL3.audio_playback.silenceBuffer = undefined;
                 }
                 SDL3.audio_playback.currentPlaybackBuffer = e['outputBuffer'];
-                dynCall('ii', $2, [$3]);
+                dynCall('ip', $2, [$3]);
             };
 
             SDL3.audio_playback.scriptProcessorNode['connect'](SDL3.audioContext['destination']);
@@ -283,7 +284,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
                 SDL3.audio_playback.silenceBuffer = SDL3.audioContext.createBuffer($0, $1, SDL3.audioContext.sampleRate);
                 SDL3.audio_playback.silenceBuffer.getChannelData(0).fill(0.0);
                 var silence_callback = function() {
-                    if ((typeof navigator.userActivation) !== 'undefined') {  // Almost everything modern except Firefox (as of August 2023)
+                    if ((typeof navigator.userActivation) !== 'undefined') {
                         if (navigator.userActivation.hasBeenActive) {
                             SDL3.audioContext.resume();
                         }
@@ -292,7 +293,7 @@ static bool EMSCRIPTENAUDIO_OpenDevice(SDL_AudioDevice *device)
                     // the buffer that gets filled here just gets ignored, so the app can make progress
                     //  and/or avoid flooding audio queues until we can actually play audio.
                     SDL3.audio_playback.currentPlaybackBuffer = SDL3.audio_playback.silenceBuffer;
-                    dynCall('ii', $2, [$3]);
+                    dynCall('ip', $2, [$3]);
                     SDL3.audio_playback.currentPlaybackBuffer = undefined;
                 };
 
@@ -350,7 +351,7 @@ static bool EMSCRIPTENAUDIO_Init(SDL_AudioDriverImpl *impl)
 }
 
 AudioBootStrap EMSCRIPTENAUDIO_bootstrap = {
-    "emscripten", "SDL emscripten audio driver", EMSCRIPTENAUDIO_Init, false
+    "emscripten", "SDL emscripten audio driver", EMSCRIPTENAUDIO_Init, false, false
 };
 
 /* *INDENT-ON* */ // clang-format on
