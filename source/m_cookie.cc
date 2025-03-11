@@ -76,15 +76,9 @@ static void Cookie_SetValue(std::string name, const std::string &value)
 
         if (context == cookie_context_e::Arguments || keep_seed)
         {
-            size_t converted = 0;
-            next_rand_seed = stoull(value, &converted);
-
-            if (converted != value.size())
-            {
-                string_seed = value;
-                ob_set_config("string_seed", value.c_str());
-                next_rand_seed = StringHash64(string_seed);
-            }
+            string_seed = value;
+            ob_set_config("seed", value.c_str());
+            next_rand_seed = StringHash64(string_seed);
         }
 
         return;

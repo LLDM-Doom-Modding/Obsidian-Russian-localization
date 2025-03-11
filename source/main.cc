@@ -81,21 +81,18 @@ int screen_h;
 
 int main_action;
 
-unsigned long long next_rand_seed;
+uint64_t next_rand_seed;
 
 std::string              batch_output_file;
 std::string              numeric_locale;
 
 // options
 int         filename_prefix        = 0;
-std::string custom_prefix          = "CUSTOM_";
 bool        create_backups         = true;
 bool        overwrite_warning      = true;
 bool        debug_messages         = false;
-bool        random_string_seeds    = false;
 bool        password_mode          = false;
 bool        mature_word_lists      = false;
-bool        did_specify_seed       = false;
 #ifdef OBSIDIAN_ENABLE_GUI
 bool        in_file_dialog         = false;
 std::string picker_filename;
@@ -124,17 +121,9 @@ static void ShowInfo()
            "\n"
            "Available options:\n"
            "     --version              Display build information\n"
-           "     --home     <dir>       Home directory\n"
-           "     --install  <dir>       Installation directory\n"
-           "\n"
-           "     --config   <file>      Config file for GUI\n"
-           "     --options  <file>      Options file for GUI\n"
-           "     --log      <file>      Log file to create\n"
            "\n"
            "  -o --output   <output>    Specify output filename\n"
            "  -a --addon    <file>...   Addon(s) to use\n"
-           "  -l --load     <file>      Load settings from a file\n"
-           "  -k --keep                 Keep SEED from loaded settings\n"
            "\n"
            "  -d --debug                Enable debugging\n"
            "  -v --verbose              Print log messages to stdout\n"
@@ -257,37 +246,16 @@ void Main::Shutdown(const bool error)
 
 void Main_CalcNewSeed()
 {
-    next_rand_seed = xoshiro_UInt();
-}
-
-void Main_SetSeed()
-{
-    if (random_string_seeds && !did_specify_seed)
+    if (string_seed.empty())
     {
-        if (string_seed.empty())
-        {
-            if (password_mode)
-            {
-                if (next_rand_seed % 2 == 1)
-                {
-                    string_seed = ob_get_password();
-                }
-                else
-                {
-                    string_seed = ob_get_random_words();
-                }
-            }
-            else
-            {
-                string_seed = ob_get_random_words();
-            }
-            ob_set_config("string_seed", string_seed.c_str());
-            next_rand_seed = StringHash64(string_seed);
-        }
+        if (password_mode)
+            string_seed = ob_get_password();
+        else
+            string_seed = ob_get_random_words();
     }
+    ob_set_config("seed", string_seed.c_str());
+    next_rand_seed = StringHash64(string_seed);
     xoshiro_Reseed(next_rand_seed);
-    std::string seed = NumToString(next_rand_seed);
-    ob_set_config("seed", seed.c_str());
 }
 
 static void Module_Defaults()
@@ -379,9 +347,8 @@ int main(int argc, char **argv)
     // initialise argument parser (skipping program name)
 
     // these flags take at least one argument
-    argv::short_flags.emplace('b');
+    argv::short_flags.emplace('o');
     argv::short_flags.emplace('a');
-    argv::short_flags.emplace('l');
     argv::short_flags.emplace('u');
 
     // parse the flags
@@ -452,8 +419,7 @@ int main(int argc, char **argv)
 
     LogInit(logging_file);
 
-    // accept -t and --terminal for backwards compatibility
-    if (argv::Find('v', "verbose") >= 0 || argv::Find('t', "terminal") >= 0)
+    if (argv::Find('v', "verbose") >= 0)
     {
         LogEnableTerminal(true);
     }
@@ -478,22 +444,7 @@ int main(int argc, char **argv)
 
     LogEnableDebug(debug_messages);
 
-    Main_CalcNewSeed();
-
-    std::string load_file;
-
     VFS_InitAddons();
-
-    if (const int load_arg = argv::Find('l', "load"); load_arg >= 0)
-    {
-        if (load_arg + 1 >= argv::list.size() || argv::IsOption(load_arg + 1))
-        {
-            FatalError("OBSIDIAN ERROR: missing filename for --load\n");
-            exit(EXIT_FAILURE);
-        }
-
-        load_file = argv::list[load_arg + 1];
-    }
 
     VFS_ParseCommandLine();
 
@@ -510,23 +461,13 @@ int main(int argc, char **argv)
 
     Module_Defaults();
 
-    if (!load_file.empty())
+    if (!FileExists(config_file))
     {
-        if (!Cookie_Load(load_file))
-        {
-            FatalError(_("No such config file: %s\n"), load_file.c_str());
-        }
+        Cookie_Save(config_file);
     }
-    else
+    if (!Cookie_Load(config_file))
     {
-        if (!FileExists(config_file))
-        {
-            Cookie_Save(config_file);
-        }
-        if (!Cookie_Load(config_file))
-        {
-            FatalError(_("No such config file: %s\n"), config_file.c_str());
-        }
+        FatalError(_("No such config file: %s\n"), config_file.c_str());
     }
 
     Cookie_ParseArguments();
@@ -583,7 +524,7 @@ int main(int argc, char **argv)
         batch_output_file = ob_default_filename();
     }
 
-    Main_SetSeed();
+    Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
     /* Platform */

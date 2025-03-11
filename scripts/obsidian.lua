@@ -880,14 +880,9 @@ function ob_read_all_config(need_full, log_only)
   do_line("-- DaveFriedLiver\n")
   do_line("-- https://github.com/obsidian-level-maker/Obsidian/\n")
 
-  if OB_CONFIG.seed and OB_CONFIG.seed ~= 0 then
-    if OB_CONFIG.string_seed then
-      do_line("seed = " .. OB_CONFIG.string_seed)
-      do_line("")
-    else
-      do_line("seed = " .. OB_CONFIG.seed)
-      do_line("")
-    end
+  if OB_CONFIG.seed ~= nil then
+    do_line("seed = " .. OB_CONFIG.seed)
+    do_line("")
   end
 
   do_line("---- Game Settings ----")
@@ -1269,7 +1264,7 @@ function ob_init()
   end
 
 
-  OB_CONFIG.seed = 0,
+  OB_CONFIG.seed = nil
 
   create_buttons("engine", OB_ENGINES)
   create_buttons("game",   OB_GAMES)
@@ -1754,8 +1749,8 @@ function ob_clean_up()
   SEEN_WALL_GROUPS = nil
   AMBIENT_SOUND_DEFS = nil
 
-  if OB_CONFIG.string_seed then
-    table.remove(OB_CONFIG, string_seed)
+  if OB_CONFIG.seed ~= nil then
+    table.remove(OB_CONFIG, seed)
   end
 
   collectgarbage("collect")

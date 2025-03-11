@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 
-void AssertFail(const char *msg, ...)
+[[noreturn]] void AssertFail(const char *msg, ...)
 {
     static char buffer[OBSIDIAN_MSG_BUF_LEN];
 

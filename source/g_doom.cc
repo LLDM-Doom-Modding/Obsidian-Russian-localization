@@ -44,7 +44,6 @@
 #include "slump.h"
 
 extern void        CSG_DOOM_Write();
-extern std::string BestDirectory();
 
 extern int ef_solid_type;
 extern int ef_liquid_type;
@@ -1118,7 +1117,7 @@ void Doom::AddThing(int x, int y, int h, int type, int angle, int options, int t
             textmap_lump->Printf("\ty = %f;\n", (double)y);
             if (ob_hexen_ceiling_check(type))
             {
-                textmap_lump->Printf("\theight = %f;\n", 0);
+                textmap_lump->Printf("\theight = 0;\n");
             }
             else
             {

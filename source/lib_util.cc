@@ -851,31 +851,6 @@ int StringPrefixCaseCompare(std::string_view A, std::string_view B)
     }
 }
 
-void StringReplaceChar(std::string *str, char old_ch, char new_ch)
-{
-    // when 'new_ch' is zero, the character is simply removed
-
-    SYS_ASSERT(old_ch != '\0');
-
-    while (true)
-    {
-        auto it = std::find(str->begin(), str->end(), old_ch);
-        if (it == str->end())
-        {
-            // found them all
-            break;
-        }
-        if (new_ch == '\0')
-        {
-            str->erase(it);
-        }
-        else
-        {
-            *it = new_ch;
-        }
-    }
-}
-
 std::string StringFormat(std::string_view fmt, ...)
 {
     /* Algorithm: keep doubling the allocated buffer size
@@ -909,7 +884,7 @@ std::string StringFormat(std::string_view fmt, ...)
     }
 }
 
-std::string NumToString(unsigned long long int value)
+std::string NumToString(uint64_t value)
 {
     return StringFormat("%llu", value);
     ;

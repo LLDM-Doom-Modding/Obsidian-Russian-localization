@@ -989,9 +989,10 @@ function ob_gui_frame(width, height)
       input.submit, input.flags = 
          nk.edit_string(OB_NK_CTX, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'decimal')
       if nk.button(OB_NK_CTX, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
-         OB_CONFIG.seed = tonumber(input.submit)
+         OB_CONFIG.seed = input.submit
          input.submit = ""
       end
+      nk.label(OB_NK_CTX, OB_CONFIG.seed, nk.TEXT_LEFT)
       if nk.button(OB_NK_CTX, nil, "Build") then
          OB_NK_PICKED_FILE = nil
          gui.spawn_file_picker()

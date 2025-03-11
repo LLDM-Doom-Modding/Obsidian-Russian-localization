@@ -59,7 +59,7 @@ extern std::string reference_file;
 
 extern std::string batch_output_file;
 
-extern unsigned long long next_rand_seed;
+extern uint64_t next_rand_seed;
 
 // this records the user action, e.g. Cancel or Quit buttons
 enum main_action_kind_e
@@ -78,14 +78,11 @@ extern std::string ob_build_step;
 
 // Misc Options
 extern int         filename_prefix;
-extern std::string custom_prefix;
 extern bool        create_backups;
 extern bool        overwrite_warning;
 extern bool        debug_messages;
-extern bool        random_string_seeds;
 extern bool        password_mode;
 extern bool        mature_word_lists;
-extern bool        did_specify_seed;
 #ifdef OBSIDIAN_ENABLE_GUI
 extern bool        in_file_dialog;
 extern std::string picker_filename;

@@ -49,9 +49,10 @@
 // -------- the support code --------
 
 #ifdef __GNUC__
-__attribute__((noreturn))
+[[noreturn]] void AssertFail(const char *msg, ...) __attribute__((format(printf, 1, 2)));
+#else
+[[noreturn]] void AssertFail(const char *msg, ...);
 #endif
-void AssertFail(const char *msg, ...);
 // throw an assertion exception with the given message.
 
 //--- editor settings ---

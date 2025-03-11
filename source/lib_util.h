@@ -113,12 +113,10 @@ int StringPrefixCompare(std::string_view A, std::string_view B);
 int StringCaseCompare(std::string_view A, std::string_view B);
 int StringPrefixCaseCompare(std::string_view A, std::string_view B);
 
-void StringReplaceChar(std::string *str, char old_ch, char new_ch);
-
 std::string StringFormat(std::string_view fmt, ...);
 
 std::string NumToString(int value);
-std::string NumToString(unsigned long long int value);
+std::string NumToString(uint64_t value);
 std::string NumToString(double value);
 int         StringToInt(const std::string &value);
 double      StringToDouble(const std::string &value);

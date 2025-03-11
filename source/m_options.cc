@@ -30,8 +30,6 @@
 #include "main.h"
 #include "sys_macro.h"
 
-extern std::string BestDirectory();
-
 void Parse_Option(const std::string &name, const std::string &value)
 {
     if (StringCompare(name, "addon") == 0)
@@ -54,10 +52,6 @@ void Parse_Option(const std::string &name, const std::string &value)
     {
         debug_messages = StringToInt(value) ? true : false;
     }
-    else if (StringCompare(name, "random_string_seeds") == 0)
-    {
-        random_string_seeds = StringToInt(value) ? true : false;
-    }
     else if (StringCompare(name, "password_mode") == 0)
     {
         password_mode = StringToInt(value) ? true : false;
@@ -69,10 +63,6 @@ void Parse_Option(const std::string &name, const std::string &value)
     else if (StringCompare(name, "filename_prefix") == 0)
     {
         filename_prefix = StringToInt(value);
-    }
-    else if (StringCompare(name, "custom_prefix") == 0)
-    {
-        custom_prefix = value;
     }
     else if (StringCompare(name, "default_output_path") == 0)
     {
@@ -165,11 +155,9 @@ bool Options_Save(const std::string &filename)
     fprintf(option_fp, "create_backups = %d\n", (create_backups ? 1 : 0));
     fprintf(option_fp, "overwrite_warning = %d\n", (overwrite_warning ? 1 : 0));
     fprintf(option_fp, "debug_messages = %d\n", (debug_messages ? 1 : 0));
-    fprintf(option_fp, "random_string_seeds = %d\n", (random_string_seeds ? 1 : 0));
     fprintf(option_fp, "password_mode = %d\n", (password_mode ? 1 : 0));
     fprintf(option_fp, "mature_word_lists = %d\n", (mature_word_lists ? 1 : 0));
     fprintf(option_fp, "filename_prefix = %d\n", filename_prefix);
-    fprintf(option_fp, "custom_prefix = %s\n", custom_prefix.c_str());
     fprintf(option_fp, "%s", StringFormat("default_output_path = %s\n\n", default_output_path.c_str()).c_str());
 
     VFS_OptWrite(option_fp);

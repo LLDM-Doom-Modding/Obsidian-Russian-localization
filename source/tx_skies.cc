@@ -55,7 +55,7 @@ uint8_t *SKY_GenGradient(int W, int H, std::vector<uint8_t> &colors)
     return pixels;
 }
 
-void SKY_AddClouds(unsigned long long seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double powscale,
+void SKY_AddClouds(uint64_t seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double powscale,
                    double thresh, double fracdim, double squish)
 {
     // SYS_ASSERT(is_power_of_two(W))
@@ -101,7 +101,7 @@ void SKY_AddClouds(unsigned long long seed, uint8_t *pixels, int W, int H, color
     delete[] synth;
 }
 
-void SKY_AddStars(unsigned long long seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double powscale,
+void SKY_AddStars(uint64_t seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double powscale,
                   double thresh)
 {
     SYS_ASSERT(map->size >= 1);
@@ -137,7 +137,7 @@ void SKY_AddStars(unsigned long long seed, uint8_t *pixels, int W, int H, color_
     }
 }
 
-void SKY_AddHills(unsigned long long seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double min_h,
+void SKY_AddHills(uint64_t seed, uint8_t *pixels, int W, int H, color_mapping_t *map, double min_h,
                   double max_h, double powscale, double fracdim)
 {
     SYS_ASSERT(map->size >= 2);
@@ -256,7 +256,7 @@ void SKY_AddHills(unsigned long long seed, uint8_t *pixels, int W, int H, color_
     delete[] height_map;
 }
 
-void SKY_AddBuilding(unsigned long long seed, uint8_t *pixels, int W, int H, std::vector<uint8_t> &colors, int pos_x,
+void SKY_AddBuilding(uint64_t seed, uint8_t *pixels, int W, int H, std::vector<uint8_t> &colors, int pos_x,
                      int width, int base_h, int top_h, int win_prob, int win_w, int win_h, int antenna)
 {
     int numcol = (int)colors.size();
