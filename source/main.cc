@@ -528,8 +528,9 @@ int main(int argc, char **argv)
 
 #ifdef OBSIDIAN_ENABLE_GUI
     /* Platform */
-    SDL_Window *win;
-    SDL_Renderer *renderer;
+    SDL_Window *win = NULL;
+    SDL_Renderer *renderer = NULL;
+    SDL_Surface *icon = NULL;
     bool running = true;
     float font_scale = 1;
     int render_w = 0;
@@ -546,14 +547,23 @@ int main(int argc, char **argv)
 
     win = SDL_CreateWindow(win_title.c_str(), WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_HIGH_PIXEL_DENSITY|SDL_WINDOW_RESIZABLE);
 
-    if (win == NULL) {
+    if (win == NULL) 
+    {
         SDL_Log("Error SDL_CreateWindow %s", SDL_GetError());
         exit(-1);
     }
 
+    icon = SDL_CreateSurfaceFrom(64, 64, SDL_PIXELFORMAT_RGB24, (void *)obsidian_icon, 64 * 3);
+
+    // If this doesn't work, not a big deal (may not work with
+    // things like Wayland, for instance)
+    if (icon)
+        SDL_SetWindowIcon(win, icon);
+
     renderer = SDL_CreateRenderer(win, NULL);
 
-    if (renderer == NULL) {
+    if (renderer == NULL) 
+    {
         SDL_Log("Error SDL_CreateRenderer %s", SDL_GetError());
         exit(-1);
     }
@@ -633,6 +643,8 @@ cleanup:
     nk_sdl_shutdown();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);
+    if (icon)
+        SDL_DestroySurface(icon);
     SDL_Quit();
     return 0;
 #else
