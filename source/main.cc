@@ -357,10 +357,10 @@ void init(void)
             img_desc.width = w;
             img_desc.height = h;
             img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
-            img_desc.data.subimage[0][0] = {
-                .ptr = image,
-                .size = (size_t)(w * h) * sizeof(uint32_t)
-            };
+            
+            memset(&img_desc.data.subimage[0][0], 0, sizeof(sg_range)); 
+            img_desc.data.subimage[0][0].ptr = image;
+            img_desc.data.subimage[0][0].size = (size_t)(w * h) * sizeof(uint32_t);
             img_desc.label = "sokol-nuklear-font";
             font_img = sg_make_image(&img_desc);
             snk_image_desc_t img_desc2 = {0};
@@ -385,9 +385,9 @@ void frame(void)
 
     // the sokol_gfx draw pass
     sg_pass pass = {0};
-    pass.action.colors[0] = {
-            .load_action = SG_LOADACTION_CLEAR, .clear_value = { bg.r, bg.g, bg.b, bg.a }
-        };
+    memset(&pass.action.colors[0], 0, sizeof(sg_color_attachment_action));
+    pass.action.colors[0].load_action = SG_LOADACTION_CLEAR;
+    pass.action.colors[0].clear_value = { bg.r, bg.g, bg.b, bg.a };
     pass.swapchain = sglue_swapchain();
     sg_begin_pass(&pass);
     snk_render(sapp_width(), sapp_height());
