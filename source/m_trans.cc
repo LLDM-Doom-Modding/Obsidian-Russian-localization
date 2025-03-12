@@ -57,7 +57,7 @@ static std::map<std::string, std::string>           trans_store;
 static std::map<std::string, std::string>::iterator trans_iter;
 
 // current Options setting
-std::string t_language = _("AUTO");
+std::string t_language = "ru";
 
 //----------------------------------------------------------------------
 
@@ -1143,7 +1143,7 @@ void Trans_SetLanguage()
     if (lang_plain == "UNKNOWN" || lang_plain == "en")
     {
         LogPrint("Using the default language (English)\n\n");
-        selected_lang = "en";
+        selected_lang = "ru";
         return;
     }
 
@@ -1162,7 +1162,7 @@ void Trans_SetLanguage()
     {
         LogPrint("No translation file: language/%s.po\n", lang_plain.c_str());
         LogPrint("Using the default language (English)\n\n");
-        selected_lang = "en";
+        selected_lang = "ru";
         return;
     }
 

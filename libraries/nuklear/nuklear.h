@@ -16881,7 +16881,14 @@ nk_range_glyph_count(const nk_rune *range, int count)
 NK_API const nk_rune*
 nk_font_default_glyph_ranges(void)
 {
-    NK_STORAGE const nk_rune ranges[] = {0x0020, 0x00FF, 0};
+    //NK_STORAGE const nk_rune ranges[] = {0x0020, 0x00FF, 0};
+    NK_STORAGE const nk_rune ranges[] = {
+        0x0020, 0x00FF,
+        0x0400, 0x052F,
+        0x2DE0, 0x2DFF,
+        0xA640, 0xA69F,
+        0
+    };
     return ranges;
 }
 NK_API const nk_rune*

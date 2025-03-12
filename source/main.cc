@@ -100,7 +100,7 @@ std::string default_output_path;
 
 std::string string_seed;
 
-std::string selected_lang = "en"; // Have a default just in case the translation stuff borks
+std::string selected_lang = "ru"; // Have a default just in case the translation stuff borks
 
 game_interface_c *game_object = NULL;
 
@@ -368,6 +368,7 @@ void init(void)
             img_desc2.sampler = snk_get_font_sampler();
             font_nk_img = snk_make_image(&img_desc2);
             nk_font_atlas_end(atlas, snk_nkhandle(font_nk_img), 0);
+            nk_font_atlas_cleanup(atlas);
         }
         else
         {
@@ -496,7 +497,7 @@ int main(int argc, char **argv)
 
     Options_Load(option_file);
     Resolve_DefaultOutputPath();
-
+    Trans_SetLanguage();
     LogInit(logging_file);
 
     if (argv::Find('v', "verbose") >= 0)

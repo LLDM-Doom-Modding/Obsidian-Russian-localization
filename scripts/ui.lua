@@ -708,7 +708,7 @@ local module_category_labels =
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
-   nk.style_from_table(OB_NK_CTX, colortable["white"])
+   nk.style_from_table(OB_NK_CTX, colortable["red"])
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
       --if show_menu then Menubar(OB_NK_CTX) end
