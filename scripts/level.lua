@@ -2507,7 +2507,7 @@ function Level_make_level(LEV)
 
   ::retryafterfailure::
 
-  gui.at_level(LEVEL.name, index, total)
+  OB_BUILD_STATUS = "Making " .. LEVEL.name
 
   gui.printf("\n\n~~~~~~| %s |~~~~~~\n", LEVEL.name)
 

@@ -272,12 +272,15 @@ function ob_gui_frame(width, height)
       end
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
-      nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 50, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 75, 1)
       f = normal_font
       nk.style_set_font(OB_NK_CTX, normal_font)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          if current_tab == "build" then
-            -- TODO
+            nk.layout_row_static(OB_NK_CTX, height/2, width/2, 1)
+            if nk.button(OB_NK_CTX, nil, "BUILD") then
+               gui.build_it()
+            end
          elseif current_tab == "options" then
             -- TODO
          else
@@ -313,6 +316,8 @@ function ob_gui_frame(width, height)
       if nk.button(OB_NK_CTX, nil, "Enter Seed") then
          show_manual_seed = true
       end
+      nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
+      nk.label(OB_NK_CTX, "Status: " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
    end
    nk.window_end(OB_NK_CTX)
    return "ok"

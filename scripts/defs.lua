@@ -54,6 +54,7 @@ OB_ENGINES = {}
 OB_PORTS = {}
 OB_MODULES = {}
 
+OB_BUILD_STATUS = ""
 
 -- internationalization / localization
 function _(s) return gui.gettext(s) end

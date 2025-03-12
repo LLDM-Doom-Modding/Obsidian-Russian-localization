@@ -3506,7 +3506,7 @@ function Quest_make_quests(LEVEL)
 
   gui.printf("\n--==| Make Quests |==--\n\n")
 
-  gui.at_level(LEVEL.name .. " (Quests)", LEVEL.id, #GAME.levels)
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Quests)"
 
   Monster_prepare(LEVEL)
 

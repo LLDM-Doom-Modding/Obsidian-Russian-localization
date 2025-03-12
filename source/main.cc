@@ -55,14 +55,13 @@ static constexpr uint16_t WINDOW_WIDTH = 1024;
 static constexpr uint16_t WINDOW_HEIGHT = 768;
 #endif
 
-std::string home_dir;
-std::string install_dir;
+std::string        home_dir;
+std::string        install_dir;
+std::string        option_file;
 static std::string config_file;
-std::string option_file;
 static std::string logging_file;
 
 std::string ob_error_message;
-std::string ob_build_step;
 
 struct UpdateKv
 {
@@ -73,16 +72,13 @@ struct UpdateKv
 
 UpdateKv update_kv;
 
-static constexpr const char *OBSIDIAN_TITLE = "OBSIDIAN Level Maker";
+static constexpr const char *OBSIDIAN_TITLE   = "OBSIDIAN Level Maker";
 static constexpr const char *CONFIG_FILENAME  = "CONFIG.txt";
 static constexpr const char *OPTIONS_FILENAME = "OPTIONS.txt";
 static constexpr const char *LOG_FILENAME     = "LOGS.txt";
 static constexpr const char *REF_FILENAME     = "REFERENCE.txt";
 
-int screen_w;
-int screen_h;
-
-int main_action;
+int main_action = 0;
 
 uint64_t next_rand_seed;
 
@@ -121,6 +117,9 @@ static void ShowInfo()
            "Available options:\n"
            "     --version              Display build information\n"
            "\n"
+#ifdef OBSIDIAN_ENABLE_GUI
+           "  -b --batch                Run in batch mode (no GUI)\n"
+#endif
            "  -o --output   <output>    Specify output filename\n"
            "  -a --addon    <file>...   Addon(s) to use\n"
            "\n"
@@ -228,13 +227,6 @@ void Main_CalcNewSeed()
     xoshiro_Reseed(next_rand_seed);
 }
 
-static void Module_Defaults()
-{
-    ob_set_mod_option("sky_generator", "self", "1");
-    //ob_set_mod_option("armaetus_epic_textures", "self", "1");
-    ob_set_mod_option("music_swapper", "self", "1");
-}
-
 //------------------------------------------------------------------------
 
 bool Build_Cool_Shit()
@@ -305,6 +297,8 @@ bool Build_Cool_Shit()
     delete game_object;
     game_object = NULL;
 
+    Main_CalcNewSeed();
+
     return was_ok;
 }
 
@@ -358,7 +352,6 @@ void init(void)
             img_desc.width = w;
             img_desc.height = h;
             img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
-            
             memset(&img_desc.data.subimage[0][0], 0, sizeof(sg_range)); 
             img_desc.data.subimage[0][0].ptr = image;
             img_desc.data.subimage[0][0].size = (size_t)(w * h) * sizeof(uint32_t);
@@ -383,6 +376,12 @@ void frame(void)
     ctx = snk_new_frame();
 
     running = ob_gui_frame(sapp_width(), sapp_height());
+
+    if (main_action == MAIN_BUILD)
+    {
+        main_action = MAIN_BUILDING;
+        Build_Cool_Shit();
+    }
 
     // the sokol_gfx draw pass
     sg_pass pass = {0};
@@ -541,8 +540,6 @@ int main(int argc, char **argv)
         ob_set_config("mature_words", "no");
     }
 
-    Module_Defaults();
-
     if (!FileExists(config_file))
     {
         Cookie_Save(config_file);
@@ -609,27 +606,43 @@ int main(int argc, char **argv)
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
-    std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
-    sapp_desc app = {0};
-    app.init_cb = init;
-    app.frame_cb = frame;
-    app.cleanup_cb = cleanup;
-    app.event_cb = input;
-    app.enable_clipboard = true;
-    app.width = WINDOW_WIDTH;
-    app.height = WINDOW_HEIGHT;
-    app.window_title = CStringDup(win_title.c_str());
-    app.ios_keyboard_resizes_canvas = true;
-    app.icon.sokol_default = true;
-    app.logger.func = slog_func;
-    return app;
+    if (argv::Find('b', "batch") >= 0)
+    { 
+        if (!Build_Cool_Shit())
+        {
+            FatalError("FAILED!\n");
+            LogPrint("FAILED!\n");
+
+            Main::Shutdown(true);
+            exit(EXIT_FAILURE);
+        }
+        Main::Shutdown(false);
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
+        std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
+        sapp_desc app = {0};
+        app.init_cb = init;
+        app.frame_cb = frame;
+        app.cleanup_cb = cleanup;
+        app.event_cb = input;
+        app.enable_clipboard = true;
+        app.width = WINDOW_WIDTH;
+        app.height = WINDOW_HEIGHT;
+        app.window_title = CStringDup(win_title.c_str());
+        app.ios_keyboard_resizes_canvas = true;
+        app.icon.sokol_default = true;
+        app.logger.func = slog_func;
+        return app;
+    }
 #else
     if (!Build_Cool_Shit())
     {
         FatalError("FAILED!\n");
         LogPrint("FAILED!\n");
 
-        Main::Shutdown(false);
+        Main::Shutdown(true);
         return EXIT_FAILURE;
     }
     Main::Shutdown(false);

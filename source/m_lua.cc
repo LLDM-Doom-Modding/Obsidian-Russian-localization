@@ -387,33 +387,6 @@ int gui_scan_directory(lua_State *L)
     return 1;
 }
 
-// TODO: Have the new GUI use this
-static float plan_progress = 0.0f;
-
-// LUA: at_level(name, idx, total)
-//
-int gui_at_level(lua_State *L)
-{
-    std::string name = luaL_optstring(L, 1, "");
-
-    int index = luaL_checkinteger(L, 2);
-    int total = luaL_checkinteger(L, 3);
-
-    ProgStatus("%s %s", _("Making"), name.c_str());
-    plan_progress = (float)index / (float)total;
-    ob_build_step = _("Plan");
-    return 0;
-}
-
-// LUA: prog_step(step_name)
-//
-int gui_prog_step(lua_State *L)
-{
-    const char *name = luaL_checkstring(L, 1);
-    ob_build_step = name;
-    return 0;
-}
-
 // LUA: abort() --> boolean
 //
 int gui_abort(lua_State *L)
@@ -573,6 +546,7 @@ extern int wadfab_get_3d_floor(lua_State *L);
 extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
 int gui_calc_seed(lua_State *L);
+int gui_build_it(lua_State *L);
 
 static const luaL_Reg gui_script_funcs[] = {
 
@@ -584,13 +558,12 @@ static const luaL_Reg gui_script_funcs[] = {
     {"config_line", gui_config_line},
     {"set_colormap", gui_set_colormap},
 
-    {"at_level", gui_at_level},
-    {"prog_step", gui_prog_step},
     {"abort", gui_abort},
     {"random", gui_random},
     {"random_int", gui_random_int},
     {"reseed_rng", gui_reseed_rng},
 #ifdef OBSIDIAN_ENABLE_GUI
+    {"build_it", gui_build_it},
     {"calc_seed", gui_calc_seed},
 #endif
 
@@ -1148,6 +1121,12 @@ bool ob_build_cool_shit()
     return false;
 }
 
+void ob_set_build_status(const std::string &status)
+{
+    lua_pushstring(LUA_ST, status.c_str());
+    lua_setglobal(LUA_ST, "OB_BUILD_STATUS");
+}
+
 #ifdef OBSIDIAN_ENABLE_GUI
 int gui_calc_seed(lua_State *L)
 {
@@ -1297,6 +1276,12 @@ bool ob_gui_frame(int width, int height)
     }
 
     return true;
+}
+
+int gui_build_it(lua_State *L)
+{
+    main_action = MAIN_BUILD;
+    return 0;
 }
 #endif
 

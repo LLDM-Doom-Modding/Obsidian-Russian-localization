@@ -46,6 +46,7 @@ enum main_action_kind_e
 {
     MAIN_NONE = 0,
     MAIN_BUILD,
+    MAIN_BUILDING,
     MAIN_CANCEL,
     MAIN_QUIT,
 };
@@ -53,7 +54,6 @@ enum main_action_kind_e
 extern int main_action;
 
 extern std::string ob_error_message;
-extern std::string ob_build_step;
 
 // Misc Options
 extern int         filename_prefix;

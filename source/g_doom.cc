@@ -290,7 +290,7 @@ namespace Doom
 
 void Send_Prog_Nodes(int progress, int num_maps)
 {
-    ob_build_step = StringFormat("%s (%d/%d)", _("Nodes"), progress, num_maps);
+    ProgStatus(StringFormat("%s (%d/%d)", _("Nodes"), progress, num_maps).c_str());
 }
 
 bool BuildNodes(std::string filename)
@@ -1289,7 +1289,8 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
     ob_invoke_hook("pre_setup");
 
-    if (IsPathAbsolute(preset))
+    // If not a bare filename, use as-is
+    if (GetFilename(preset) != preset)
     {
         filename = preset;
     }
@@ -1317,7 +1318,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
     {
         map_format  = FORMAT_BINARY;
         build_nodes = true;
-        ob_build_step.clear();
         return true;
     }
 
@@ -1326,8 +1326,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
         ProgStatus("%s", _("Error (create file)"));
         return false;
     }
-
-    ob_build_step = _("CSG");
 
     if (StringCompare(current_port, "zdoom") == 0)
     {
@@ -1460,8 +1458,6 @@ void Doom::game_interface_c::EndLevel()
     {
         FatalError("Script problem: did not set level name!\n");
     }
-
-    ob_build_step = _("CSG");
 
     CSG_DOOM_Write();
 

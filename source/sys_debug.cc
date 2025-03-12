@@ -25,6 +25,7 @@
 #include <time.h>
 
 #include "lib_util.h"
+#include "m_lua.h"
 #include "main.h"
 #include "sys_assert.h"
 
@@ -181,6 +182,8 @@ void ProgStatus(const char *message, ...)
         printf("%s", message_buf);
         fflush(stdout);
     }
+
+    ob_set_build_status(message_buf);
 }
 
 [[noreturn]] void FatalError(const char *message, ...)

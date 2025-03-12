@@ -2588,8 +2588,7 @@ function Monster_make_battles(LEVEL, SEEDS)
 
   gui.printf("\n--==| Make Battles |==--\n\n")
 
-  gui.at_level(LEVEL.name, LEVEL.id, #GAME.levels)
-  gui.prog_step("Mons")
+  OB_BUILD_STATUS = "Making " .. LEVEL.name
 
   Player_init(LEVEL)
 

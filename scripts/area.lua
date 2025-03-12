@@ -2880,7 +2880,7 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   gui.printf("Map size target: %dx%d seeds\n", LEVEL.map_W, LEVEL.map_H)
 
-  gui.at_level(LEVEL.name .. " (Shapes)", LEVEL.id, #GAME.levels)
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Shapes)"
 
   local level_grammar = {}
 
@@ -2914,7 +2914,7 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   Grower_create_rooms(LEVEL, SEEDS)
 
-  gui.at_level(LEVEL.name .. " (Rooms)", LEVEL.id, #GAME.levels)
+  OB_BUILD_STATUS = LEVEL.name .. " (Rooms)", LEVEL.id, #GAME.levels
   Area_divvy_up_borders(LEVEL, SEEDS)
 
   Area_analyse_areas(LEVEL, SEEDS)

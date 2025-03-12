@@ -92,11 +92,17 @@ SKY_GEN.NEBULA_COLOR_CHOICES =
 }
 
 function SKY_GEN.setup(self)
-  OB_CONFIG.episode_sky_color = {}
-  OB_CONFIG.sky_generator_active = true
+  if OB_CONFIG.generate_skies ~= "yes" then
+    OB_CONFIG.sky_generator_active = false
+  else
+    OB_CONFIG.episode_sky_color = {}
+    OB_CONFIG.sky_generator_active = true
+  end
 end
 
 function SKY_GEN.generate_skies()
+
+  if OB_CONFIG.sky_generator_active == false then return end
 
   -- select episode for the starry starry night
   local starry_ep = rand.irange(1, # GAME.episodes)
@@ -345,6 +351,14 @@ OB_MODULES["sky_generator"] =
 
   options =
   {
+    {
+      name = "generate_skies",
+      label=_("Generate Skies"),
+      choices= YES_NO_CHOICES,
+      default = "yes",
+      priority = 10,
+      tooltip = _("This forces the sky background (behind the hills and clouds) to either be night or day. Default means vanilla Oblige behavior of picking one episode to be night. Random means 50% chance of night or day to be picked per episode."),
+    },
 
     {
       name = "force_sky",

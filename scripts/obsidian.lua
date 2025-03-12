@@ -744,20 +744,10 @@ function ob_set_config(name, value)
 
   assert(name and value)
 
-  if name == "seed" then
-    OB_CONFIG[name] = value or 0
-    return
-  end
-  
-  if name == "filename_prefix" then
+  if name == "seed" or name == "filename_prefix" then
     OB_CONFIG[name] = value
     return
   end
-  
-  if name == "string_seed" then
-    OB_CONFIG[name] = value
-    return
-  end   
 
   -- check all the UI modules for a matching option
   -- [ this is only needed when parsing the CONFIG.txt file ]
@@ -1281,6 +1271,8 @@ function ob_init()
   ob_update_all()
 
   gui.printf("\n~~ Completed Lua initialization ~~\n\n")
+
+  OB_BUILD_STATUS = "Ready to Go!"
 end
 
 
@@ -1324,10 +1316,12 @@ function ob_get_bool_param(parameter)
 
   assert(parameter)
 
-  local param
+  local param = nil
 
   if OB_CONFIG[parameter] then
     param = OB_CONFIG[parameter]
+  else
+    return 0
   end
   
   assert(param and (param == "yes" or param == "no"))
@@ -1761,7 +1755,7 @@ function ob_clean_up()
   SCRIPTS = {}
   SEEN_ROOM_THEMES = {}
   SEEN_WALL_GROUPS = {}
-  if OB_MODULES["sky_generator"].enabled and OB_MODULES["sky_generator"].visible then
+  if OB_CONFIG.sky_generator_active == true then
     gui.fsky_free()
   end
   AMBIENT_SOUND_DEFS = {}
