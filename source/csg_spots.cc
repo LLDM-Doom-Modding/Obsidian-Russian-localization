@@ -26,6 +26,7 @@
 #include "main.h"
 #include "minilua.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 constexpr uint8_t GRID_SIZE = 20;

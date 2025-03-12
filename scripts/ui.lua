@@ -27,8 +27,8 @@ function ob_gui_init_fonts(font_scale)
   if OB_NK_ATLAS == nil then return "bork" end
   normal_font = OB_NK_ATLAS:add(24 * font_scale, "data/fonts/SourceSansPro/SourceSansPro-Regular.ttf")
   normal_font:set_height(24)
-  bold_font = OB_NK_ATLAS:add(28 * font_scale, "data/fonts/SourceSansPro/SourceSansPro-Bold.ttf")
-  bold_font:set_height(28)
+  bold_font = OB_NK_ATLAS:add(24 * font_scale, "data/fonts/SourceSansPro/SourceSansPro-Bold.ttf")
+  bold_font:set_height(24)
   nk.style_set_font(OB_NK_CTX, normal_font)
   return "groovy"
 end
@@ -168,6 +168,7 @@ local show_app_about = false
 
 local menu1 = { prog=40, slider=10, check=true }
 local menuwidgets = { prog = 60 }
+local show_menu = true
 
 local function Menubar(ctx)
    nk.menubar_begin(ctx)
@@ -698,8 +699,8 @@ local module_category_labels =
    ["arch"] = _("Architecture"),
    ["combat"] = _("Combat"),
    ["pickup"] = _("Pickups"),
-   ["other"] = _("Miscellaneous"),
-   ["debug"] = _("Debugging"),
+   ["other"] = _("Other"),
+   ["debug"] = _("Debug"),
    ["experimental"] = _("Experimental"),
    ["options"] = _("Options")
 }
@@ -707,36 +708,18 @@ local module_category_labels =
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
-   nk.style_from_table(OB_NK_CTX, colortable["blue"])
+   nk.style_from_table(OB_NK_CTX, colortable["white"])
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
-      if show_menu then Menubar(OB_NK_CTX) end
-      if show_app_about then About(OB_NK_CTX) end
-      nk.layout_row(OB_NK_CTX, 'static', 25, ratio)
-      input.submit, input.flags = 
-         nk.edit_string(OB_NK_CTX, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'default')
-      if nk.button(OB_NK_CTX, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
-         OB_CONFIG.seed = input.submit
-         input.submit = ""
-      end
-      nk.label(OB_NK_CTX, OB_CONFIG.seed, nk.TEXT_LEFT)
-      if nk.button(OB_NK_CTX, nil, "Build") then
-         OB_NK_PICKED_FILE = nil
-         gui.spawn_file_picker()
-      end
-      if OB_NK_PICKED_FILE ~= nil then
-         nk.label(OB_NK_CTX, OB_NK_PICKED_FILE, nk.TEXT_LEFT)
-      end
-      local bounds = nk.widget_bounds(OB_NK_CTX)
-      if OB_NK_CTX:is_mouse_hovering_rect(bounds) then
-         nk.tooltip(OB_NK_CTX, "This is a tooltip")
-      end
+      --if show_menu then Menubar(OB_NK_CTX) end
+      --if show_app_about then About(OB_NK_CTX) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
       nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
-      nk.layout_row_begin(OB_NK_CTX, 'static', 20, 6)
+      local f = bold_font
+      nk.style_set_font(OB_NK_CTX, bold_font)
+      nk.layout_row_dynamic(OB_NK_CTX, f:height(), #module_categories)
       for _, name in ipairs(module_categories) do
-         local f = OB_NK_CTX:font()
          -- make sure button perfectly fits text 
          local text_width = f:width(f:height(), module_category_labels[name])
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
@@ -755,7 +738,9 @@ function ob_gui_frame(width, height)
       nk.style_pop_float(OB_NK_CTX)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
-      nk.layout_row_dynamic(OB_NK_CTX, height - normal_font:height(), 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - f:height() - 50, 1)
+      f = normal_font
+      nk.style_set_font(OB_NK_CTX, normal_font)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          if current_tab ~= "build" and current_tab ~= "options" then
             for _,mod in pairs(OB_MODULES) do
@@ -775,8 +760,15 @@ function ob_gui_frame(width, height)
          end
          nk.group_end(OB_NK_CTX)
       end
+      nk.layout_row_dynamic(OB_NK_CTX, 25, 4)
+      nk.label(OB_NK_CTX, "Seed: " .. OB_CONFIG.seed, nk.TEXT_LEFT)
+      if nk.button(OB_NK_CTX, nil, "Build") then
+         OB_NK_PICKED_FILE = nil
+      end
+      if OB_NK_PICKED_FILE ~= nil then
+         nk.label(OB_NK_CTX, OB_NK_PICKED_FILE, nk.TEXT_LEFT)
+      end
    end
-
    nk.window_end(OB_NK_CTX)
    return "ok"
 end

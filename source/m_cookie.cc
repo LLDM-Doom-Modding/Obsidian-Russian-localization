@@ -29,6 +29,7 @@
 #include "m_lua.h"
 #include "main.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 
 enum struct cookie_context_e
 {
@@ -248,7 +249,7 @@ bool Cookie_Save(const std::string &filename)
     LogPrint("Saving config file...\n");
 
     // header...
-    fprintf(cookie_fp, "-- CONFIG FILE : OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
+    fprintf(cookie_fp, "-- CONFIG FILE : OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
     fprintf(cookie_fp, "-- Build %s\n", OBSIDIAN_VERSION);
     fprintf(cookie_fp, "-- Based on OBLIGE Level Maker (C) 2006-2017 Andrew Apted\n");
     fprintf(cookie_fp, "-- %s\n\n", OBSIDIAN_WEBSITE);

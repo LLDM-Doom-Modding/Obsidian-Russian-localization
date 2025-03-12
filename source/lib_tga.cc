@@ -30,6 +30,7 @@
 
 #include "m_addons.h"
 #include "main.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 tga_image_c::tga_image_c(int W, int H) : width(W), height(H), opacity(OPAC_UNKNOWN)

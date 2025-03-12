@@ -40,6 +40,7 @@
 
 #include "main.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 #ifdef _WIN32                                   // Windows API

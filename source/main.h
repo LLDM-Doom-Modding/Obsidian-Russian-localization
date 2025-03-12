@@ -22,15 +22,9 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
-#include <map>
 #include <string>
-#include <vector>
-
-#include "lib_util.h"
-#include "sys_debug.h"
-
-extern std::string OBSIDIAN_TITLE;
 
 #ifdef OBSIDIAN_TIMESTAMP
 constexpr const char *OBSIDIAN_VERSION = OBSIDIAN_TIMESTAMP;
@@ -39,26 +33,12 @@ constexpr const char *OBSIDIAN_VERSION = OBSIDIAN_TIMESTAMP;
 // shouldn't be used in practice
 constexpr const char *OBSIDIAN_VERSION = __DATE__;
 #endif
-
 constexpr const char *OBSIDIAN_SHORT_VERSION = "21";
-extern std::string    OBSIDIAN_CODE_NAME;
-
+constexpr const char *OBSIDIAN_CODE_NAME = "Tabs of Terror";
 constexpr const char *OBSIDIAN_WEBSITE = "https://obsidian-level-maker.github.io";
-
-constexpr const char *CONFIG_FILENAME  = "CONFIG.txt";
-constexpr const char *OPTIONS_FILENAME = "OPTIONS.txt";
-constexpr const char *LOG_FILENAME     = "LOGS.txt";
-constexpr const char *REF_FILENAME     = "REFERENCE.txt";
 
 extern std::string home_dir;
 extern std::string install_dir;
-extern std::string config_file;
-extern std::string options_file;
-extern std::string logging_file;
-extern std::string reference_file;
-
-extern std::string batch_output_file;
-
 extern uint64_t next_rand_seed;
 
 // this records the user action, e.g. Cancel or Quit buttons
@@ -73,7 +53,6 @@ enum main_action_kind_e
 extern int main_action;
 
 extern std::string ob_error_message;
-extern float ob_build_progress;
 extern std::string ob_build_step;
 
 // Misc Options
@@ -83,20 +62,9 @@ extern bool        overwrite_warning;
 extern bool        debug_messages;
 extern bool        password_mode;
 extern bool        mature_word_lists;
-#ifdef OBSIDIAN_ENABLE_GUI
-extern bool        in_file_dialog;
-extern std::string picker_filename;
-#endif
 
-extern std::string def_filename;
-
-extern std::string              last_directory;
-extern std::string              numeric_locale;
-
+extern std::string numeric_locale;
 extern std::string default_output_path;
-
-extern std::string Resolve_DefaultOutputPath();
-
 extern std::string string_seed;
 extern std::string selected_lang;
 
@@ -129,7 +97,7 @@ class game_interface_c
     //
     // when 'preset' parameter is not NULL, it is a filename to
     // use in the save dialog.
-    virtual bool Start(const char *preset) = 0;
+    virtual bool Start(std::string_view preset) = 0;
 
     // this is called after all levels are done.  The 'build_ok'
     // value is the result from the LUA script, and is false if

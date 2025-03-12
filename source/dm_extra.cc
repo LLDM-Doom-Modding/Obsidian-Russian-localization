@@ -35,6 +35,7 @@
 #include "physfs.h"
 #include "raw_def.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_endian.h"
 #include "sys_macro.h"
 #include "tx_forge.h"

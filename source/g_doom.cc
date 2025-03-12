@@ -36,6 +36,7 @@
 #include "main.h"
 #include "raw_def.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_endian.h"
 #include "sys_macro.h"
 #include "sys_xoshiro.h"
@@ -255,7 +256,7 @@ qLump_c *BSP_CreateInfoLump()
     L->SetCRLF(true);
 
     L->Printf("\n");
-    L->Printf("-- Levels created by OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
+    L->Printf("-- Levels created by OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
     L->Printf("-- Build %s\n", OBSIDIAN_VERSION);
     L->Printf("-- Based on the OBLIGE Level Maker (C) 2006-2017 Andrew Apted\n");
     L->Printf("-- %s\n", OBSIDIAN_WEBSITE);
@@ -284,16 +285,12 @@ qLump_c *BSP_CreateInfoLump()
 //  AJBSP NODE BUILDING
 //----------------------------------------------------------------------------
 
-// TODO: Have the new GUI use this
-static float node_progress = 0.0f;
-
 namespace Doom
 {
 
 void Send_Prog_Nodes(int progress, int num_maps)
 {
-    node_progress = (float)progress / (float)num_maps;
-    ob_build_step = _("Nodes");
+    ob_build_step = StringFormat("%s (%d/%d)", _("Nodes"), progress, num_maps);
 }
 
 bool BuildNodes(std::string filename)
@@ -555,9 +552,6 @@ void Doom::EndLevel(const std::string &level_name)
         const uint8_t nuls[4] = {0, 0, 0, 0};
         header_lump->Append(nuls, 1);
     }
-
-    // in case we need it
-    std::string level_wad = PathAppend(home_dir, StringFormat("%s.wad", level_name.c_str()));
 
     WriteLump(level_name, header_lump);
 
@@ -1273,7 +1267,7 @@ class game_interface_c : public ::game_interface_c
     {
     }
 
-    bool Start(const char *preset);
+    bool Start(std::string_view preset);
     bool Finish(bool build_ok);
 
     void        BeginLevel();
@@ -1283,7 +1277,7 @@ class game_interface_c : public ::game_interface_c
 };
 } // namespace Doom
 
-bool Doom::game_interface_c::Start(const char *preset)
+bool Doom::game_interface_c::Start(std::string_view preset)
 {
     sub_format = 0;
 
@@ -1295,13 +1289,13 @@ bool Doom::game_interface_c::Start(const char *preset)
 
     ob_invoke_hook("pre_setup");
 
-    if (IsPathAbsolute(batch_output_file))
+    if (IsPathAbsolute(preset))
     {
-        filename = batch_output_file;
+        filename = preset;
     }
     else
     {
-        filename = PathAppend(CurrentDirectoryGet(), batch_output_file);
+        filename = PathAppend(default_output_path, preset);
     }
 
     if (filename.empty())
@@ -1323,7 +1317,6 @@ bool Doom::game_interface_c::Start(const char *preset)
     {
         map_format  = FORMAT_BINARY;
         build_nodes = true;
-        ob_build_progress = 0.0f;
         ob_build_step.clear();
         return true;
     }
@@ -1334,7 +1327,6 @@ bool Doom::game_interface_c::Start(const char *preset)
         return false;
     }
 
-    ob_build_progress = 0.20f;
     ob_build_step = _("CSG");
 
     if (StringCompare(current_port, "zdoom") == 0)

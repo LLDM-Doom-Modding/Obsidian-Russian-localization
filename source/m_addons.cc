@@ -26,6 +26,7 @@
 #include "m_cookie.h"
 #include "main.h"
 #include "physfs.h"
+#include "sys_debug.h"
 
 // need this because the OPTIONS file is loaded *before* the addons
 // folder is scanned for valid archives, so remember enabled ones here.

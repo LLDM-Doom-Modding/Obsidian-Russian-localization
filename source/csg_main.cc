@@ -30,6 +30,7 @@
 #include "main.h"
 #include "minilua.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 constexpr double EPSILON = 0.001;

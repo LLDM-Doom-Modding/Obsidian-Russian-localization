@@ -37,10 +37,12 @@
 #include <string.h>
 
 #include <algorithm>
+#include <vector>
 
 #include "lib_util.h"
 #include "main.h"
 #include "sys_assert.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 //

@@ -501,43 +501,6 @@ int gui_bit_not(lua_State *L)
     return 1;
 }
 
-#ifdef OBSIDIAN_ENABLE_GUI
-static void gui_file_picker_callback(void *userdata, const char * const *filelist, int filter)
-{
-    return;
-    /*bool *in_dialog = (bool *)userdata;
-    if (!filelist) 
-    {
-        LogPrint("An error occured: %s", SDL_GetError());
-        *in_dialog = false;
-        return;
-    } else if (!*filelist) 
-    {
-        LogPrint("The user did not select any file.");
-        LogPrint("Most likely, the dialog was canceled.");
-        *in_dialog = false;
-        return;
-    }
-    picker_filename = *filelist;
-    if (!picker_filename.empty())
-        lua_pushlstring(LUA_ST, picker_filename.c_str(), picker_filename.size());
-    else
-        lua_pushlstring(LUA_ST, NULL, 0);
-    lua_setglobal(LUA_ST, "OB_NK_PICKED_FILE");
-    *in_dialog = false;
-    return;*/
-}
-
-int gui_spawn_file_picker(lua_State *L)
-{
-    return 0;
-    //picker_filename.clear();
-    //in_file_dialog = true;
-    //SDL_ShowOpenFolderDialog(gui_file_picker_callback, &in_file_dialog, NULL, default_output_path.c_str(), false);
-    //return 0;
-}
-#endif
-
 //------------------------------------------------------------------------
 
 extern int SPOT_begin(lua_State *L);
@@ -636,9 +599,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"get_filename_base", gui_get_filename_base},
     {"get_file_extension", gui_get_file_extension},
     {"get_save_path", gui_get_save_path},
-#ifdef OBSIDIAN_ENABLE_GUI
-    {"spawn_file_picker", gui_spawn_file_picker},
-#endif
 
     // CSG functions
     {"begin_level", CSG_begin_level},

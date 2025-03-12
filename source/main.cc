@@ -32,6 +32,7 @@
 #include "m_lua.h"
 #include "m_trans.h"
 #include "physfs.h"
+#include "sys_debug.h"
 #include "sys_xoshiro.h"
 
 #ifdef OBSIDIAN_ENABLE_GUI
@@ -49,19 +50,17 @@
 #define NK_INCLUDE_STANDARD_VARARGS
 #include "nuklear.h"
 #include "sokol_nuklear.h"
-
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
+static constexpr uint16_t WINDOW_WIDTH = 1024;
+static constexpr uint16_t WINDOW_HEIGHT = 768;
 #endif
 
 std::string home_dir;
 std::string install_dir;
-std::string config_file;
-std::string options_file;
-std::string logging_file;
+static std::string config_file;
+std::string option_file;
+static std::string logging_file;
 
 std::string ob_error_message;
-float ob_build_progress;
 std::string ob_build_step;
 
 struct UpdateKv
@@ -73,8 +72,11 @@ struct UpdateKv
 
 UpdateKv update_kv;
 
-std::string OBSIDIAN_TITLE     = "OBSIDIAN Level Maker";
-std::string OBSIDIAN_CODE_NAME = "Tabs of Terror";
+static constexpr const char *OBSIDIAN_TITLE = "OBSIDIAN Level Maker";
+static constexpr const char *CONFIG_FILENAME  = "CONFIG.txt";
+static constexpr const char *OPTIONS_FILENAME = "OPTIONS.txt";
+static constexpr const char *LOG_FILENAME     = "LOGS.txt";
+static constexpr const char *REF_FILENAME     = "REFERENCE.txt";
 
 int screen_w;
 int screen_h;
@@ -83,20 +85,16 @@ int main_action;
 
 uint64_t next_rand_seed;
 
-std::string              batch_output_file;
-std::string              numeric_locale;
+static std::string batch_output_file;
+std::string        numeric_locale;
 
 // options
 int         filename_prefix        = 0;
 bool        create_backups         = true;
 bool        overwrite_warning      = true;
 bool        debug_messages         = false;
-bool        password_mode          = false;
+bool        password_mode          = true;
 bool        mature_word_lists      = false;
-#ifdef OBSIDIAN_ENABLE_GUI
-bool        in_file_dialog         = false;
-std::string picker_filename;
-#endif
 
 std::string default_output_path;
 
@@ -115,7 +113,7 @@ static void ShowInfo()
            "** Build %s **\n"
            "** Based on OBLIGE Level Maker (C) 2006-2017 Andrew Apted **\n"
            "\n",
-           OBSIDIAN_TITLE.c_str(), OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str(), OBSIDIAN_VERSION);
+           OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME, OBSIDIAN_VERSION);
 
     printf("Usage: Obsidian [options...] [key=value...]\n"
            "\n"
@@ -150,13 +148,13 @@ static void ShowInfo()
 
 static void ShowVersion()
 {
-    printf("%s %s \"%s\" Build %s\n", OBSIDIAN_TITLE.c_str(), OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str(),
+    printf("%s %s \"%s\" Build %s\n", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME,
            OBSIDIAN_VERSION);
 
     fflush(stdout);
 }
 
-std::string Resolve_DefaultOutputPath()
+static std::string Resolve_DefaultOutputPath()
 {
     if (default_output_path.empty())
     {
@@ -206,9 +204,9 @@ void Main::Shutdown(const bool error)
         Cookie_Save(config_file);
     }
 
-    if (!FileExists(options_file))
+    if (!FileExists(option_file))
     {
-        Options_Save(options_file);
+        Options_Save(option_file);
     }
 
     Script_Close();
@@ -259,12 +257,10 @@ bool Build_Cool_Shit()
         }
     }
 
-    const std::string def_filename = batch_output_file;
-
     const uint32_t start_time = TimeGetMillies();
     bool           was_ok     = false;
     // this will ask for output filename (among other things)
-    was_ok = game_object->Start(def_filename.c_str());
+    was_ok = game_object->Start(batch_output_file.c_str());
 
     if (was_ok)
     {
@@ -495,10 +491,10 @@ int main(int argc, char **argv)
 #endif
     Trans_Init();
     config_file = PathAppend(home_dir, CONFIG_FILENAME);
-    options_file = PathAppend(home_dir, OPTIONS_FILENAME);
+    option_file = PathAppend(home_dir, OPTIONS_FILENAME);
     logging_file = PathAppend(home_dir, LOG_FILENAME);
 
-    Options_Load(options_file);
+    Options_Load(option_file);
     Resolve_DefaultOutputPath();
 
     LogInit(logging_file);
@@ -510,7 +506,7 @@ int main(int argc, char **argv)
 
     LogPrint("\n");
     LogPrint("********************************************************\n");
-    LogPrint("** %s %s \"%s\" **\n", OBSIDIAN_TITLE.c_str(), OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
+    LogPrint("** %s %s \"%s\" **\n", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
     LogPrint("** Build %s **\n", OBSIDIAN_VERSION);
     LogPrint("********************************************************\n");
     LogPrint("\n");
@@ -567,7 +563,7 @@ int main(int argc, char **argv)
             Parse_Option(update_kv.key, update_kv.value);
             break;
         }
-        Options_Save(options_file);
+        Options_Save(option_file);
         Cookie_Save(config_file);
         Main::Shutdown(false);
         exit(EXIT_SUCCESS);
@@ -611,15 +607,15 @@ int main(int argc, char **argv)
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
-    std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE.c_str(), OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
+    std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
     sapp_desc app = {0};
     app.init_cb = init;
     app.frame_cb = frame;
     app.cleanup_cb = cleanup;
     app.event_cb = input;
     app.enable_clipboard = true;
-    app.width = 1024;
-    app.height = 768;
+    app.width = WINDOW_WIDTH;
+    app.height = WINDOW_HEIGHT;
     app.window_title = CStringDup(win_title.c_str());
     app.ios_keyboard_resizes_canvas = true;
     app.icon.sokol_default = true;

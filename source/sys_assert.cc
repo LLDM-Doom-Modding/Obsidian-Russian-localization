@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "main.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 #include <stdarg.h>

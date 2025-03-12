@@ -28,6 +28,7 @@
 #include "m_lua.h"
 #include "m_trans.h"
 #include "main.h"
+#include "sys_debug.h"
 #include "sys_macro.h"
 
 void Parse_Option(const std::string &name, const std::string &value)
@@ -145,7 +146,7 @@ bool Options_Save(const std::string &filename)
 
     LogPrint("Saving options file...\n");
 
-    fprintf(option_fp, "-- OPTIONS FILE : OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME.c_str());
+    fprintf(option_fp, "-- OPTIONS FILE : OBSIDIAN %s \"%s\"\n", OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
     fprintf(option_fp, "-- Build %s\n", OBSIDIAN_VERSION);
     fprintf(option_fp, "-- Based on OBLIGE Level Maker (C) 2006-2017 Andrew Apted\n");
     fprintf(option_fp, "-- %s\n\n", OBSIDIAN_WEBSITE);
