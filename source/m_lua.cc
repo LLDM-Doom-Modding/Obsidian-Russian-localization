@@ -572,6 +572,7 @@ extern int wadfab_get_line_hexen(lua_State *L);
 extern int wadfab_get_3d_floor(lua_State *L);
 extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
+int gui_calc_seed(lua_State *L);
 
 static const luaL_Reg gui_script_funcs[] = {
 
@@ -589,6 +590,9 @@ static const luaL_Reg gui_script_funcs[] = {
     {"random", gui_random},
     {"random_int", gui_random_int},
     {"reseed_rng", gui_reseed_rng},
+#ifdef OBSIDIAN_ENABLE_GUI
+    {"calc_seed", gui_calc_seed},
+#endif
 
     // file & directory functions
     {"import", gui_import},
@@ -1145,6 +1149,17 @@ bool ob_build_cool_shit()
 }
 
 #ifdef OBSIDIAN_ENABLE_GUI
+int gui_calc_seed(lua_State *L)
+{
+    const char *seed = luaL_checkstring(L, 1);
+    if (!seed)
+        string_seed.clear();
+    else
+        string_seed = seed;
+    Main_CalcNewSeed();
+    return 0;
+}
+
 bool ob_gui_init_ctx(void *context)
 {
     SYS_ASSERT(context);

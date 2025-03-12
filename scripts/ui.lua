@@ -21,15 +21,17 @@
 
 local normal_font
 local bold_font
+local font_scale
 
-function ob_gui_init_fonts(font_scale)
+function ob_gui_init_fonts(scale)
   if OB_NK_CTX == nil then return "bork" end
   if OB_NK_ATLAS == nil then return "bork" end
-  normal_font = OB_NK_ATLAS:add(24 * font_scale, "data/fonts/SourceSansPro/SourceSansPro-Regular.ttf")
+  normal_font = OB_NK_ATLAS:add(24 * scale, "data/fonts/SourceSansPro/SourceSansPro-Regular.ttf")
   normal_font:set_height(24)
-  bold_font = OB_NK_ATLAS:add(24 * font_scale, "data/fonts/SourceSansPro/SourceSansPro-Bold.ttf")
+  bold_font = OB_NK_ATLAS:add(24 * scale, "data/fonts/SourceSansPro/SourceSansPro-Bold.ttf")
   bold_font:set_height(24)
   nk.style_set_font(OB_NK_CTX, normal_font)
+  font_scale = scale
   return "groovy"
 end
 
@@ -160,7 +162,7 @@ colortable.dark = {
 }
 
 -- popups 
-local show_app_about = false
+local show_manual_seed = false
 
 -------------------------------------------------------------------------------
 -- Menubar
@@ -178,7 +180,7 @@ local function Menubar(ctx)
    if nk.menu_begin(ctx, nil, "MENU", nk.TEXT_LEFT, {120, 200}) then
       nk.layout_row_dynamic(ctx, 25, 1)
       if nk.menu_item(ctx, nil, "Hide", nk.TEXT_LEFT) then show_menu = false end
-      if nk.menu_item(ctx, nil, "About", nk.TEXT_LEFT) then show_app_about = true end
+      if nk.menu_item(ctx, nil, "About", nk.TEXT_LEFT) then show_manual_seed = true end
       menu1.prog = nk.progress(ctx, menu1.prog, 100, 'modifiable')
       menu1.slider = nk.slider(ctx, 0, menu1.slider, 16, 1)
       menu1.check = nk.checkbox(ctx, "check", menu1.check)
@@ -195,490 +197,24 @@ end
 -- Popup
 -------------------------------------------------------------------------------
 
-local function About(ctx)
-   if nk.popup_begin(ctx, 'static', "About", nk.WINDOW_CLOSABLE, {20, 100, 300, 190}) then
-      nk.layout_row_dynamic(ctx, 20, 1)
-      nk.label(ctx, "Nuklear", nk.TEXT_LEFT)
-      nk.label(ctx, "By Micha Mettke", nk.TEXT_LEFT)
-      nk.label(ctx, "nuklear is licensed under the",  nk.TEXT_LEFT)
-      nk.label(ctx, "public domain License.",  nk.TEXT_LEFT)
-      nk.popup_end(ctx)
-   else 
-      show_app_about = false
-   end
-end
-
--------------------------------------------------
-
 local input = 
 {
    submit = "",
-   flags = 0,
-}
- 
---------------------------------------------------------------------------------
-
-local layout = 
-{
-   group_titlebar = false,
-   group_border = true,
-   group_no_scrollbar = false,
-   group_width = 320,
-   group_height = 200,
-   group_selected = { false,false,false,false,false,false,false,false,
-                false,false,false,false,false,false,false,false},
-   current_tab = "Lines",
-   tab_names = {"Lines", "Columns", "Mixed"},
-   selected_left = {},
-   selected_right_top = {},
-   selected_right_center = {},
-   selected_right_bottom = {},
-   vertical = { a = 100, b = 100, c = 100 },
-   horizontal = { a = 100, b = 100, c = 100 },
-   root_selected = false,
-   selected = { false,false,false,false,false,false,false,false },
-   sel_nodes = { false,false,false,false },
+   flags = 0
 }
 
-local function Layout(ctx)
-   if nk.tree_push(ctx, 'tab', "Layout", 'minimized', 'layout') then
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Widget", 'minimized', 'layout widget') then
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Dynamic fixed column layout with generated position and size:", nk.TEXT_LEFT)
-         nk.layout_row_dynamic(ctx, 30, 3)
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "static fixed column layout with generated position and size:", nk.TEXT_LEFT)
-         nk.layout_row_static(ctx, 30, 100, 3)
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Dynamic array-based custom column layout with generated position and custom size:",nk.TEXT_LEFT)
-         nk.layout_row(ctx, 'dynamic', 30, {0.2, 0.6, 0.2})
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Static array-based custom column layout with generated position and custom size:",nk.TEXT_LEFT )
-         nk.layout_row(ctx, 'static', 30, {100, 200, 50})
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Dynamic immediate mode custom column layout with generated position and custom size:",nk.TEXT_LEFT)
-         nk.layout_row_begin(ctx, 'dynamic', 30, 3)
-         nk.layout_row_push(ctx, 0.2)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_push(ctx, 0.6)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_push(ctx, 0.2)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_end(ctx)
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Static immediate mode custom column layout with generated position and custom size:", nk.TEXT_LEFT)
-         nk.layout_row_begin(ctx, 'static', 30, 3)
-         nk.layout_row_push(ctx, 100)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_push(ctx, 200)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_push(ctx, 50)
-         nk.button(ctx, nil, "button")
-         nk.layout_row_end(ctx)
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Static free space with custom position and custom size:", nk.TEXT_LEFT)
-         nk.layout_space_begin(ctx, 'static', 60, 4)
-         nk.layout_space_push(ctx, {100, 0, 100, 30})
-         nk.button(ctx, nil, "button")
-         nk.layout_space_push(ctx, {0, 15, 100, 30})
-         nk.button(ctx, nil, "button")
-         nk.layout_space_push(ctx, {200, 15, 100, 30})
-         nk.button(ctx, nil, "button")
-         nk.layout_space_push(ctx, {100, 30, 100, 30})
-         nk.button(ctx, nil, "button")
-         nk.layout_space_end(ctx)
-
-         nk.layout_row_dynamic(ctx, 30, 1)
-         nk.label(ctx, "Row template:", nk.TEXT_LEFT)
-         nk.layout_row_template_begin(ctx, 30)
-         nk.layout_row_template_push_dynamic(ctx)
-         nk.layout_row_template_push_variable(ctx, 80)
-         nk.layout_row_template_push_static(ctx, 80)
-         nk.layout_row_template_end(ctx)
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.button(ctx, nil, "button")
-         nk.tree_pop(ctx)
+local function ManualSeed(ctx, w, h)
+   if nk.popup_begin(ctx, 'dynamic', _("New Seed"), nk.WINDOW_CLOSABLE, {w/2-140, h/2-60, 280, 120}) then
+      nk.layout_row_dynamic(ctx, 25, 1)
+      input.submit, input.flags = 
+         nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'default')
+      if nk.button(ctx, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
+         gui.calc_seed(input.submit)
+         input.submit = ""
       end
-
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Group", 'minimized', 'layout group') then
-         local flags = 0
-         if layout.group_border then flags = flags | nk.WINDOW_BORDER end
-         if layout.group_no_scrollbar then flags = flags | nk.WINDOW_NO_SCROLLBAR end
-         if layout.group_titlebar then flags = flags | nk.WINDOW_TITLE end
-         nk.layout_row_dynamic(ctx, 30, 3)
-         layout.group_titlebar =  nk.checkbox(ctx, "Titlebar", layout.group_titlebar)
-         layout.group_border = nk.checkbox(ctx, "Border", layout.group_border)
-         layout.group_no_scrollbar = nk.checkbox(ctx, "No Scrollbar", layout.group_no_scrollbar)
-         nk.layout_row_begin(ctx, 'static', 22, 3)
-         nk.layout_row_push(ctx, 50)
-         nk.label(ctx, "size:", nk.TEXT_LEFT)
-         nk.layout_row_push(ctx, 130)
-         layout.group_width = nk.property(ctx, "#Width:", 100, layout.group_width, 500, 10, 1)
-         nk.layout_row_push(ctx, 130)
-         layout.group_height = nk.property(ctx, "#Height:", 100, layout.group_height, 500, 10, 1)
-         nk.layout_row_end(ctx)
-
-         nk.layout_row_static(ctx, layout.group_height, layout.group_width, 2)
-         if nk.group_begin(ctx, "Group", flags) then
-            nk.layout_row_static(ctx, 18, 100, 1)
-            local sel = layout.group_selected
-            for i = 1,16 do
-               sel[i] = nk.selectable(ctx, nil, sel[i] and "Selected" or "Unselected", nk.TEXT_CENTERED, sel[i])
-            end
-           nk.group_end(ctx)
-         end
-         nk.tree_pop(ctx)
-      end
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Tree", 'minimized', 'layout tree') then
-         local sel, ok = layout.root_selected, nil
-         ok, sel = nk.tree_element_push(ctx, 'node', "Root", 'minimized', sel, "layout tree root")
-         if ok then
-            if sel ~= layout.root_selected then
-               layout.root_selected = sel
-               for i=1, 8 do layout.selected[i] = sel end
-            end
-            local sel = layout.selected[1]
-            ok, sel = nk.tree_element_push(ctx, 'node', "Node", 'minimized', sel, "layout tree node")
-            if ok then
-               if sel ~= layout.selected[1] then
-                  layout.selected[1] = sel
-                  for i=1,4 do layout.sel_nodes[i] = sel end
-               end
-                  nk.layout_row_static(ctx, 18, 100, 1)
-                  sel = layout.sel_nodes
-                  for i=1,4 do
-                     sel[i] = nk.selectable(ctx, 'circle solid', sel[i] and "Selected" or "Unselected", nk.TEXT_RIGHT, sel[i])
-                  end
-               nk.tree_element_pop(ctx)
-            end
-            nk.layout_row_static(ctx, 18, 100, 1)
-            sel = layout.selected
-            for i=1,8 do
-               sel[i] = nk.selectable(ctx, 'circle solid', sel[i] and "Selected" or "Unselected", nk.TEXT_RIGHT, sel[i])
-            end
-            nk.tree_element_pop(ctx)
-         end
-         nk.tree_pop(ctx)
-      end
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Notebook", 'minimized', 'layout notebook') then
-         -- Header 
-         nk.style_push_vec2(ctx, "window.spacing", {0,0})
-         nk.style_push_float(ctx, "button.rounding", 0)
-         nk.layout_row_begin(ctx, 'static', 20, 3)
-         for _, name in ipairs(layout.tab_names) do
-            local f = ctx:font()
-            -- make sure button perfectly fits text 
-            local text_width = f:width(f:height(), name)
-            local widget_width = text_width + 3 * nk.style_get_vec2(ctx, "button.padding")[1]
-            nk.layout_row_push(ctx, widget_width)
-            if layout.current_tab == name then
-               -- active tab gets highlighted 
-               local button_color = nk.style_get_style_item(ctx, "button.normal")
-               local act = nk.style_get_style_item(ctx, "button.active")
-               nk.style_set_style_item(ctx, "button.normal", nk.style_get_style_item(ctx, "button.active"))
-               layout.current_tab = nk.button(ctx, nil, name) and name or layout.current_tab
-               nk.style_set_style_item(ctx, "button.normal", button_color)
-            else 
-               layout.current_tab = nk.button(ctx, nil, name) and name or layout.current_tab
-            end
-         end
-         nk.style_pop_float(ctx)
-         nk.style_pop_vec2(ctx)
-         -- Body 
-         nk.layout_row_dynamic(ctx, 140, 1)
-         if nk.group_begin(ctx, "Notebook", nk.WINDOW_BORDER) then
-            if layout.current_tab == "Lines" then
-               nk.layout_row_dynamic(ctx, 100, 1)
-               local bounds = nk.widget_bounds(ctx)
-               if nk.chart_begin(ctx, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255, 0, 0}) then
-                  nk.chart_add_slot(ctx, 'lines',32, -1.0, 1.0, {0, 0, 1}, {0, 0,150/255})
-                  local id = 0
-                  for i = 1, 32 do
-                     nk.chart_push(ctx, abs(sin(id)), 1)
-                     nk.chart_push(ctx, cos(id), 2)
-                     id = id + STEP
-                  end
-               end 
-               nk.chart_end(ctx)
-            elseif layout.current_tab == "Columns" then
-               nk.layout_row_dynamic(ctx, 100, 1)
-               local bounds = nk.widget_bounds(ctx)
-               if nk.chart_begin(ctx, 'column', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
-                  local id = 0
-                  for i = 1, 32 do
-                     nk.chart_push(ctx, abs(sin(id)), 1)
-                     id = id + STEP
-                  end
-               end
-               nk.chart_end(ctx)
-            elseif layout.current_tab == "Mixed" then
-               nk.layout_row_dynamic(ctx, 100, 1)
-               local bounds = nk.widget_bounds(ctx)
-               if nk.chart_begin(ctx, 'lines', 32, 0.0, 1.0, {1, 0, 0}, {150/255,0,0}) then
-                  nk.chart_add_slot(ctx, 'lines',32, -1.0, 1.0, {0,0,1}, {0,0,150/255})
-                  nk.chart_add_slot(ctx, 'column', 32, 0.0, 1.0, {0,1,0}, {0,150/255,0})
-                  local id = 0
-                  for i = 1, 32 do
-                     nk.chart_push(ctx, abs(sin(id)), 1)
-                     nk.chart_push(ctx, abs(cos(id)), 2)
-                     nk.chart_push(ctx, abs(sin(id)), 3)
-                     id = id + STEP
-                  end
-               end
-               nk.chart_end(ctx)
-            end
-            nk.group_end(ctx)
-         end
-         nk.tree_pop(ctx)
-      end
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Simple", 'minimized', 'layout simple') then
-         nk.layout_row_dynamic(ctx, 300, 2)
-         if nk.group_begin(ctx, "Group_Without_Border", 0) then
-            nk.layout_row_static(ctx, 18, 150, 1)
-            for i = 0, 63 do
-               nk.label(ctx, string.format("0x%02x: scrollable region", i), nk.TEXT_LEFT)
-            end
-            nk.group_end(ctx)
-         end
-         if (nk.group_begin(ctx, "Group_With_Border", nk.WINDOW_BORDER)) then
-            nk.layout_row_dynamic(ctx, 25, 2)
-            for i = 0, 63 do
-               nk.button(ctx, nil, string.format("%08d", 1<<i))
-            end
-            nk.group_end(ctx)
-         end
-         nk.tree_pop(ctx)
-      end
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Complex", 'minimized', 'layout complex') then
-         nk.layout_space_begin(ctx, 'static', 500, 64)
-         nk.layout_space_push(ctx, {0,0,150,500})
-         if nk.group_begin(ctx, "Group_left", nk.WINDOW_BORDER) then
-            local sel = layout.selected_left
-            nk.layout_row_static(ctx, 18, 100, 1)
-            for i = 1, 32 do
-               sel[i] = nk.selectable(ctx, nil, sel[i] and "Selected" or "Unselected", nk.TEXT_CENTERED, sel[i] or false)
-            end
-            nk.group_end(ctx)
-         end
-         nk.layout_space_push(ctx, {160,0,150,240})
-         if nk.group_begin(ctx, "Group_top", nk.WINDOW_BORDER) then
-            nk.layout_row_dynamic(ctx, 25, 1)
-            nk.button(ctx, nil, "#FFAA")
-            nk.button(ctx, nil, "#FFBB")
-            nk.button(ctx, nil, "#FFCC")
-            nk.button(ctx, nil, "#FFDD")
-            nk.button(ctx, nil, "#FFEE")
-            nk.button(ctx, nil, "#FFFF")
-            nk.group_end(ctx)
-         end
-         nk.layout_space_push(ctx, {160,250,150,250})
-         if nk.group_begin(ctx, "Group_buttom", nk.WINDOW_BORDER) then
-            nk.layout_row_dynamic(ctx, 25, 1)
-            nk.button(ctx, nil, "#FFAA")
-            nk.button(ctx, nil, "#FFBB")
-            nk.button(ctx, nil, "#FFCC")
-            nk.button(ctx, nil, "#FFDD")
-            nk.button(ctx, nil, "#FFEE")
-            nk.button(ctx, nil, "#FFFF")
-            nk.group_end(ctx)
-         end 
-         nk.layout_space_push(ctx, {320,0,150,150})
-         if nk.group_begin(ctx, "Group_right_top", nk.WINDOW_BORDER)  then
-            local sel = layout.selected_right_top
-            nk.layout_row_static(ctx, 18, 100, 1)
-            for i = 1, 4 do
-               sel[i] = nk.selectable(ctx, nil, sel[i] and "Selected" or "Unselected", nk.TEXT_CENTERED, sel[i] or false)
-            end
-            nk.group_end(ctx)
-         end
-         nk.layout_space_push(ctx, {320,160,150,150})
-         if nk.group_begin(ctx, "Group_right_center", nk.WINDOW_BORDER) then
-            local sel = layout.selected_right_center
-            nk.layout_row_static(ctx, 18, 100, 1)
-            for i = 1, 4 do
-               sel[i] = nk.selectable(ctx, nil, sel[i] and "Selected" or "Unselected", nk.TEXT_CENTERED, sel[i] or false)
-            end
-            nk.group_end(ctx)
-         end
-         nk.layout_space_push(ctx, {320,320,150,150})
-         if nk.group_begin(ctx, "Group_right_bottom", nk.WINDOW_BORDER) then
-            local sel = layout.selected_right_bottom
-            nk.layout_row_static(ctx, 18, 100, 1)
-            for i = 1, 4 do
-               sel[i] = nk.selectable(ctx, nil, sel[i] and "Selected" or "Unselected", nk.TEXT_CENTERED, sel[i] or false)
-            end
-            nk.group_end(ctx)
-         end
-         nk.layout_space_end(ctx)
-         nk.tree_pop(ctx)
-      end
-      -----------------------------------------------------
-      if nk.tree_push(ctx, 'node', "Splitter", 'minimized', 'tree splitter') then
-         nk.layout_row_static(ctx, 20, 320, 1)
-         nk.label(ctx, "Use slider and spinner to change tile size", nk.TEXT_LEFT)
-         nk.label(ctx, "Drag the space between tiles to change tile ratio", nk.TEXT_LEFT)
-         if nk.tree_push(ctx, 'node', "Vertical", 'minimized', 'tree splitted vertical') then
-            local vert = layout.vertical
-            local row_layout = { vert.a, 8, vert.b, 8, vert.c }
-            -- header 
-            nk.layout_row_static(ctx, 30, 100, 2)
-            nk.label(ctx, "left:", nk.TEXT_LEFT)
-            vert.a = nk.slider(ctx, 10.0, vert.a, 200.0, 10.0)
-            nk.label(ctx, "middle:", nk.TEXT_LEFT)
-            vert.b = nk.slider(ctx, 10.0, vert.b, 200.0, 10.0)
-            nk.label(ctx, "right:", nk.TEXT_LEFT)
-            vert.c = nk.slider(ctx, 10.0, vert.c, 200.0, 10.0)
-            -- tiles 
-            nk.layout_row(ctx, 'static', 200, row_layout)
-            -- left space 
-            if nk.group_begin(ctx, "left", 
-                     nk.WINDOW_NO_SCROLLBAR|nk.WINDOW_BORDER|nk.WINDOW_NO_SCROLLBAR) then
-               nk.layout_row_dynamic(ctx, 25, 1)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            -- scaler 
-            local bounds = nk.widget_bounds(ctx)
-            nk.spacing(ctx, 1)
-            if (ctx:is_mouse_hovering_rect(bounds) or ctx:is_mouse_prev_hovering_rect(bounds)) 
-                  and ctx:is_mouse_down('left') then
-               local dx = ctx:mouse_delta()
-               vert.a = row_layout[1] + dx
-               vert.b = row_layout[3] - dx
-            end
-            -- middle space 
-            if nk.group_begin(ctx, "center", nk.WINDOW_BORDER|nk.WINDOW_NO_SCROLLBAR) then
-               nk.layout_row_dynamic(ctx, 25, 1)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            -- scaler 
-            local bounds = nk.widget_bounds(ctx)
-            nk.spacing(ctx, 1)
-            if (ctx:is_mouse_hovering_rect(bounds) or ctx:is_mouse_prev_hovering_rect(bounds)) 
-                   and ctx:is_mouse_down('left') then
-               local dx = ctx:mouse_delta()
-               vert.b = row_layout[3] + dx
-               vert.c = row_layout[5] - dx
-            end
-            -- right space 
-            if nk.group_begin(ctx, "right", nk.WINDOW_BORDER|nk.WINDOW_NO_SCROLLBAR) then
-               nk.layout_row_dynamic(ctx, 25, 1)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            nk.tree_pop(ctx)
-         end
-         if nk.tree_push(ctx, 'node', "Horizontal", 'minimized', 'widget tree horizontal') then
-            local hor = layout.horizontal
-            -- header 
-            nk.layout_row_static(ctx, 30, 100, 2)
-            nk.label(ctx, "top:", nk.TEXT_LEFT)
-            hor.a = nk.slider(ctx, 10.0, hor.a, 200.0, 10.0)
-            nk.label(ctx, "middle:", nk.TEXT_LEFT)
-            hor.b = nk.slider(ctx, 10.0, hor.b, 200.0, 10.0)
-            nk.label(ctx, "bottom:", nk.TEXT_LEFT)
-            hor.c = nk.slider(ctx, 10.0, hor.c, 200.0, 10.0)
-            -- top space 
-            nk.layout_row_dynamic(ctx, hor.a, 1)
-            if nk.group_begin(ctx, "top", nk.WINDOW_NO_SCROLLBAR|nk.WINDOW_BORDER) then
-               nk.layout_row_dynamic(ctx, 25, 3)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            -- scaler 
-            nk.layout_row_dynamic(ctx, 8, 1)
-            local bounds = nk.widget_bounds(ctx)
-            nk.spacing(ctx, 1)
-            if (ctx:is_mouse_hovering_rect(bounds) or ctx:is_mouse_prev_hovering_rect(bounds))
-                  and ctx:is_mouse_down('left') then
-               local dx, dy = ctx:mouse_delta()
-               hor.a = hor.a + dy
-               hor.b = hor.b - dy
-            end
-            -- middle space 
-            nk.layout_row_dynamic(ctx, hor.b, 1)
-            if nk.group_begin(ctx, "middle", nk.WINDOW_NO_SCROLLBAR|nk.WINDOW_BORDER) then
-               nk.layout_row_dynamic(ctx, 25, 3)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            -- scaler 
-            nk.layout_row_dynamic(ctx, 8, 1)
-            local bounds = nk.widget_bounds(ctx)
-            if (ctx:is_mouse_hovering_rect(bounds) or ctx:is_mouse_prev_hovering_rect(bounds)) 
-                  and ctx:is_mouse_down('left') then
-               local dx, dy = ctx:mouse_delta()
-               hor.b = hor.b + dy
-               hor.c = hor.c - dy
-            end
-            -- bottom space 
-            nk.layout_row_dynamic(ctx, hor.c, 1)
-            if nk.group_begin(ctx, "bottom", nk.WINDOW_NO_SCROLLBAR|nk.WINDOW_BORDER) then
-               nk.layout_row_dynamic(ctx, 25, 3)
-               nk.button(ctx, nil, "#FFAA")
-               nk.button(ctx, nil, "#FFBB")
-               nk.button(ctx, nil, "#FFCC")
-               nk.button(ctx, nil, "#FFDD")
-               nk.button(ctx, nil, "#FFEE")
-               nk.button(ctx, nil, "#FFFF")
-               nk.group_end(ctx)
-            end
-            nk.tree_pop(ctx)
-         end
-         nk.tree_pop(ctx)
-      end
-   nk.tree_pop(ctx)
+      nk.popup_end(ctx)
+   else 
+      show_manual_seed = false
    end
 end
 
@@ -712,16 +248,15 @@ function ob_gui_frame(width, height)
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
       --if show_menu then Menubar(OB_NK_CTX) end
-      --if show_app_about then About(OB_NK_CTX) end
+      if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
-      nk.style_push_float(OB_NK_CTX, "button.rounding", 0)
       local f = bold_font
       nk.style_set_font(OB_NK_CTX, bold_font)
-      nk.layout_row_dynamic(OB_NK_CTX, f:height(), #module_categories)
+      nk.layout_row_dynamic(OB_NK_CTX, (f:height() * font_scale), #module_categories)
       for _, name in ipairs(module_categories) do
          -- make sure button perfectly fits text 
-         local text_width = f:width(f:height(), module_category_labels[name])
+         local text_width = f:width(f:height() * font_scale, module_category_labels[name]) * font_scale
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
          nk.layout_row_push(OB_NK_CTX, widget_width)
          if current_tab == name then
@@ -735,38 +270,48 @@ function ob_gui_frame(width, height)
             current_tab = nk.button(OB_NK_CTX, nil, module_category_labels[name]) and name or current_tab
          end
       end
-      nk.style_pop_float(OB_NK_CTX)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
-      nk.layout_row_dynamic(OB_NK_CTX, height - f:height() - 50, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 50, 1)
       f = normal_font
       nk.style_set_font(OB_NK_CTX, normal_font)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
-         if current_tab ~= "build" and current_tab ~= "options" then
+         if current_tab == "build" then
+            -- TODO
+         elseif current_tab == "options" then
+            -- TODO
+         else
             for _,mod in pairs(OB_MODULES) do
                if mod.valid == true and mod.where == current_tab then
                   for _,opt in pairs(mod.options) do
-                     nk.layout_row_begin(OB_NK_CTX, 'static', 30, 2)
-                     nk.layout_row_push(OB_NK_CTX, width)
+                     nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
                      nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                     nk.layout_row_end(OB_NK_CTX)
-                     nk.layout_row_static(OB_NK_CTX, 25, 200, 1)
-                     opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                     opt.value = opt.avail_choices[opt.choice_selection]
-                     OB_CONFIG[opt.name] = opt.value
+                     if opt.choices == YES_NO_CHOICES then
+                        if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
+                           opt.value = "yes"
+                           OB_CONFIG[opt.name] = "yes"
+                        else
+                           opt.value = "no"
+                           OB_CONFIG[opt.name] = "no"
+                        end
+                     else
+                        opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                        opt.value = opt.avail_choices[opt.choice_selection]
+                        OB_CONFIG[opt.name] = opt.value
+                     end
                   end
                end
             end
          end
          nk.group_end(OB_NK_CTX)
       end
-      nk.layout_row_dynamic(OB_NK_CTX, 25, 4)
+      nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
       nk.label(OB_NK_CTX, "Seed: " .. OB_CONFIG.seed, nk.TEXT_LEFT)
-      if nk.button(OB_NK_CTX, nil, "Build") then
-         OB_NK_PICKED_FILE = nil
+      if nk.button(OB_NK_CTX, nil, "New Random Seed") then
+         gui.calc_seed(ob_get_random_words())
       end
-      if OB_NK_PICKED_FILE ~= nil then
-         nk.label(OB_NK_CTX, OB_NK_PICKED_FILE, nk.TEXT_LEFT)
+      if nk.button(OB_NK_CTX, nil, "Enter Seed") then
+         show_manual_seed = true
       end
    end
    nk.window_end(OB_NK_CTX)

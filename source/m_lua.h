@@ -64,7 +64,7 @@ bool ob_build_cool_shit();
 bool ob_gui_init_ctx(void *context);
 bool ob_gui_init_fonts(void *atlas, float font_scale);
 bool ob_gui_frame(int width, int height);
-void ob_check_file_picker();
+void Main_CalcNewSeed();
 #endif
 
 //--- editor settings ---
