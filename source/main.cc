@@ -22,6 +22,7 @@
 #include "main.h"
 
 #include <locale.h>
+#include <string.h>
 
 #include "csg_main.h"
 #include "images.h"
@@ -100,7 +101,7 @@ std::string default_output_path;
 
 std::string string_seed;
 
-std::string selected_lang = "ru"; // Have a default just in case the translation stuff borks
+std::string selected_lang = "en"; // Have a default just in case the translation stuff borks
 
 game_interface_c *game_object = NULL;
 
