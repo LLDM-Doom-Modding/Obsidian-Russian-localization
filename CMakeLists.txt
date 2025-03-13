@@ -8,14 +8,28 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-option(OBSIDIAN_DEBUG_LUA "Enable Lua debugging" OFF)
-option(OBSIDIAN_GUI "Build Sokol+Nuklear GUI" ON)
+option(OBSIDIAN_DEBUG_LUA "Enable Lua debugging"    OFF)
+option(OBSIDIAN_GUI       "Build Sokol+Nuklear GUI" ON)
+# These are only needed if wanting to force a specific Sokol backend,
+# otherwise a platform-specific default will be selected
+option(OBSIDIAN_SOKOL_D3D11 "Use Sokol D3D11" OFF)
+option(OBSIDIAN_SOKOL_GL    "Use Sokol GL"    OFF)
+option(OBSIDIAN_SOKOL_GLES3 "Use Sokol GLES3" OFF)
 
 if(OBSIDIAN_DEBUG_LUA)
   add_compile_definitions(OBSIDIAN_DEBUG_LUA)
 endif()
 
 if(OBSIDIAN_GUI)
+  if (NOT OBSIDIAN_SOKOL_GL AND NOT OBSIDIAN_SOKOL_D3D11 AND NOT OBSIDIAN_SOKOL_GLES3)
+    if (WIN32 OR MINGW)
+      set (OBSIDIAN_SOKOL_D3D11 ON)
+    elseif (EMSCRIPTEN)
+      set (OBSIDIAN_SOKOL_GLES3 ON)
+    else ()
+      set (OBSIDIAN_SOKOL_GL ON)
+    endif ()
+  endif ()
   add_compile_definitions(OBSIDIAN_ENABLE_GUI)
 endif()
 
@@ -42,7 +56,13 @@ if(APPLE OR ${CMAKE_SYSTEM} MATCHES "BSD")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/include")
 endif()
 
-find_package(OpenGL REQUIRED)
+if(OBSIDIAN_GUI)
+  if (OBSIDIAN_SOKOL_GL)  
+    find_package(OpenGL REQUIRED)
+  elseif (OBSIDIAN_SOKOL_GLES3 AND NOT EMSCRIPTEN)
+    find_package(OpenGL COMPONENTS GLES3 EGL REQUIRED)
+  endif()
+endif()
 
 add_subdirectory(libraries)
 
