@@ -381,6 +381,7 @@ void frame(void)
     {
         main_action = MAIN_BUILDING;
         Build_Cool_Shit();
+        batch_output_file = ob_default_filename();
     }
 
     // the sokol_gfx draw pass
