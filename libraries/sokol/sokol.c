@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#define SOKOL_WIN32_FORCE_MAIN
+#define SOKOL_WIN32_FORCE_WINMAIN
 #endif
 #define SOKOL_IMPL
 #include "sokol_app.h"
