@@ -258,7 +258,6 @@ function ob_gui_frame(width, height)
          -- make sure button perfectly fits text 
          local text_width = f:width(f:height() * font_scale, module_category_labels[name]) * font_scale
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
-         nk.layout_row_push(OB_NK_CTX, widget_width)
          if current_tab == name then
             -- active tab gets highlighted 
             local button_color = nk.style_get_style_item(OB_NK_CTX, "button.normal")
