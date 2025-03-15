@@ -1780,6 +1780,8 @@ function ob_build_cool_shit()
     
   ob_read_all_config(false, "log_only")
 
+  gui.start_it()
+
   if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
     ob_clean_up()
     ob_sort_modules()
@@ -1825,6 +1827,8 @@ function ob_build_cool_shit()
     profiler.stop()
     profiler.report("profile.log")
   end
+
+  gui.finish_it()
 
   return "ok"
 end

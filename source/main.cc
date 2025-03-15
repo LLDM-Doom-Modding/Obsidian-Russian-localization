@@ -82,7 +82,7 @@ int main_action = 0;
 
 uint64_t next_rand_seed;
 
-static std::string batch_output_file;
+std::string batch_output_file;
 std::string        numeric_locale;
 
 // options
@@ -377,13 +377,6 @@ void frame(void)
 
     running = ob_gui_frame(sapp_width(), sapp_height());
 
-    if (main_action == MAIN_BUILD)
-    {
-        main_action = MAIN_BUILDING;
-        Build_Cool_Shit();
-        batch_output_file = ob_default_filename();
-    }
-
     // the sokol_gfx draw pass
     sg_pass pass = {0};
     memset(&pass.action.colors[0], 0, sizeof(sg_color_attachment_action));
@@ -607,36 +600,20 @@ int main(int argc, char **argv)
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
-    if (argv::Find('b', "batch") >= 0)
-    { 
-        if (!Build_Cool_Shit())
-        {
-            FatalError("FAILED!\n");
-            LogPrint("FAILED!\n");
-
-            Main::Shutdown(true);
-            exit(EXIT_FAILURE);
-        }
-        Main::Shutdown(false);
-        exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
-        sapp_desc app = {0};
-        app.init_cb = init;
-        app.frame_cb = frame;
-        app.cleanup_cb = cleanup;
-        app.event_cb = input;
-        app.enable_clipboard = true;
-        app.width = WINDOW_WIDTH;
-        app.height = WINDOW_HEIGHT;
-        app.window_title = CStringDup(win_title.c_str());
-        app.ios_keyboard_resizes_canvas = true;
-        app.icon.sokol_default = true;
-        app.logger.func = slog_func;
-        return app;
-    }
+    std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
+    sapp_desc app = {0};
+    app.init_cb = init;
+    app.frame_cb = frame;
+    app.cleanup_cb = cleanup;
+    app.event_cb = input;
+    app.enable_clipboard = true;
+    app.width = WINDOW_WIDTH;
+    app.height = WINDOW_HEIGHT;
+    app.window_title = CStringDup(win_title.c_str());
+    app.ios_keyboard_resizes_canvas = true;
+    app.icon.sokol_default = true;
+    app.logger.func = slog_func;
+    return app;
 #else
     if (!Build_Cool_Shit())
     {

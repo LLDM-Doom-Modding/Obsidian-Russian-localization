@@ -546,7 +546,8 @@ extern int wadfab_get_3d_floor(lua_State *L);
 extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
 int gui_calc_seed(lua_State *L);
-int gui_build_it(lua_State *L);
+int gui_start_it(lua_State *L);
+int gui_finish_it(lua_State *L);
 
 static const luaL_Reg gui_script_funcs[] = {
 
@@ -563,7 +564,8 @@ static const luaL_Reg gui_script_funcs[] = {
     {"random_int", gui_random_int},
     {"reseed_rng", gui_reseed_rng},
 #ifdef OBSIDIAN_ENABLE_GUI
-    {"build_it", gui_build_it},
+    {"start_it", gui_start_it},
+    {"finish_it", gui_finish_it},
     {"calc_seed", gui_calc_seed},
 #endif
 
@@ -1277,10 +1279,60 @@ bool ob_gui_frame(int width, int height)
 
     return true;
 }
-
-int gui_build_it(lua_State *L)
+extern std::string batch_output_file;
+int gui_start_it(lua_State *L)
 {
-    main_action = MAIN_BUILD;
+    const std::string format = ob_game_format();
+
+    if (format.empty())
+    {
+        FatalError("ERROR: missing 'format' for game?!?\n");
+    }
+
+    // create game object
+    {
+        if (StringCompare(format, "doom") == 0)
+        {
+            game_object = Doom_GameObject();
+        }
+        else
+        {
+            FatalError("ERROR: unknown format: '%s'\n", format.c_str());
+        }
+    }
+
+    // this will ask for output filename (among other things)
+    game_object->Start(batch_output_file.c_str());
+    return 0;
+}
+int gui_finish_it(lua_State *L)
+{
+    bool was_ok = game_object->Finish(true);
+
+    if (was_ok)
+    {
+        ProgStatus("%s", _("Success"));
+        string_seed.clear();
+    }
+    else
+    {
+        string_seed.clear();
+    }
+
+    // Insurance in case the build process errored/cancelled
+    if (!was_ok)
+    {
+        if (FileExists(game_object->Filename()))
+        {
+            FileDelete(game_object->Filename());
+        }
+    }
+
+    // don't need game object anymore
+    delete game_object;
+    game_object = NULL;
+
+    Main_CalcNewSeed();
     return 0;
 }
 #endif
