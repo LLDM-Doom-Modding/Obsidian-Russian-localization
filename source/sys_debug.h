@@ -35,12 +35,10 @@ void LogEnableTerminal(bool enable);
 #ifdef __GNUC__
 void              LogPrint(const char *message, ...) __attribute__((format(printf, 1, 2)));
 void              DebugPrint(const char *message, ...) __attribute__((format(printf, 1, 2)));
-void              ProgStatus(const char *message, ...) __attribute__((format(printf, 1, 2)));
 [[noreturn]] void FatalError(const char *message, ...) __attribute__((format(printf, 1, 2)));
 #else
 void              LogPrint(const char *message, ...);
 void              DebugPrint(const char *message, ...);
-void              ProgStatus(const char *message, ...);
 [[noreturn]] void FatalError(const char *message, ...);
 #endif
 

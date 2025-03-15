@@ -156,36 +156,6 @@ void DebugPrint(const char *message, ...)
     }
 }
 
-void ProgStatus(const char *message, ...)
-{
-    char message_buf[LOG_BUF_LEN];
-
-    message_buf[LOG_BUF_LEN-1] = 0;
-
-    // Print the message into a text string
-    va_list argptr;
-
-    va_start(argptr, message);
-    vsprintf(message_buf, message, argptr);
-    va_end(argptr);
-
-    SYS_ASSERT(message_buf[LOG_BUF_LEN-1] == 0);
-
-    if (log_file)
-    {
-        fprintf(log_file, "%s", message_buf);
-        fflush(log_file);
-    }
-
-    if (terminal)
-    {
-        printf("%s", message_buf);
-        fflush(stdout);
-    }
-
-    ob_set_build_status(message_buf);
-}
-
 [[noreturn]] void FatalError(const char *message, ...)
 {
     char message_buf[LOG_BUF_LEN];

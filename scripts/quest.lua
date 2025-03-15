@@ -3508,7 +3508,7 @@ function Quest_make_quests(LEVEL)
 
   OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Quests)"
 
-  coroutine.yield()
+  ob_coroutine_yield()
 
   Monster_prepare(LEVEL)
 

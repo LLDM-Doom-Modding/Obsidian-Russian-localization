@@ -2508,7 +2508,7 @@ function Level_make_level(LEV)
   ::retryafterfailure::
 
   OB_BUILD_STATUS = "Making " .. LEVEL.name
-  coroutine.yield()
+  ob_coroutine_yield()
 
   gui.printf("\n\n~~~~~~| %s |~~~~~~\n", LEVEL.name)
 

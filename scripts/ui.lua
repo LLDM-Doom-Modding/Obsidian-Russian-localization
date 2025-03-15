@@ -241,8 +241,6 @@ local module_category_labels =
    ["options"] = _("Options")
 }
 
-local co = nil
-
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
@@ -250,13 +248,13 @@ function ob_gui_frame(width, height)
 
    local window_flags = 0
 
-   if co ~= nil then
-      local status = coroutine.status(co)
+   if OB_BUILD_ROUTINE ~= nil then
+      local status = coroutine.status(OB_BUILD_ROUTINE)
       if status == "dead" then
-         co = nil
+         OB_BUILD_ROUTINE = nil
       elseif status == "suspended" then
          window_flags = nk.WINDOW_NO_INPUT
-         coroutine.resume(co)
+         coroutine.resume(OB_BUILD_ROUTINE)
       end
    end
 
@@ -292,8 +290,8 @@ function ob_gui_frame(width, height)
          if current_tab == "build" then
             nk.layout_row_static(OB_NK_CTX, height/2, width/2, 1)
             if nk.button(OB_NK_CTX, nil, "BUILD") then
-               if co == nil then
-                 co = coroutine.create(ob_build_cool_shit)
+               if OB_BUILD_ROUTINE == nil then
+                  OB_BUILD_ROUTINE = coroutine.create(ob_build_cool_shit)
                end
             end
          elseif current_tab == "options" then

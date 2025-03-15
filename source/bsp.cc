@@ -117,8 +117,6 @@ build_result_e BuildFile(buildinfo_t *build_info)
 
         visited += 1;
 
-        Doom::Send_Prog_Nodes(visited, num_levels);
-
         res = ajbsp::BuildLevel(n);
 
         // handle a failed map (due to lump overflow)
@@ -179,15 +177,6 @@ static void VisitFile(const std::string &filename, buildinfo_t *build_info)
 }
 
 // ----- user information -----------------------------
-
-void ShowBanner()
-{
-    printf("+-----------------------------------------------+\n");
-    printf("|   AJBSP %s   (C) 2022 Andrew Apted, et al   |\n", AJBSP_VERSION);
-    printf("+-----------------------------------------------+\n");
-
-    fflush(stdout);
-}
 
 bool ValidateMapName(char *name)
 {
@@ -324,8 +313,6 @@ int BuildNodes(const std::string &filename, buildinfo_t *build_info)
         FatalError("no files to process\n");
         return 0;
     }
-
-    ShowBanner();
 
     // validate file before processing it
     if (!FileExists(filename))

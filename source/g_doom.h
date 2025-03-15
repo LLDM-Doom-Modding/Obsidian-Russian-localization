@@ -119,8 +119,6 @@ int NumSidedefs();
 int NumLinedefs();
 int NumThings();
 
-void Send_Prog_Nodes(int progress, int num_maps);
-
 } // namespace Doom
 
 //--- editor settings ---

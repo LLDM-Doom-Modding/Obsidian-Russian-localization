@@ -227,81 +227,6 @@ void Main_CalcNewSeed()
     xoshiro_Reseed(next_rand_seed);
 }
 
-//------------------------------------------------------------------------
-
-bool Build_Cool_Shit()
-{
-    const std::string format = ob_game_format();
-
-    if (format.empty())
-    {
-        FatalError("ERROR: missing 'format' for game?!?\n");
-    }
-
-    // create game object
-    {
-        if (StringCompare(format, "doom") == 0)
-        {
-            game_object = Doom_GameObject();
-        }
-        else
-        {
-            FatalError("ERROR: unknown format: '%s'\n", format.c_str());
-        }
-    }
-
-    const uint32_t start_time = TimeGetMillies();
-    bool           was_ok     = false;
-    // this will ask for output filename (among other things)
-    was_ok = game_object->Start(batch_output_file.c_str());
-
-    if (was_ok)
-    {
-        // run the scripts Scotty!
-        was_ok = ob_build_cool_shit();
-
-        was_ok = game_object->Finish(was_ok);
-    }
-    if (was_ok)
-    {
-        ProgStatus("%s", _("Success"));
-
-        const uint32_t end_time   = TimeGetMillies();
-        const uint32_t total_time = end_time - start_time;
-
-        LogPrint("\nTOTAL TIME: %g seconds\n\n", total_time / 1000.0);
-
-        string_seed.clear();
-    }
-    else
-    {
-        string_seed.clear();
-    }
-
-    if (main_action == MAIN_CANCEL)
-    {
-        main_action = 0;
-        ProgStatus("%s", _("Cancelled"));
-    }
-
-    // Insurance in case the build process errored/cancelled
-    if (!was_ok)
-    {
-        if (FileExists(game_object->Filename()))
-        {
-            FileDelete(game_object->Filename());
-        }
-    }
-
-    // don't need game object anymore
-    delete game_object;
-    game_object = NULL;
-
-    Main_CalcNewSeed();
-
-    return was_ok;
-}
-
 /* ----- main program ----------------------------- */
 
 #ifdef OBSIDIAN_ENABLE_GUI
@@ -600,22 +525,38 @@ int main(int argc, char **argv)
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
-    std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
-    sapp_desc app = {0};
-    app.init_cb = init;
-    app.frame_cb = frame;
-    app.cleanup_cb = cleanup;
-    app.event_cb = input;
-    app.enable_clipboard = true;
-    app.width = WINDOW_WIDTH;
-    app.height = WINDOW_HEIGHT;
-    app.window_title = CStringDup(win_title.c_str());
-    app.ios_keyboard_resizes_canvas = true;
-    app.icon.sokol_default = true;
-    app.logger.func = slog_func;
-    return app;
+    if (argv::Find('b', "batch") >= 0)
+    { 
+        if (!ob_build_cool_shit())
+        {
+            FatalError("FAILED!\n");
+            LogPrint("FAILED!\n");
+
+            Main::Shutdown(true);
+            exit(EXIT_FAILURE);
+        }
+        Main::Shutdown(false);
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
+        std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
+        sapp_desc app = {0};
+        app.init_cb = init;
+        app.frame_cb = frame;
+        app.cleanup_cb = cleanup;
+        app.event_cb = input;
+        app.enable_clipboard = true;
+        app.width = WINDOW_WIDTH;
+        app.height = WINDOW_HEIGHT;
+        app.window_title = CStringDup(win_title.c_str());
+        app.ios_keyboard_resizes_canvas = true;
+        app.icon.sokol_default = true;
+        app.logger.func = slog_func;
+        return app;
+    }
 #else
-    if (!Build_Cool_Shit())
+    if (!ob_build_cool_shit())
     {
         FatalError("FAILED!\n");
         LogPrint("FAILED!\n");

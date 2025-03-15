@@ -55,6 +55,7 @@ OB_PORTS = {}
 OB_MODULES = {}
 
 OB_BUILD_STATUS = ""
+OB_BUILD_ROUTINE = nil
 
 -- internationalization / localization
 function _(s) return gui.gettext(s) end

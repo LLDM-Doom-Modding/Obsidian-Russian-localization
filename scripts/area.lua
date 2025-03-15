@@ -2882,7 +2882,7 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Shapes)"
 
-  coroutine.yield()
+  ob_coroutine_yield()
 
   local level_grammar = {}
 
@@ -2916,8 +2916,8 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   Grower_create_rooms(LEVEL, SEEDS)
 
-  OB_BUILD_STATUS = LEVEL.name .. " (Rooms)", LEVEL.id, #GAME.levels
-  coroutine.yield()
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Rooms)", LEVEL.id, #GAME.levels
+  ob_coroutine_yield()
   Area_divvy_up_borders(LEVEL, SEEDS)
 
   Area_analyse_areas(LEVEL, SEEDS)

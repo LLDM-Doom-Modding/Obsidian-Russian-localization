@@ -288,11 +288,6 @@ qLump_c *BSP_CreateInfoLump()
 namespace Doom
 {
 
-void Send_Prog_Nodes(int progress, int num_maps)
-{
-    ProgStatus(StringFormat("%s (%d/%d)", _("Nodes"), progress, num_maps).c_str());
-}
-
 bool BuildNodes(std::string filename)
 {
     LogPrint("\n");
@@ -323,7 +318,6 @@ bool BuildNodes(std::string filename)
 
     if (ajbsp::BuildNodes(filename, &build_info) != 0)
     {
-        ProgStatus("%s", _("AJBSP Error!"));
         return false;
     }
 
@@ -1301,7 +1295,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
     if (filename.empty())
     {
-        ProgStatus("%s", _("Cancelled"));
         return false;
     }
 
@@ -1323,7 +1316,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
     if (!StartWAD(filename))
     {
-        ProgStatus("%s", _("Error (create file)"));
         return false;
     }
 

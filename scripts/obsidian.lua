@@ -1763,6 +1763,16 @@ end
 
 local PROFILING = false
 
+-- Either yield to the GUI so that the build status
+-- can be updated or print the build status to console
+function ob_coroutine_yield()
+  if OB_BUILD_ROUTINE ~= nil then
+    coroutine.yield()
+  else
+    gui.console_print(OB_BUILD_STATUS .. "\n")
+  end
+end
+
 function ob_build_cool_shit()
   local profiler
   if PROFILING then
@@ -1782,7 +1792,7 @@ function ob_build_cool_shit()
 
   gui.start_it()
 
-  coroutine.yield()
+  ob_coroutine_yield()
 
   if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
     ob_clean_up()
@@ -1830,9 +1840,13 @@ function ob_build_cool_shit()
     profiler.report("profile.log")
   end
 
-  coroutine.yield()
+  OB_BUILD_STATUS = "Building Nodes"
+  ob_coroutine_yield()
 
   gui.finish_it()
+
+  OB_BUILD_STATUS = "Success"
+  ob_coroutine_yield()
 
   return "ok"
 end

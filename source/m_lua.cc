@@ -563,9 +563,9 @@ static const luaL_Reg gui_script_funcs[] = {
     {"random", gui_random},
     {"random_int", gui_random_int},
     {"reseed_rng", gui_reseed_rng},
-#ifdef OBSIDIAN_ENABLE_GUI
     {"start_it", gui_start_it},
     {"finish_it", gui_finish_it},
+    #ifdef OBSIDIAN_ENABLE_GUI
     {"calc_seed", gui_calc_seed},
 #endif
 
@@ -1095,17 +1095,13 @@ std::string ob_default_filename()
 
 void ob_invoke_hook(const std::string &hookname)
 {
-    if (!Script_CallFunc("ob_invoke_hook", 0, {hookname}))
-    {
-        ProgStatus("%s", _("Script Error"));
-    }
+    Script_CallFunc("ob_invoke_hook", 0, {hookname});
 }
 
 bool ob_build_cool_shit()
 {
     if (!Script_CallFunc("ob_build_cool_shit", 1))
     {
-        ProgStatus("%s", _("Script Error"));
         return false;
     }
 
@@ -1119,7 +1115,6 @@ bool ob_build_cool_shit()
         return true;
     }
 
-    ProgStatus("%s", _("Cancelled"));
     return false;
 }
 
@@ -1127,6 +1122,59 @@ void ob_set_build_status(const std::string &status)
 {
     lua_pushstring(LUA_ST, status.c_str());
     lua_setglobal(LUA_ST, "OB_BUILD_STATUS");
+}
+
+extern std::string batch_output_file;
+int gui_start_it(lua_State *L)
+{
+    const std::string format = ob_game_format();
+
+    if (format.empty())
+    {
+        FatalError("ERROR: missing 'format' for game?!?\n");
+    }
+
+    // create game object
+    {
+        if (StringCompare(format, "doom") == 0)
+        {
+            game_object = Doom_GameObject();
+        }
+        else
+        {
+            FatalError("ERROR: unknown format: '%s'\n", format.c_str());
+        }
+    }
+
+    // this will ask for output filename (among other things)
+    game_object->Start(batch_output_file.c_str());
+#ifdef OBSIDIAN_ENABLE_GUI
+    batch_output_file = ob_default_filename();
+#endif
+    return 0;
+}
+int gui_finish_it(lua_State *L)
+{
+    bool was_ok = game_object->Finish(true);
+
+    string_seed.clear();
+
+    // Insurance in case the build process errored/cancelled
+    if (!was_ok)
+    {
+        if (FileExists(game_object->Filename()))
+        {
+            FileDelete(game_object->Filename());
+        }
+    }
+
+    // don't need game object anymore
+    delete game_object;
+    game_object = NULL;
+#ifdef OBSIDIAN_ENABLE_GUI
+    Main_CalcNewSeed();
+#endif
+    return 0;
 }
 
 #ifdef OBSIDIAN_ENABLE_GUI
@@ -1278,62 +1326,6 @@ bool ob_gui_frame(int width, int height)
     }
 
     return true;
-}
-extern std::string batch_output_file;
-int gui_start_it(lua_State *L)
-{
-    const std::string format = ob_game_format();
-
-    if (format.empty())
-    {
-        FatalError("ERROR: missing 'format' for game?!?\n");
-    }
-
-    // create game object
-    {
-        if (StringCompare(format, "doom") == 0)
-        {
-            game_object = Doom_GameObject();
-        }
-        else
-        {
-            FatalError("ERROR: unknown format: '%s'\n", format.c_str());
-        }
-    }
-
-    // this will ask for output filename (among other things)
-    game_object->Start(batch_output_file.c_str());
-    return 0;
-}
-int gui_finish_it(lua_State *L)
-{
-    bool was_ok = game_object->Finish(true);
-
-    if (was_ok)
-    {
-        ProgStatus("%s", _("Success"));
-        string_seed.clear();
-    }
-    else
-    {
-        string_seed.clear();
-    }
-
-    // Insurance in case the build process errored/cancelled
-    if (!was_ok)
-    {
-        if (FileExists(game_object->Filename()))
-        {
-            FileDelete(game_object->Filename());
-        }
-    }
-
-    // don't need game object anymore
-    delete game_object;
-    game_object = NULL;
-
-    Main_CalcNewSeed();
-    return 0;
 }
 #endif
 
