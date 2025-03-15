@@ -241,12 +241,26 @@ local module_category_labels =
    ["options"] = _("Options")
 }
 
+local co = nil
+
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
    nk.style_from_table(OB_NK_CTX, colortable["red"])
 
-   if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, 0) then
+   local window_flags = 0
+
+   if co ~= nil then
+      local status = coroutine.status(co)
+      if status == "dead" then
+         co = nil
+      elseif status == "suspended" then
+         window_flags = nk.WINDOW_NO_INPUT
+         coroutine.resume(co)
+      end
+   end
+
+   if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, window_flags) then
       --if show_menu then Menubar(OB_NK_CTX) end
       if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
       -- Header 
@@ -278,7 +292,9 @@ function ob_gui_frame(width, height)
          if current_tab == "build" then
             nk.layout_row_static(OB_NK_CTX, height/2, width/2, 1)
             if nk.button(OB_NK_CTX, nil, "BUILD") then
-               ob_build_cool_shit()
+               if co == nil then
+                 co = coroutine.create(ob_build_cool_shit)
+               end
             end
          elseif current_tab == "options" then
             -- TODO

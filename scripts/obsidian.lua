@@ -1782,6 +1782,8 @@ function ob_build_cool_shit()
 
   gui.start_it()
 
+  coroutine.yield()
+
   if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
     ob_clean_up()
     ob_sort_modules()
@@ -1827,6 +1829,8 @@ function ob_build_cool_shit()
     profiler.stop()
     profiler.report("profile.log")
   end
+
+  coroutine.yield()
 
   gui.finish_it()
 

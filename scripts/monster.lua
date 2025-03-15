@@ -2589,6 +2589,7 @@ function Monster_make_battles(LEVEL, SEEDS)
   gui.printf("\n--==| Make Battles |==--\n\n")
 
   OB_BUILD_STATUS = "Making " .. LEVEL.name
+  coroutine.yield()
 
   Player_init(LEVEL)
 
