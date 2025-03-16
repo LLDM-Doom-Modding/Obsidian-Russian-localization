@@ -1847,7 +1847,7 @@ function ob_cli_loop()
     gui.console_print(OB_BUILD_STATUS .. "\n")
     coroutine.resume(OB_BUILD_ROUTINE)
   end
-  assert(coroutine.status(OB_BUILD_ROUTINE) == "dead")
+  assert(OB_BUILD_ROUTINE == nil or coroutine.status(OB_BUILD_ROUTINE) == "dead")
   OB_BUILD_ROUTINE = nil
 end
 
