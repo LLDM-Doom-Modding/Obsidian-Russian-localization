@@ -4231,8 +4231,6 @@ function Room_build_all(LEVEL, SEEDS)
 
   ob_invoke_hook_with_table("level_layout_finished", LEVEL) --MSSP
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Fabs)"
-  ob_coroutine_yield()
   Render_set_all_properties(LEVEL)
 
   Render_all_chunks(LEVEL, SEEDS)

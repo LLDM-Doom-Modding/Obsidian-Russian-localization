@@ -2436,29 +2436,32 @@ end
 function Level_build_it(LEVEL, SEEDS)
   Level_init(LEVEL)
 
-  -- Can just uncomment and manuall set an ID to match if we really need this - Dasho
-
-  --[[if OB_CONFIG.float_build_levels then
-    if OB_CONFIG.float_build_levels ~= 0 then
-      if LEVEL.id ~= OB_CONFIG.float_build_levels then return "nope" end
-    end
-  end]]--
-
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Areas)"
+  coroutine.yield()
   Area_create_rooms(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Quests)"
+  coroutine.yield()  
   Quest_make_quests(LEVEL)
+
   -- do some prefab pre-filtering
   -- remove prefabs that have no expectation to ever be used
   Fab_trim_list(LEVEL)
     if gui.abort() then return "abort" end
 
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Rooms)"
+  coroutine.yield()
   Room_build_all(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Battles)"
+  coroutine.yield()
   Monster_make_battles(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
+  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Pickups)"
+  coroutine.yield()
   Item_add_pickups(LEVEL)
     if gui.abort() then return "abort" end
 
@@ -2508,7 +2511,7 @@ function Level_make_level(LEV)
   ::retryafterfailure::
 
   OB_BUILD_STATUS = "Making " .. LEVEL.name
-  ob_coroutine_yield()
+  coroutine.yield()
 
   gui.printf("\n\n~~~~~~| %s |~~~~~~\n", LEVEL.name)
 

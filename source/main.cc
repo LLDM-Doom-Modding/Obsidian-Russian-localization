@@ -527,7 +527,7 @@ int main(int argc, char **argv)
 #ifdef OBSIDIAN_ENABLE_GUI
     if (argv::Find('b', "batch") >= 0)
     { 
-        if (!ob_build_cool_shit())
+        if (!ob_do_build())
         {
             FatalError("FAILED!\n");
             LogPrint("FAILED!\n");
@@ -556,7 +556,7 @@ int main(int argc, char **argv)
         return app;
     }
 #else
-    if (!ob_build_cool_shit())
+    if (!ob_do_build())
     {
         FatalError("FAILED!\n");
         LogPrint("FAILED!\n");

@@ -291,7 +291,7 @@ function ob_gui_frame(width, height)
             nk.layout_row_static(OB_NK_CTX, height/2, width/2, 1)
             if nk.button(OB_NK_CTX, nil, "BUILD") then
                if OB_BUILD_ROUTINE == nil then
-                  OB_BUILD_ROUTINE = coroutine.create(ob_build_cool_shit)
+                  ob_do_build()
                end
             end
          elseif current_tab == "options" then

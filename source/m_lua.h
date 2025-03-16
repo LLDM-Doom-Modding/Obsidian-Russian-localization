@@ -58,8 +58,7 @@ std::string ob_default_filename();
 std::string ob_get_random_words();
 std::string ob_get_password();
 
-bool ob_build_cool_shit();
-void ob_set_build_status(const std::string &status);
+bool ob_do_build();
 
 #ifdef OBSIDIAN_ENABLE_GUI
 bool ob_gui_init_ctx(void *context);

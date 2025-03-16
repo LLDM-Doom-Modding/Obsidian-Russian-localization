@@ -3506,10 +3506,6 @@ function Quest_make_quests(LEVEL)
 
   gui.printf("\n--==| Make Quests |==--\n\n")
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Quests)"
-
-  ob_coroutine_yield()
-
   Monster_prepare(LEVEL)
 
   LEVEL.quests = {}

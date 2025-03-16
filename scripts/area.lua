@@ -2880,10 +2880,6 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   gui.printf("Map size target: %dx%d seeds\n", LEVEL.map_W, LEVEL.map_H)
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Shapes)"
-
-  ob_coroutine_yield()
-
   local level_grammar = {}
 
   if OB_CONFIG.float_grammar_boxes_of_death and rand.odds(OB_CONFIG.float_grammar_boxes_of_death) then
@@ -2916,8 +2912,6 @@ function Area_create_rooms(LEVEL, SEEDS)
 
   Grower_create_rooms(LEVEL, SEEDS)
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Rooms)", LEVEL.id, #GAME.levels
-  ob_coroutine_yield()
   Area_divvy_up_borders(LEVEL, SEEDS)
 
   Area_analyse_areas(LEVEL, SEEDS)

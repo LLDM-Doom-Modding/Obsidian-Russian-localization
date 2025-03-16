@@ -1763,16 +1763,6 @@ end
 
 local PROFILING = false
 
--- Either yield to the GUI so that the build status
--- can be updated or print the build status to console
-function ob_coroutine_yield()
-  if OB_BUILD_ROUTINE ~= nil then
-    coroutine.yield()
-  else
-    gui.console_print(OB_BUILD_STATUS .. "\n")
-  end
-end
-
 function ob_build_cool_shit()
   local profiler
   if PROFILING then
@@ -1792,7 +1782,7 @@ function ob_build_cool_shit()
 
   gui.start_it()
 
-  ob_coroutine_yield()
+  coroutine.yield()
 
   if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
     ob_clean_up()
@@ -1841,12 +1831,30 @@ function ob_build_cool_shit()
   end
 
   OB_BUILD_STATUS = "Building Nodes"
-  ob_coroutine_yield()
+  coroutine.yield()
 
   gui.finish_it()
 
   OB_BUILD_STATUS = "Success"
-  ob_coroutine_yield()
+  coroutine.yield()
 
   return "ok"
+end
+
+function ob_cli_loop()
+  coroutine.resume(OB_BUILD_ROUTINE)
+  while OB_BUILD_ROUTINE ~= nil and coroutine.status(OB_BUILD_ROUTINE) ~= "dead" do
+    gui.console_print(OB_BUILD_STATUS .. "\n")
+    coroutine.resume(OB_BUILD_ROUTINE)
+  end
+  assert(coroutine.status(OB_BUILD_ROUTINE) == "dead")
+  OB_BUILD_ROUTINE = nil
+end
+
+function ob_do_build()
+  assert(OB_BUILD_ROUTINE == nil)
+  OB_BUILD_ROUTINE = coroutine.create(ob_build_cool_shit)
+  if OB_NK_CTX == nil then
+    ob_cli_loop()
+  end
 end

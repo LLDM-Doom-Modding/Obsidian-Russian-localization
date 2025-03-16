@@ -1098,9 +1098,9 @@ void ob_invoke_hook(const std::string &hookname)
     Script_CallFunc("ob_invoke_hook", 0, {hookname});
 }
 
-bool ob_build_cool_shit()
+bool ob_do_build()
 {
-    if (!Script_CallFunc("ob_build_cool_shit", 1))
+    if (!Script_CallFunc("ob_do_build", 1))
     {
         return false;
     }
@@ -1116,12 +1116,6 @@ bool ob_build_cool_shit()
     }
 
     return false;
-}
-
-void ob_set_build_status(const std::string &status)
-{
-    lua_pushstring(LUA_ST, status.c_str());
-    lua_setglobal(LUA_ST, "OB_BUILD_STATUS");
 }
 
 extern std::string batch_output_file;
