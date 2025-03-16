@@ -287,35 +287,32 @@ function ob_gui_frame(width, height)
       f = normal_font
       nk.style_set_font(OB_NK_CTX, normal_font)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
+         for _,mod in pairs(OB_MODULES) do
+            if mod.valid == true and mod.where == current_tab then
+               for _,opt in pairs(mod.options) do
+                  nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+                  nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
+                  if opt.choices == YES_NO_CHOICES then
+                     if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
+                        opt.value = "yes"
+                        OB_CONFIG[opt.name] = "yes"
+                     else
+                        opt.value = "no"
+                        OB_CONFIG[opt.name] = "no"
+                     end
+                  else
+                     opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                     opt.value = opt.avail_choices[opt.choice_selection]
+                     OB_CONFIG[opt.name] = opt.value
+                  end
+               end
+            end
+         end
          if current_tab == "build" then
-            nk.layout_row_static(OB_NK_CTX, height/2, width/2, 1)
+            nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
             if nk.button(OB_NK_CTX, nil, "BUILD") then
                if OB_BUILD_ROUTINE == nil then
                   ob_do_build()
-               end
-            end
-         elseif current_tab == "options" then
-            -- TODO
-         else
-            for _,mod in pairs(OB_MODULES) do
-               if mod.valid == true and mod.where == current_tab then
-                  for _,opt in pairs(mod.options) do
-                     nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
-                     nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                     if opt.choices == YES_NO_CHOICES then
-                        if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
-                           opt.value = "yes"
-                           OB_CONFIG[opt.name] = "yes"
-                        else
-                           opt.value = "no"
-                           OB_CONFIG[opt.name] = "no"
-                        end
-                     else
-                        opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                        opt.value = opt.avail_choices[opt.choice_selection]
-                        OB_CONFIG[opt.name] = opt.value
-                     end
-                  end
                end
             end
          end

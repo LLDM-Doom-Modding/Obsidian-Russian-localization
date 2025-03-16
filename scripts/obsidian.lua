@@ -1171,19 +1171,43 @@ function ob_init()
     assert(DEFS)
     gui.debugf("creating buttons for %s\n", what)
 
-    local list = {}
+    local list = nil
 
-    for name,def in pairs(DEFS) do
+    if what == "engine" then
+      list = UI_BUILD.ENGINES
+    elseif what == "port" then
+      list = UI_BUILD.PORTS
+    elseif what == "game" then
+      list = UI_BUILD.GAMES
+    elseif what == "theme" then
+      list = UI_BUILD.THEMES
+    else
+      return
+    end
+
+    for _,def in pairs(DEFS) do
       assert(def.name and def.label)
-      table.insert(list, def)
+      table.insert(list, def.name)
+      table.insert(list, def.label)
     end
 
-    -- set the current value
-    if what ~= "module" then
-      local default = list[1] and list[1].name
-
-      OB_CONFIG[what] = default
+    -- We need to set defaults manually here because the associated
+    -- modules/options have not been populated at this stage. They will
+    -- be changed to existing config settings later
+    if what == "engine" then
+      assert(table.has_elem(UI_BUILD.ENGINES, "idtech_1"))
+      OB_CONFIG.engine = "idtech_1"
+    elseif what == "port" then
+      assert(table.has_elem(UI_BUILD.PORTS, "boom"))
+      OB_CONFIG.port = "boom"
+    elseif what == "game" then
+      assert(table.has_elem(UI_BUILD.GAMES, "doom2"))
+      OB_CONFIG.game = "doom2"
+    elseif what == "theme" then
+      assert(table.has_elem(UI_BUILD.THEMES, "original"))
+      OB_CONFIG.theme = "original"
     end
+
   end
 
 
@@ -1258,7 +1282,7 @@ function ob_init()
 
   create_buttons("engine", OB_ENGINES)
   create_buttons("game",   OB_GAMES)
-  create_buttons("port", OB_PORTS)
+  create_buttons("port",   OB_PORTS)
   create_buttons("theme",  OB_THEMES)
 
   simple_buttons("length",   LENGTH_CHOICES,   "game")

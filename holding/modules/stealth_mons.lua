@@ -268,7 +268,7 @@ function STEALTH.setup(self)
     end
 
     -- EDGE uses different id numbers -- fix them
-    if M and OB_CONFIG.engine == "edge" then
+    if M and OB_CONFIG.port == "edge" then
       M.id = STEALTH.EDGE_IDS[name]
     end
   end
@@ -342,7 +342,7 @@ function STEALTH.control_setup(self)
       end
 
       -- EDGE uses different id numbers -- fix them
-      if OB_CONFIG.engine == "edge" then
+      if OB_CONFIG.port == "edge" then
         M.id = STEALTH.EDGE_IDS[string.sub(opt.name, 7)]
       end
     end
