@@ -737,6 +737,14 @@ function ob_mod_enabled(name)
   end
 end
 
+function ob_add_language(langcode, fullname)
+
+  assert(langcode and fullname)
+  table.insert(UI_OPTIONS.LANGUAGES, langcode)
+  table.insert(UI_OPTIONS.LANGUAGES, fullname)
+
+end
+
 function ob_set_config(name, value)
   -- See the document 'doc/Config_Flow.txt' for a good
   -- description of the flow of configuration values
@@ -744,7 +752,7 @@ function ob_set_config(name, value)
 
   assert(name and value)
 
-  if name == "seed" or name == "filename_prefix" then
+  if name == "seed" then
     OB_CONFIG[name] = value
     return
   end
@@ -1126,6 +1134,13 @@ function ob_init()
 
   gui.printf("~~ Obsidian Lua initialization begun ~~\n\n")
 
+  -- load detected languages (needs to be done fairly early)
+  UI_OPTIONS = {}
+  UI_OPTIONS.LANGUAGES = 
+  {
+    "auto", _("AUTO")
+  }
+  gui.populate_languages()
 
   -- load definitions for all games
 
@@ -1398,7 +1413,7 @@ end
 
 function ob_get_random_words()
   
-  RANDOM_WORDS = {}
+  RANDOM_WORDS = nil
 
   if OB_CONFIG.mature_words == "yes" then
     RANDOM_WORDS = RANDOM_WORDS_EN_M
@@ -1446,6 +1461,14 @@ function ob_get_random_words()
     return case_randomizer(rand.pick(RANDOM_WORDS)) .. " " .. case_randomizer(rand.pick(RANDOM_WORDS))
   else
     return case_randomizer(rand.pick(RANDOM_WORDS)) .. " " .. case_randomizer(rand.pick(RANDOM_WORDS)) .. " " .. case_randomizer(rand.pick(RANDOM_WORDS))
+  end
+end
+
+function ob_get_random_phrase()
+  if OB_CONFIG.password_mode == "yes" then
+    return ob_get_password()
+  else
+    return ob_get_random_words()
   end
 end
 

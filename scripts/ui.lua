@@ -321,7 +321,7 @@ function ob_gui_frame(width, height)
       nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
       nk.label(OB_NK_CTX, "Seed: " .. OB_CONFIG.seed, nk.TEXT_LEFT)
       if nk.button(OB_NK_CTX, nil, "New Random Seed") then
-         gui.calc_seed(ob_get_random_words())
+         gui.calc_seed(ob_get_random_phrase())
       end
       if nk.button(OB_NK_CTX, nil, "Enter Seed") then
          show_manual_seed = true

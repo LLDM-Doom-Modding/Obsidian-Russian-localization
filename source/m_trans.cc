@@ -37,9 +37,12 @@
 #include <string.h>
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #include "lib_util.h"
+#include "m_cookie.h"
+#include "m_lua.h"
 #include "main.h"
 #include "sys_assert.h"
 #include "sys_debug.h"
@@ -55,9 +58,6 @@
 
 static std::map<std::string, std::string>           trans_store;
 static std::map<std::string, std::string>::iterator trans_iter;
-
-// current Options setting
-std::string t_language = "en";
 
 //----------------------------------------------------------------------
 
@@ -820,6 +820,14 @@ void Trans_ParseLangLine(char *line)
     available_langs.push_back(lang);
 }
 
+void Trans_PopulateLanguages()
+{
+    for (const available_language_t &lang : available_langs)
+    {
+        ob_add_language(lang.langcode, lang.fullname);
+    }
+}
+
 void Trans_AddMessage(const char *before, const char *after)
 {
     // an empty before string has special meaning in a PO file,
@@ -1125,11 +1133,9 @@ void Trans_Init()
 
 void Trans_SetLanguage()
 {
-    // this is called *once*, after user options are read
+    std::string langcode = Cookie_LoadLanguage(config_file);
 
-    std::string langcode = t_language;
-
-    if (langcode.empty() || langcode == "AUTO")
+    if (langcode.empty() || langcode == "auto")
     {
         langcode = Trans_GetUserLanguage();
 
@@ -1175,37 +1181,6 @@ void Trans_SetLanguage()
     fclose(fp);
 
     LogPrint("DONE.\n\n");
-}
-
-std::string Trans_GetAvailCode(int idx)
-{
-    SYS_ASSERT(idx >= 0);
-
-    // end of list?
-    if (idx >= (int)available_langs.size())
-    {
-        return "";
-    }
-
-    return available_langs[idx].langcode;
-}
-
-std::string Trans_GetAvailLanguage(int idx)
-{
-    SYS_ASSERT(idx >= 0);
-
-    // end of list?
-    if (idx >= (int)available_langs.size())
-    {
-        return "";
-    }
-
-    return available_langs[idx].fullname;
-}
-
-void Trans_UnInit()
-{
-    trans_store.clear();
 }
 
 //----------------------------------------------------------------------

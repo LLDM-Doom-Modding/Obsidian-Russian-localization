@@ -92,7 +92,6 @@ set(OBSIDIAN_SOURCE_FILES
     source/m_cookie.cc
     source/m_lua.cc
     source/m_luadbg.cc
-    source/m_options.cc
     source/m_trans.cc
     source/main.cc
     source/poly_map.cc

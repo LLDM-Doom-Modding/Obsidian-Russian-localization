@@ -54,15 +54,7 @@ enum main_action_kind_e
 extern int main_action;
 
 extern std::string ob_error_message;
-
-// Misc Options
-extern int         filename_prefix;
-extern bool        create_backups;
-extern bool        overwrite_warning;
-extern bool        debug_messages;
-extern bool        password_mode;
-extern bool        mature_word_lists;
-
+extern std::string config_file;
 extern std::string numeric_locale;
 extern std::string default_output_path;
 extern std::string string_seed;

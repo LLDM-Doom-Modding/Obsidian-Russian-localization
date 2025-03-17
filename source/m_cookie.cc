@@ -148,7 +148,118 @@ static bool Cookie_ParseLine(std::string_view buf)
     return true;
 }
 
+static bool Cookie_CheckLanguage(std::string_view buf, std::string &ret)
+{
+    if (buf.find('=') == std::string_view::npos)
+    {
+        // Skip blank lines, comments, etc
+        return false;
+    }
+
+    while (!buf.empty() && IsSpaceASCII(buf.front()))
+    {
+        buf.remove_prefix(1);
+    }
+
+    if (buf.empty() || !(IsAlphaASCII(buf.front()) || buf.front() == '@'))
+    {
+        LogPrint("Weird config line: [%s]\n", std::string(buf).c_str());
+        return false;
+    }
+
+    std::string_view::size_type pos = buf.find('=');
+
+    // Shouldn't happen but still
+    if (pos == std::string_view::npos)
+    {
+        LogPrint("Malformed config line: [%s]\n", std::string(buf).c_str());
+        return false;
+    }
+
+    std::string name = std::string(buf.substr(0, pos));
+
+    if (pos + 1 >= buf.size())
+    {
+        LogPrint("Value missing!\n");
+        return false;
+    }
+
+    std::string value = std::string(buf.substr(pos + 1));
+
+    while (!name.empty() && IsSpaceASCII(name.back()))
+    {
+        name.pop_back();
+    }
+
+    if (name != "language")
+    {
+        return false;
+    }
+
+    while (!value.empty() && IsSpaceASCII(value.front()))
+    {
+        value.erase(value.begin());
+    }
+    while (!value.empty() && IsSpaceASCII(value.back()))
+    {
+        value.pop_back();
+    }
+    if (value.empty())
+    {
+        LogPrint("Name or value missing!\n");
+        return false;
+    }
+
+    ret = value;
+    return true;
+}
+
 //----------------------------------------------------------------------
+
+std::string Cookie_LoadLanguage(const std::string &filename)
+{
+    std::string ret = "auto";
+
+    context = cookie_context_e::Load;
+
+    keep_seed = false;
+
+    active_module.clear();
+
+    setlocale(LC_NUMERIC, "C");
+
+    FILE *cookie_fp = FileOpen(filename, "r");
+
+    if (!cookie_fp)
+    {
+        return ret;
+    }
+
+    std::string buffer;
+    int         c = EOF;
+    for (;;)
+    {
+        buffer.clear();
+        while ((c = fgetc(cookie_fp)) != EOF)
+        {
+            if (c == '\n' || c == '\r')
+                break;
+            else
+                buffer.push_back(c);
+        }
+
+        if (Cookie_CheckLanguage(buffer, ret))
+            break;
+
+        if (feof(cookie_fp) || ferror(cookie_fp))
+            break;
+    }
+
+    fclose(cookie_fp);
+
+    setlocale(LC_NUMERIC, numeric_locale.c_str());
+    return ret;
+}
 
 bool Cookie_Load(const std::string &filename)
 {
@@ -205,31 +316,6 @@ bool Cookie_Load(const std::string &filename)
     }
 
     setlocale(LC_NUMERIC, numeric_locale.c_str());
-    return true;
-}
-
-bool Cookie_LoadString(std::string_view str, bool _keep_seed)
-{
-    context   = cookie_context_e::Load;
-    keep_seed = _keep_seed;
-
-    active_module.clear();
-
-    LogPrint("Reading config data...\n");
-
-    std::string_view::size_type oldpos = 0;
-    std::string_view::size_type pos    = 0;
-    while (pos != std::string::npos)
-    {
-        pos = str.find('\n', oldpos);
-        if (pos != std::string_view::npos)
-        {
-            Cookie_ParseLine(str.substr(oldpos, pos - oldpos));
-            oldpos = pos + 1;
-        }
-    }
-
-    LogPrint("DONE.\n\n");
     return true;
 }
 

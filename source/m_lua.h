@@ -43,6 +43,7 @@ extern color_mapping_t color_mappings[MAX_COLOR_MAPS];
 // Wrappers which call Lua functions:
 
 bool ob_set_config(const std::string &key, const std::string &value);
+bool ob_add_language(const std::string &langcode, const std::string &fullname);
 bool ob_set_mod_option(const std::string &module, const std::string &option, const std::string &value);
 
 bool ob_read_all_config(std::vector<std::string> *lines, bool need_full);
@@ -55,8 +56,7 @@ void        ob_invoke_hook(const std::string &hookname);
 
 std::string ob_game_format();
 std::string ob_default_filename();
-std::string ob_get_random_words();
-std::string ob_get_password();
+std::string ob_get_random_phrase();
 
 bool ob_do_build();
 

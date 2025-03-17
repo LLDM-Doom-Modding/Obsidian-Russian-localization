@@ -1300,7 +1300,7 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
     ReplaceExtension(filename, ".wad");
 
-    if (create_backups)
+    if (ob_get_bool_param("create_backups"))
     {
         Main::BackupFile(filename);
     }

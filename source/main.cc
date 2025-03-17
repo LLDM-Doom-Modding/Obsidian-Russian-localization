@@ -24,6 +24,8 @@
 #include <locale.h>
 #include <string.h>
 
+#include <string>
+
 #include "csg_main.h"
 #include "images.h"
 #include "lib_argv.h"
@@ -57,41 +59,29 @@ static constexpr uint16_t WINDOW_HEIGHT = 768;
 
 std::string        home_dir;
 std::string        install_dir;
-std::string        option_file;
-static std::string config_file;
+std::string        config_file;
 static std::string logging_file;
 
 std::string ob_error_message;
 
 struct UpdateKv
 {
-    char        section;
     std::string key;
     std::string value;
 };
 
-UpdateKv update_kv;
+static UpdateKv update_kv;
 
 static constexpr const char *OBSIDIAN_TITLE   = "OBSIDIAN Level Maker";
 static constexpr const char *CONFIG_FILENAME  = "CONFIG.txt";
-static constexpr const char *OPTIONS_FILENAME = "OPTIONS.txt";
 static constexpr const char *LOG_FILENAME     = "LOGS.txt";
-static constexpr const char *REF_FILENAME     = "REFERENCE.txt";
 
 int main_action = 0;
 
 uint64_t next_rand_seed;
 
 std::string batch_output_file;
-std::string        numeric_locale;
-
-// options
-int         filename_prefix        = 0;
-bool        create_backups         = true;
-bool        overwrite_warning      = true;
-bool        debug_messages         = false;
-bool        password_mode          = true;
-bool        mature_word_lists      = false;
+std::string numeric_locale;
 
 std::string default_output_path;
 
@@ -126,9 +116,8 @@ static void ShowInfo()
            "  -d --debug                Enable debugging\n"
            "  -v --verbose              Print log messages to stdout\n"
            "  -h --help                 Show this help message\n"
-           "  -u --update <section> <key> <value>\n"
+           "  -u --update <key> <value>\n"
            "                            Set a key in the config file\n"
-           "                            (section should be 'c' or 'o')\n"
            "\n");
 
     printf("Please visit the web site for complete information:\n"
@@ -204,11 +193,6 @@ void Main::Shutdown(const bool error)
         Cookie_Save(config_file);
     }
 
-    if (!FileExists(option_file))
-    {
-        Options_Save(option_file);
-    }
-
     Script_Close();
     LogClose();
 }
@@ -216,12 +200,7 @@ void Main::Shutdown(const bool error)
 void Main_CalcNewSeed()
 {
     if (string_seed.empty())
-    {
-        if (password_mode)
-            string_seed = ob_get_password();
-        else
-            string_seed = ob_get_random_words();
-    }
+        string_seed = ob_get_random_phrase();
     ob_set_config("seed", string_seed.c_str());
     next_rand_seed = StringHash64(string_seed);
     xoshiro_Reseed(next_rand_seed);
@@ -375,27 +354,14 @@ int main(int argc, char **argv)
 
     if (int update_arg = argv::Find('u', "update"); update_arg >= 0)
     {
-        if (update_arg + 3 >= argv::list.size() || argv::IsOption(update_arg + 1) || argv::IsOption(update_arg + 2) ||
-            argv::IsOption(update_arg + 3))
+        if (update_arg + 2 >= argv::list.size() || argv::IsOption(update_arg + 1) || argv::IsOption(update_arg + 2))
         {
             FatalError("OBSIDIAN ERROR: missing one or more args for --update "
                        "<section> <key> <value>\n");
             exit(EXIT_FAILURE);
         }
-        if (argv::list[update_arg + 1].length() > 1)
-        {
-            FatalError("OBSIDIAN ERROR: section name must be one character\n");
-            exit(EXIT_FAILURE);
-        }
-        char section = argv::list[update_arg + 1][0];
-        if (section != 'c' && section != 'o')
-        {
-            FatalError("OBSIDIAN ERROR: section name must be 'c' or 'o'\n");
-            exit(EXIT_FAILURE);
-        }
-        update_kv.section = section;
-        update_kv.key     = argv::list[update_arg + 2];
-        update_kv.value   = argv::list[update_arg + 3];
+        update_kv.key     = argv::list[update_arg + 1];
+        update_kv.value   = argv::list[update_arg + 2];
     }
 
     install_dir = PHYSFS_getBaseDir();
@@ -411,10 +377,8 @@ int main(int argc, char **argv)
 #endif
     Trans_Init();
     config_file = PathAppend(home_dir, CONFIG_FILENAME);
-    option_file = PathAppend(home_dir, OPTIONS_FILENAME);
     logging_file = PathAppend(home_dir, LOG_FILENAME);
 
-    Options_Load(option_file);
     Resolve_DefaultOutputPath();
     Trans_SetLanguage();
     LogInit(logging_file);
@@ -435,14 +399,8 @@ int main(int argc, char **argv)
     LogPrint("install_dir: %s\n", install_dir.c_str());
     LogPrint("config_file: %s\n\n", config_file.c_str());
 
-    if (argv::Find('d', "debug") >= 0)
-    {
-        debug_messages = true;
-    }
     // Grab current numeric locale
     numeric_locale = setlocale(LC_NUMERIC, NULL);
-
-    LogEnableDebug(debug_messages);
 
     VFS_InitAddons();
 
@@ -450,83 +408,34 @@ int main(int argc, char **argv)
 
     Script_Open();
 
-    if (mature_word_lists)
-    {
-        ob_set_config("mature_words", "yes");
-    }
-    else
-    {
-        ob_set_config("mature_words", "no");
-    }
-
     if (!FileExists(config_file))
     {
         Cookie_Save(config_file);
     }
     if (!Cookie_Load(config_file))
     {
-        FatalError(_("No such config file: %s\n"), config_file.c_str());
+        FatalError(_("Error loading config file: %s\n"), config_file.c_str());
     }
 
     Cookie_ParseArguments();
 
     if (argv::Find('u', "update") >= 0)
     {
-        switch (update_kv.section)
-        {
-        case 'c':
-            ob_set_config(update_kv.key, update_kv.value);
-            break;
-        case 'o':
-            Parse_Option(update_kv.key, update_kv.value);
-            break;
-        }
-        Options_Save(option_file);
+        ob_set_config(update_kv.key, update_kv.value);
         Cookie_Save(config_file);
         Main::Shutdown(false);
         exit(EXIT_SUCCESS);
     }
 
     if (batch_output_file.empty())
-    {
-        switch (filename_prefix)
-        {
-        case 0:
-            ob_set_config("filename_prefix", "datetime");
-            break;
-        case 1:
-            ob_set_config("filename_prefix", "numlevels");
-            break;
-        case 2:
-            ob_set_config("filename_prefix", "game");
-            break;
-        case 3:
-            ob_set_config("filename_prefix", "port");
-            break;
-        case 4:
-            ob_set_config("filename_prefix", "theme");
-            break;
-        case 5:
-            ob_set_config("filename_prefix", "version");
-            break;
-        case 6:
-            ob_set_config("filename_prefix", "custom");
-            break;
-        case 7:
-            ob_set_config("filename_prefix", "none");
-            break;
-        default:
-            ob_set_config("filename_prefix", "datetime");
-            break;
-        }
         batch_output_file = ob_default_filename();
-    }
 
     Main_CalcNewSeed();
 
 #ifdef OBSIDIAN_ENABLE_GUI
     if (argv::Find('b', "batch") >= 0)
     { 
+        LogEnableDebug(ob_get_bool_param("debug_messages"));
         if (!ob_do_build())
         {
             FatalError("FAILED!\n");
@@ -556,6 +465,7 @@ int main(int argc, char **argv)
         return app;
     }
 #else
+    LogEnableDebug(debug_messages);
     if (!ob_do_build())
     {
         FatalError("FAILED!\n");

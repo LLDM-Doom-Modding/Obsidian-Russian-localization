@@ -29,6 +29,7 @@
 #include "luaalloc.h"
 #include "m_trans.h"
 #include "main.h"
+#include "m_cookie.h"
 #include "m_luadbg.h"
 #include "minilua.h"
 #include "physfs.h"
@@ -127,6 +128,14 @@ int gui_raw_debug_print(lua_State *L)
         DebugPrint("%s", res);
     }
 
+    return 0;
+}
+
+// LUA: populate_languages()
+//
+int gui_populate_languages(lua_State *L)
+{
+    Trans_PopulateLanguages();
     return 0;
 }
 
@@ -555,6 +564,7 @@ static const luaL_Reg gui_script_funcs[] = {
     {"raw_log_print", gui_raw_log_print},
     {"raw_debug_print", gui_raw_debug_print},
 
+    {"populate_languages", gui_populate_languages},
     {"gettext", gui_gettext},
     {"config_line", gui_config_line},
     {"set_colormap", gui_set_colormap},
@@ -938,6 +948,11 @@ bool ob_set_config(const std::string &key, const std::string &value)
     return Script_CallFunc("ob_set_config", 0, {key, value});
 }
 
+bool ob_add_language(const std::string &langcode, const std::string &fullname)
+{
+    return Script_CallFunc("ob_add_language", 0, {langcode, fullname});
+}
+
 bool ob_set_mod_option(const std::string &module, const std::string &option, const std::string &value)
 {
     if (!has_loaded)
@@ -986,9 +1001,9 @@ std::string ob_get_password()
     return res;
 }
 
-std::string ob_get_random_words()
+std::string ob_get_random_phrase()
 {
-    if (!Script_CallFunc("ob_get_random_words", 1))
+    if (!Script_CallFunc("ob_get_random_phrase", 1))
     {
         return "";
     }
@@ -1100,6 +1115,8 @@ void ob_invoke_hook(const std::string &hookname)
 
 bool ob_do_build()
 {
+    LogEnableDebug(ob_get_bool_param("debug_messages"));
+
     if (!Script_CallFunc("ob_do_build", 1))
     {
         return false;

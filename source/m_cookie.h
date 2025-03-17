@@ -26,17 +26,10 @@
 #include <string>
 
 bool Cookie_Load(const std::string &filename);
+std::string Cookie_LoadLanguage(const std::string &filename);
 bool Cookie_Save(const std::string &filename);
 
-bool Cookie_LoadString(std::string_view str, bool _keep_seed);
-
 void Cookie_ParseArguments(void);
-
-/* option stuff */
-
-void Parse_Option(const std::string &name, const std::string &value);
-bool Options_Load(const std::string &filename);
-bool Options_Save(const std::string &filename);
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab
