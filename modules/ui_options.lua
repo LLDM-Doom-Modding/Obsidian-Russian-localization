@@ -1,8 +1,17 @@
+-- Unlike other modules, UI_OPTIONS and UI_OPTIONS.LANGUAGES are not initialized here;
+-- they happen pretty early in ob_init so that the .po file language loading
+-- works properly
+
 UI_OPTIONS.FILENAME_PREFIXES = 
 {
   "datetime", _("Date and Time"),
-  "game", _("Selected Game"),
-  "none", _("None")
+  "game",     _("Selected Game"),
+  "none",     _("None")
+}
+
+UI_OPTIONS.THEMES = 
+{
+  "default", _("Default")
 }
 
 OB_MODULES["ui_options"] =
@@ -67,6 +76,14 @@ OB_MODULES["ui_options"] =
       choices = YES_NO_CHOICES,
       default = "no",
       tooltip = _("Will generate a psuedo-password sequence of characters for seeds"),
+      priority = 100,
+    },
+    { 
+      name="ui_theme", 
+      label=_("UI Theme"),
+      choices = UI_OPTIONS.THEMES,
+      default = "default",
+      tooltip = _("Choose the theme for the user interface"),
       priority = 100,
     },
   }

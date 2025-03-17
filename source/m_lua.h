@@ -62,7 +62,7 @@ bool ob_do_build();
 
 #ifdef OBSIDIAN_ENABLE_GUI
 bool ob_gui_init_ctx(void *context);
-bool ob_gui_init_fonts(void *atlas, float font_scale);
+bool ob_gui_init_themes(void *atlas, float font_scale);
 bool ob_gui_frame(int width, int height);
 void Main_CalcNewSeed();
 #endif

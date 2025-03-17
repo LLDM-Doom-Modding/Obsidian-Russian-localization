@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
---  OBSIDIAN  :  NUKLEAR UI INTERFACE
+--  OBSIDIAN  :  NUKLEAR UI
 ------------------------------------------------------------------------
 --
 --
@@ -19,183 +19,68 @@
 
 -- CAVEMAN SHIT BELOW THIS LINE --
 
-local normal_font
-local bold_font
 local font_scale
 
-function ob_gui_init_fonts(scale)
+local UI_THEMES =
+{
+   ["default"] =
+   {
+      label = _("Default"),
+      normal_font_file = "SourceSansPro-Regular.ttf",
+      normal_font_size = 24,
+      bold_font_file = "SourceSansPro-Bold.ttf",
+      bold_font_size = 24,
+      colortable = 
+      {
+         text = nk.color_from_bytes(190, 190, 190, 255),
+         window = nk.color_from_bytes(30, 33, 40, 215),
+         header = nk.color_from_bytes(181, 45, 69, 220),
+         border = nk.color_from_bytes(51, 55, 67, 255),
+         button = nk.color_from_bytes(181, 45, 69, 255),
+         button_hover = nk.color_from_bytes(190, 50, 70, 255),
+         button_active = nk.color_from_bytes(195, 55, 75, 255),
+         toggle = nk.color_from_bytes(51, 55, 67, 255),
+         toggle_hover = nk.color_from_bytes(45, 60, 60, 255),
+         toggle_cursor = nk.color_from_bytes(181, 45, 69, 255),
+         select = nk.color_from_bytes(51, 55, 67, 255),
+         select_active = nk.color_from_bytes(181, 45, 69, 255),
+         edit = nk.color_from_bytes(51, 55, 67, 225),
+         edit_cursor = nk.color_from_bytes(190, 190, 190, 255),
+         combo = nk.color_from_bytes(51, 55, 67, 255),
+         scrollbar = nk.color_from_bytes(30, 33, 40, 255),
+         scrollbar_cursor = nk.color_from_bytes(64, 84, 95, 255),
+         scrollbar_cursor_hover = nk.color_from_bytes(70, 90, 100, 255),
+         scrollbar_cursor_active = nk.color_from_bytes(75, 95, 105, 255),
+         tab_header = nk.color_from_bytes(181, 45, 69, 220),
+      }
+   }
+}
+
+function ob_gui_init_themes(scale)
   if OB_NK_CTX == nil then return "bork" end
   if OB_NK_ATLAS == nil then return "bork" end
-  normal_font = OB_NK_ATLAS:add(24 * scale, "data/fonts/SourceSansPro/SourceSansPro-Regular.ttf")
-  normal_font:set_height(24)
-  bold_font = OB_NK_ATLAS:add(24 * scale, "data/fonts/SourceSansPro/SourceSansPro-Bold.ttf")
-  bold_font:set_height(24)
-  nk.style_set_font(OB_NK_CTX, normal_font)
+  assert(UI_THEMES and UI_THEMES["default"])
+  for _,theme in pairs(UI_THEMES) do
+   assert(theme.normal_font_file and theme.normal_font_size and theme.bold_font_file and theme.bold_font_size) 
+   theme.normal_font = OB_NK_ATLAS:add(theme.normal_font_size * scale, "data/fonts/" .. theme.normal_font_file)
+   theme.normal_font:set_height(theme.normal_font_size)
+   if (theme.bold_font_file ~= theme.normal_font_file or theme.bold_font_size ~= theme.normal_font_size) then
+      theme.bold_font = OB_NK_ATLAS:add(theme.bold_font_size * scale, "data/fonts/" .. theme.bold_font_file)
+      theme.bold_font:set_height(theme.bold_font_size)
+   else
+      theme.bold_font = theme.normal_font
+   end
+  end
+  nk.style_set_font(OB_NK_CTX, UI_THEMES["default"].normal_font)
   font_scale = scale
   return "groovy"
 end
 
-local colortable = {}
+-------------------------------------------------------------------------------
+-- Manual Seed Entry
+-------------------------------------------------------------------------------
 
-colortable.white = {
-   text = nk.color_from_bytes(70, 70, 70, 255),
-   window = nk.color_from_bytes(175, 175, 175, 255),
-   header = nk.color_from_bytes(175, 175, 175, 255),
-   border = nk.color_from_bytes(0, 0, 0, 255),
-   button = nk.color_from_bytes(185, 185, 185, 255),
-   button_hover = nk.color_from_bytes(170, 170, 170, 255),
-   button_active = nk.color_from_bytes(160, 160, 160, 255),
-   toggle = nk.color_from_bytes(150, 150, 150, 255),
-   toggle_hover = nk.color_from_bytes(120, 120, 120, 255),
-   toggle_cursor = nk.color_from_bytes(175, 175, 175, 255),
-   select = nk.color_from_bytes(190, 190, 190, 255),
-   select_active = nk.color_from_bytes(175, 175, 175, 255),
-   slider = nk.color_from_bytes(190, 190, 190, 255),
-   slider_cursor = nk.color_from_bytes(80, 80, 80, 255),
-   slider_cursor_hover = nk.color_from_bytes(70, 70, 70, 255),
-   slider_cursor_active = nk.color_from_bytes(60, 60, 60, 255),
-   property = nk.color_from_bytes(175, 175, 175, 255),
-   edit = nk.color_from_bytes(150, 150, 150, 255),
-   edit_cursor = nk.color_from_bytes(0, 0, 0, 255),
-   combo = nk.color_from_bytes(175, 175, 175, 255),
-   chart = nk.color_from_bytes(160, 160, 160, 255),
-   chart_color = nk.color_from_bytes(45, 45, 45, 255),
-   chart_color_highlight = nk.color_from_bytes( 255, 0, 0, 255),
-   scrollbar = nk.color_from_bytes(180, 180, 180, 255),
-   scrollbar_cursor = nk.color_from_bytes(140, 140, 140, 255),
-   scrollbar_cursor_hover = nk.color_from_bytes(150, 150, 150, 255),
-   scrollbar_cursor_active = nk.color_from_bytes(160, 160, 160, 255),
-   tab_header = nk.color_from_bytes(180, 180, 180, 255),
-}
-
-colortable.red = {
-   text = nk.color_from_bytes(190, 190, 190, 255),
-   window = nk.color_from_bytes(30, 33, 40, 215),
-   header = nk.color_from_bytes(181, 45, 69, 220),
-   border = nk.color_from_bytes(51, 55, 67, 255),
-   button = nk.color_from_bytes(181, 45, 69, 255),
-   button_hover = nk.color_from_bytes(190, 50, 70, 255),
-   button_active = nk.color_from_bytes(195, 55, 75, 255),
-   toggle = nk.color_from_bytes(51, 55, 67, 255),
-   toggle_hover = nk.color_from_bytes(45, 60, 60, 255),
-   toggle_cursor = nk.color_from_bytes(181, 45, 69, 255),
-   select = nk.color_from_bytes(51, 55, 67, 255),
-   select_active = nk.color_from_bytes(181, 45, 69, 255),
-   slider = nk.color_from_bytes(51, 55, 67, 255),
-   slider_cursor = nk.color_from_bytes(181, 45, 69, 255),
-   slider_cursor_hover = nk.color_from_bytes(186, 50, 74, 255),
-   slider_cursor_active = nk.color_from_bytes(191, 55, 79, 255),
-   property = nk.color_from_bytes(51, 55, 67, 255),
-   edit = nk.color_from_bytes(51, 55, 67, 225),
-   edit_cursor = nk.color_from_bytes(190, 190, 190, 255),
-   combo = nk.color_from_bytes(51, 55, 67, 255),
-   chart = nk.color_from_bytes(51, 55, 67, 255),
-   chart_color = nk.color_from_bytes(170, 40, 60, 255),
-   chart_color_highlight = nk.color_from_bytes( 255, 0, 0, 255),
-   scrollbar = nk.color_from_bytes(30, 33, 40, 255),
-   scrollbar_cursor = nk.color_from_bytes(64, 84, 95, 255),
-   scrollbar_cursor_hover = nk.color_from_bytes(70, 90, 100, 255),
-   scrollbar_cursor_active = nk.color_from_bytes(75, 95, 105, 255),
-   tab_header = nk.color_from_bytes(181, 45, 69, 220),
-}
-
-colortable.blue = {
-   text = nk.color_from_bytes(20, 20, 20, 255),
-   window = nk.color_from_bytes(202, 212, 214, 215),
-   header = nk.color_from_bytes(137, 182, 224, 220),
-   border = nk.color_from_bytes(140, 159, 173, 255),
-   button = nk.color_from_bytes(137, 182, 224, 255),
-   button_hover = nk.color_from_bytes(142, 187, 229, 255),
-   button_active = nk.color_from_bytes(147, 192, 234, 255),
-   toggle = nk.color_from_bytes(177, 210, 210, 255),
-   toggle_hover = nk.color_from_bytes(182, 215, 215, 255),
-   toggle_cursor = nk.color_from_bytes(137, 182, 224, 255),
-   select = nk.color_from_bytes(177, 210, 210, 255),
-   select_active = nk.color_from_bytes(137, 182, 224, 255),
-   slider = nk.color_from_bytes(177, 210, 210, 255),
-   slider_cursor = nk.color_from_bytes(137, 182, 224, 245),
-   slider_cursor_hover = nk.color_from_bytes(142, 188, 229, 255),
-   slider_cursor_active = nk.color_from_bytes(147, 193, 234, 255),
-   property = nk.color_from_bytes(210, 210, 210, 255),
-   edit = nk.color_from_bytes(210, 210, 210, 225),
-   edit_cursor = nk.color_from_bytes(20, 20, 20, 255),
-   combo = nk.color_from_bytes(210, 210, 210, 255),
-   chart = nk.color_from_bytes(210, 210, 210, 255),
-   chart_color = nk.color_from_bytes(137, 182, 224, 255),
-   chart_color_highlight = nk.color_from_bytes( 255, 0, 0, 255),
-   scrollbar = nk.color_from_bytes(190, 200, 200, 255),
-   scrollbar_cursor = nk.color_from_bytes(64, 84, 95, 255),
-   scrollbar_cursor_hover = nk.color_from_bytes(70, 90, 100, 255),
-   scrollbar_cursor_active = nk.color_from_bytes(75, 95, 105, 255),
-   tab_header = nk.color_from_bytes(156, 193, 220, 255),
-}
- 
-colortable.dark = {
-   text = nk.color_from_bytes(210, 210, 210, 255),
-   window = nk.color_from_bytes(57, 67, 71, 215),
-   header = nk.color_from_bytes(51, 51, 56, 220),
-   border = nk.color_from_bytes(46, 46, 46, 255),
-   button = nk.color_from_bytes(48, 83, 111, 255),
-   button_hover = nk.color_from_bytes(58, 93, 121, 255),
-   button_active = nk.color_from_bytes(63, 98, 126, 255),
-   toggle = nk.color_from_bytes(50, 58, 61, 255),
-   toggle_hover = nk.color_from_bytes(45, 53, 56, 255),
-   toggle_cursor = nk.color_from_bytes(48, 83, 111, 255),
-   select = nk.color_from_bytes(57, 67, 61, 255),
-   select_active = nk.color_from_bytes(48, 83, 111, 255),
-   slider = nk.color_from_bytes(50, 58, 61, 255),
-   slider_cursor = nk.color_from_bytes(48, 83, 111, 245),
-   slider_cursor_hover = nk.color_from_bytes(53, 88, 116, 255),
-   slider_cursor_active = nk.color_from_bytes(58, 93, 121, 255),
-   property = nk.color_from_bytes(50, 58, 61, 255),
-   edit = nk.color_from_bytes(50, 58, 61, 225),
-   edit_cursor = nk.color_from_bytes(210, 210, 210, 255),
-   combo = nk.color_from_bytes(50, 58, 61, 255),
-   chart = nk.color_from_bytes(50, 58, 61, 255),
-   chart_color = nk.color_from_bytes(48, 83, 111, 255),
-   chart_color_highlight = nk.color_from_bytes(255, 0, 0, 255),
-   scrollbar = nk.color_from_bytes(50, 58, 61, 255),
-   scrollbar_cursor = nk.color_from_bytes(48, 83, 111, 255),
-   scrollbar_cursor_hover = nk.color_from_bytes(53, 88, 116, 255),
-   scrollbar_cursor_active = nk.color_from_bytes(58, 93, 121, 255),
-   tab_header = nk.color_from_bytes(48, 83, 111, 255),
-}
-
--- popups 
 local show_manual_seed = false
-
--------------------------------------------------------------------------------
--- Menubar
--------------------------------------------------------------------------------
-
-local menu1 = { prog=40, slider=10, check=true }
-local menuwidgets = { prog = 60 }
-local show_menu = true
-
-local function Menubar(ctx)
-   nk.menubar_begin(ctx)
-   -- menu #1 -------------------------------------
-   nk.layout_row_begin(ctx, 'static', 25, 5)
-   nk.layout_row_push(ctx, 45)
-   if nk.menu_begin(ctx, nil, "MENU", nk.TEXT_LEFT, {120, 200}) then
-      nk.layout_row_dynamic(ctx, 25, 1)
-      if nk.menu_item(ctx, nil, "Hide", nk.TEXT_LEFT) then show_menu = false end
-      if nk.menu_item(ctx, nil, "About", nk.TEXT_LEFT) then show_manual_seed = true end
-      menu1.prog = nk.progress(ctx, menu1.prog, 100, 'modifiable')
-      menu1.slider = nk.slider(ctx, 0, menu1.slider, 16, 1)
-      menu1.check = nk.checkbox(ctx, "check", menu1.check)
-      nk.menu_end(ctx)
-   end
-   -- menu widgets ------------------------------
-   nk.layout_row_push(ctx, 70)
-   menuwidgets.prog = nk.progress(ctx, menuwidgets.prog, 100, 'modifiable')
-   ----------------------------------------------
-   nk.menubar_end(ctx)
-end 
-
--------------------------------------------------------------------------------
--- Popup
--------------------------------------------------------------------------------
 
 local input = 
 {
@@ -208,7 +93,7 @@ local function ManualSeed(ctx, w, h)
       nk.layout_row_dynamic(ctx, 25, 1)
       input.submit, input.flags = 
          nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'default')
-      if nk.button(ctx, nil, "Submit") or (input.flags & nk.EDIT_COMMITED ~= 0) then
+      if nk.button(ctx, nil, _("Submit")) or (input.flags & nk.EDIT_COMMITED ~= 0) then
          gui.calc_seed(input.submit)
          input.submit = ""
       end
@@ -219,6 +104,10 @@ local function ManualSeed(ctx, w, h)
 end
 
 -------------------------------------------------------------------------------
+-- Main Program Window
+-------------------------------------------------------------------------------
+
+-- menuwidgets.prog = nk.progress(ctx, menuwidgets.prog, 100, 'modifiable')
 
 local ratio = {120, 150}
 
@@ -241,10 +130,12 @@ local module_category_labels =
    ["options"] = _("Options")
 }
 
+local current_theme = UI_THEMES["default"]
+
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
-   nk.style_from_table(OB_NK_CTX, colortable["red"])
+   nk.style_from_table(OB_NK_CTX, current_theme.colortable)
 
    local window_flags = 0
 
@@ -263,8 +154,8 @@ function ob_gui_frame(width, height)
       if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
-      local f = bold_font
-      nk.style_set_font(OB_NK_CTX, bold_font)
+      local f = current_theme.bold_font
+      nk.style_set_font(OB_NK_CTX, f)
       nk.layout_row_dynamic(OB_NK_CTX, (f:height() * font_scale), #module_categories)
       for _, name in ipairs(module_categories) do
          -- make sure button perfectly fits text 
@@ -284,8 +175,8 @@ function ob_gui_frame(width, height)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
       nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 75, 1)
-      f = normal_font
-      nk.style_set_font(OB_NK_CTX, normal_font)
+      f = current_theme.normal_font
+      nk.style_set_font(OB_NK_CTX, f)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          for _,mod in pairs(OB_MODULES) do
             if mod.valid == true and mod.where == current_tab then

@@ -1233,7 +1233,7 @@ bool ob_gui_init_ctx(void *context)
     return true;
 }
 
-bool ob_gui_init_fonts(void *atlas, float font_scale)
+bool ob_gui_init_themes(void *atlas, float font_scale)
 {
     SYS_ASSERT(atlas);
 
@@ -1264,11 +1264,11 @@ bool ob_gui_init_fonts(void *atlas, float font_scale)
     // remove result from lua stack
     lua_pop(LUA_ST, 1);
 
-    lua_getglobal(LUA_ST, "ob_gui_init_fonts");
+    lua_getglobal(LUA_ST, "ob_gui_init_themes");
 
     if (lua_type(LUA_ST, -1) == LUA_TNIL)
     {
-        LogPrint("Script problem: missing function 'ob_gui_init_fonts'");
+        LogPrint("Script problem: missing function 'ob_gui_init_themes'");
         return false;
     }
 

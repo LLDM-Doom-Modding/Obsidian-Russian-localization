@@ -248,7 +248,7 @@ void init(void)
         nk_font_atlas_init_default(atlas);
         nk_font_atlas_begin(atlas);
 
-        if (ob_gui_init_fonts(atlas, sapp_dpi_scale()))
+        if (ob_gui_init_themes(atlas, sapp_dpi_scale()))
         {
             const void *image; int w, h;
             image = nk_font_atlas_bake(atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
