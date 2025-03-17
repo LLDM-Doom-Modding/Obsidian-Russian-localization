@@ -310,7 +310,7 @@ function ob_gui_frame(width, height)
          end
          if current_tab == "build" then
             nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
-            if nk.button(OB_NK_CTX, nil, "BUILD") then
+            if nk.button(OB_NK_CTX, nil, _("BUILD")) then
                if OB_BUILD_ROUTINE == nil then
                   ob_do_build()
                end
@@ -319,15 +319,15 @@ function ob_gui_frame(width, height)
          nk.group_end(OB_NK_CTX)
       end
       nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
-      nk.label(OB_NK_CTX, "Seed: " .. OB_CONFIG.seed, nk.TEXT_LEFT)
-      if nk.button(OB_NK_CTX, nil, "New Random Seed") then
+      nk.label(OB_NK_CTX, _("Seed") .. ": " .. OB_CONFIG.seed, nk.TEXT_LEFT)
+      if nk.button(OB_NK_CTX, nil, _("New Random Seed")) then
          gui.calc_seed(ob_get_random_phrase())
       end
-      if nk.button(OB_NK_CTX, nil, "Enter Seed") then
+      if nk.button(OB_NK_CTX, nil, _("Enter Seed")) then
          show_manual_seed = true
       end
       nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
-      nk.label(OB_NK_CTX, "Status: " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
+      nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
    end
    nk.window_end(OB_NK_CTX)
    return "ok"

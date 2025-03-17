@@ -1311,7 +1311,7 @@ function ob_init()
 
   gui.printf("\n~~ Completed Lua initialization ~~\n\n")
 
-  OB_BUILD_STATUS = "Ready to Go!"
+  OB_BUILD_STATUS = _("Ready")
 end
 
 
@@ -1877,12 +1877,12 @@ function ob_build_cool_shit()
     profiler.report("profile.log")
   end
 
-  OB_BUILD_STATUS = "Building Nodes"
+  OB_BUILD_STATUS = _("Building Nodes")
   coroutine.yield()
 
   gui.finish_it()
 
-  OB_BUILD_STATUS = "Success"
+  OB_BUILD_STATUS = _("Success")
   coroutine.yield()
 
   return "ok"

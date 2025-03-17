@@ -2436,12 +2436,12 @@ end
 function Level_build_it(LEVEL, SEEDS)
   Level_init(LEVEL)
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Areas)"
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name .. " (" .. _("Areas") .. ")"
   coroutine.yield()
   Area_create_rooms(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Quests)"
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name .. " (" .. _("Quests") .. ")"
   coroutine.yield()  
   Quest_make_quests(LEVEL)
 
@@ -2450,17 +2450,17 @@ function Level_build_it(LEVEL, SEEDS)
   Fab_trim_list(LEVEL)
     if gui.abort() then return "abort" end
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Rooms)"
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name .. " (" .. _("Rooms") .. ")"
   coroutine.yield()
   Room_build_all(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Battles)"
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name .. " (" .. _("Battles") .. ")"
   coroutine.yield()
   Monster_make_battles(LEVEL, SEEDS)
     if gui.abort() then return "abort" end
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name .. " (Pickups)"
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name .. " (" .. _("Pickups") .. ")"
   coroutine.yield()
   Item_add_pickups(LEVEL)
     if gui.abort() then return "abort" end
@@ -2510,7 +2510,7 @@ function Level_make_level(LEV)
 
   ::retryafterfailure::
 
-  OB_BUILD_STATUS = "Making " .. LEVEL.name
+  OB_BUILD_STATUS = _("Making") .. " " .. LEVEL.name
   coroutine.yield()
 
   gui.printf("\n\n~~~~~~| %s |~~~~~~\n", LEVEL.name)
