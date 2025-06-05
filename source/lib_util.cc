@@ -94,18 +94,6 @@ std::string CurrentDirectoryGet()
         directory = WStringToUTF8(dir);
     return directory; // can be empty
 }
-static bool CurrentDirectorySet(std::string_view dir)
-{
-    SYS_ASSERT(!dir.empty());
-    std::wstring wdir = UTF8ToWString(dir);
-    return _wchdir(wdir.c_str()) == 0;
-}
-bool MakeDirectory(std::string_view dir)
-{
-    SYS_ASSERT(!dir.empty());
-    std::wstring wdirectory = UTF8ToWString(dir);
-    return _wmkdir(wdirectory.c_str()) == 0;
-}
 bool FileExists(std::string_view name)
 {
     if (name.empty())
@@ -148,16 +136,6 @@ std::string CurrentDirectoryGet()
     if (dir)
         directory = dir;
     return directory;
-}
-static bool CurrentDirectorySet(std::string_view dir)
-{
-    SYS_ASSERT(!dir.empty());
-    return chdir(std::string(dir).c_str()) == 0;
-}
-bool MakeDirectory(std::string_view dir)
-{
-    SYS_ASSERT(!dir.empty());
-    return (mkdir(std::string(dir).c_str(), 0774) == 0);
 }
 bool FileExists(std::string_view name)
 {
@@ -327,7 +305,7 @@ void ReplaceExtension(std::string &path, std::string_view ext)
     }
 }
 
-char *CStringNew(int length)
+static char *CStringNew(int length)
 {
     // length does not include the trailing NUL.
 
@@ -852,156 +830,6 @@ int StringPrefixCaseCompare(std::string_view A, std::string_view B)
     }
 }
 
-std::string StringFormat(std::string_view fmt, ...)
-{
-    /* Algorithm: keep doubling the allocated buffer size
-     * until the output fits. Based on code by Darren Salt.
-     */
-    int buf_size = 128;
-
-    for (;;)
-    {
-        char *buf = new char[buf_size];
-
-        va_list args;
-
-        va_start(args, fmt);
-        int out_len = vsnprintf(buf, buf_size, fmt.data(), args);
-        va_end(args);
-
-        // old versions of vsnprintf() simply return -1 when
-        // the output doesn't fit.
-        if (out_len >= 0 && out_len < buf_size)
-        {
-            std::string result(buf);
-            delete[] buf;
-
-            return result;
-        }
-
-        delete[] buf;
-
-        buf_size *= 2;
-    }
-}
-
-std::string NumToString(uint64_t value)
-{
-    return StringFormat("%llu", value);
-    ;
-}
-
-std::string NumToString(int value)
-{
-    return StringFormat("%d", value);
-}
-
-std::string NumToString(double value)
-{
-    return StringFormat("%f", value);
-}
-
-int StringToInt(const std::string &value)
-{
-    return atoi(value.c_str());
-}
-
-double StringToDouble(const std::string &value)
-{
-    return strtod(value.data(), nullptr);
-}
-
-char *mem_gets(char *buf, int size, const char **str_ptr)
-{
-    // This is like fgets() but reads lines from a string.
-    // The pointer at 'str_ptr' will point to the next line
-    // after this call (or the trailing NUL).
-    // Lines which are too long will be truncated (silently).
-    // Returns NULL when at end of the string.
-
-    SYS_ASSERT(str_ptr && *str_ptr);
-    SYS_ASSERT(size >= 4);
-
-    const char *p = *str_ptr;
-
-    if (!*p)
-    {
-        return NULL;
-    }
-
-    char *dest     = buf;
-    char *dest_end = dest + (size - 2);
-
-    for (; *p && *p != '\n'; p++)
-    {
-        if (dest < dest_end)
-        {
-            *dest++ = *p;
-        }
-    }
-
-    if (*p == '\n')
-    {
-        *dest++ = *p++;
-    }
-
-    *dest = 0;
-
-    *str_ptr = p;
-
-    return buf;
-}
-
-//------------------------------------------------------------------------
-
-/* Thomas Wang's 32-bit Mix function */
-uint32_t IntHash(uint32_t key)
-{
-    key += ~(key << 15);
-    key ^= (key >> 10);
-    key += (key << 3);
-    key ^= (key >> 6);
-    key += ~(key << 11);
-    key ^= (key >> 16);
-
-    return key;
-}
-
-uint32_t StringHash(const std::string &str)
-{
-    uint32_t hash = 0;
-
-    if (!str.empty())
-    {
-        for (auto c : str)
-        {
-            hash = (hash << 5) - hash + c;
-        }
-    }
-
-    return hash;
-}
-
-uint64_t StringHash64(const std::string &str)
-{
-    uint32_t hash1 = 0;
-    uint32_t hash2 = 0;
-
-    if (!str.empty())
-    {
-        for (auto c : str)
-        {
-            hash1 = (hash1 << 5) - hash1 + c;
-        }
-        for (size_t c = str.size() - 1; c > 0; c--)
-        {
-            hash2 = (hash2 << 5) - hash2 + str[c];
-        }
-    }
-
-    return (uint64_t)(((uint64_t)hash1 << 32) | hash2);
-}
-
 double PerpDist(double x, double y, double x1, double y1, double x2, double y2)
 {
     x -= x1;
@@ -1059,33 +887,9 @@ double CalcAngle(double sx, double sy, double ex, double ey)
     return angle;
 }
 
-double DiffAngle(double A, double B)
-{
-    // A + result = B
-    // result ranges from -180 to +180
-
-    double D = B - A;
-
-    while (D > 180.0)
-    {
-        D = D - 360.0;
-    }
-    while (D < -180.0)
-    {
-        D = D + 360.0;
-    }
-
-    return D;
-}
-
 double ComputeDist(double sx, double sy, double ex, double ey)
 {
     return sqrt((ex - sx) * (ex - sx) + (ey - sy) * (ey - sy));
-}
-
-double ComputeDist(double sx, double sy, double sz, double ex, double ey, double ez)
-{
-    return sqrt((ex - sx) * (ex - sx) + (ey - sy) * (ey - sy) + (ez - sz) * (ez - sz));
 }
 
 double PointLineDist(double x, double y, double x1, double y1, double x2, double y2)
@@ -1157,9 +961,9 @@ bool VectorSameDir(const double dx1, const double dy1, const double dx2, const d
 
 //------------------------------------------------------------------------
 
-uint32_t TimeGetMillies()
+int64_t TimeGetMillies()
 {
-    return (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
                std::chrono::system_clock::now().time_since_epoch())
         .count();
 }
@@ -1208,22 +1012,6 @@ void UtilFree(void *data)
 //------------------------------------------------------------------------
 // MATH STUFF
 //------------------------------------------------------------------------
-
-//
-// rounds the value _up_ to the nearest power of two.
-//
-int RoundPOW2(int x)
-{
-    if (x <= 2)
-        return x;
-
-    x--;
-
-    for (int tmp = x >> 1; tmp; tmp >>= 1)
-        x |= tmp;
-
-    return x + 1;
-}
 
 //
 // Compute angle of line from (0,0) to (dx,dy).

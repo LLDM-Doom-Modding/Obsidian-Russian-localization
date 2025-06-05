@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <format>
 
 #include "lib_util.h"
 #include "luaalloc.h"
@@ -34,7 +35,7 @@
 #include "physfs.h"
 #include "sys_assert.h"
 #include "sys_debug.h"
-#include "sys_xoshiro.h"
+#include "sys_twister.h"
 
 #ifdef OBSIDIAN_ENABLE_GUI
 #include "sokol_app.h"
@@ -159,18 +160,6 @@ int gui_config_line(lua_State *L)
     conf_line_buffer->push_back(res);
 
     return 0;
-}
-
-// LUA: mkdir(dir_name)
-//
-int gui_mkdir(lua_State *L)
-{
-    const char *name = luaL_checkstring(L, 1);
-
-    bool result = MakeDirectory(name);
-
-    lua_pushboolean(L, result ? 1 : 0);
-    return 1;
 }
 
 // LUA: get_filename_base()
@@ -408,14 +397,14 @@ int gui_abort(lua_State *L)
 //
 int gui_random(lua_State *L)
 {
-    lua_Number value = xoshiro_Double();
+    lua_Number value = twister_Double();
     lua_pushnumber(L, value);
     return 1;
 }
 
 int gui_random_int(lua_State *L)
 {
-    lua_Integer value = xoshiro_UInt();
+    lua_Integer value = twister_UInt();
     lua_pushnumber(L, value);
     return 1;
 }
@@ -423,7 +412,7 @@ int gui_random_int(lua_State *L)
 int gui_reseed_rng(lua_State *L)
 {
     int seed = luaL_checkinteger(L, 1);
-    xoshiro_Reseed(seed);
+    twister_Reseed(seed);
     return 0;
 }
 
@@ -583,7 +572,6 @@ static const luaL_Reg gui_script_funcs[] = {
     {"set_import_dir", gui_set_import_dir},
     {"get_install_dir", gui_get_install_dir},
     {"scan_directory", gui_scan_directory},
-    {"mkdir", gui_mkdir},
     {"get_filename_base", gui_get_filename_base},
     {"get_file_extension", gui_get_file_extension},
     {"get_save_path", gui_get_save_path},
@@ -812,7 +800,7 @@ static int my_loadfile(lua_State *L, const std::string &filename)
         lua_settop(L, fnameindex);
         status = LUA_ERRFILE;
 
-        lua_pushstring(L, StringFormat("file read error: %s", info.error_msg.c_str()).c_str());
+        lua_pushstring(L, std::format("file read error: %s", info.error_msg).c_str());
     }
 
     lua_remove(L, fnameindex);
@@ -1040,7 +1028,7 @@ bool ob_get_bool_param(const std::string &parameter)
 
 bool ob_hexen_ceiling_check(int thing_id)
 {
-    if (!Script_CallFunc("ob_hexen_ceiling_check", 1, {NumToString(thing_id)}))
+    if (!Script_CallFunc("ob_hexen_ceiling_check", 1, {std::format("{}", thing_id)}))
     {
         return false;
     }

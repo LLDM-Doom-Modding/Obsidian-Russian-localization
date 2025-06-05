@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-//  RANDOM NUMBER GENERATION (Xoshiro256)
+//  RANDOM NUMBER GENERATION
 //------------------------------------------------------------------------
 //
 //  OBSIDIAN Level Maker
@@ -18,15 +18,27 @@
 //
 //------------------------------------------------------------------------
 
-#pragma once
+#include <random>
 
-void xoshiro_Reseed(uint64_t newseed);
+//#include "Rand.h" // from Steve
 
-uint64_t xoshiro_UInt();
+std::mt19937_64 twister;
+static std::uniform_real_distribution<double> the_doubler(0.0, 1.0);
 
-// These return in the range of 0.0f-1.0f/0.0-1.0
-float xoshiro_Float();
-double xoshiro_Double();
+void twister_Reseed(uint64_t newseed)
+{
+    twister.seed(newseed);
+    // proc gen MIDI uses its own RNG, but let's at least
+    // match the seeds
+    //steve::Rand::reseed(newseed);
+}
 
-int xoshiro_Between(int low, int high);
-double xoshiro_Between(double low, double high);
+uint64_t twister_UInt()
+{
+    return twister();
+}
+
+double twister_Double()
+{
+    return the_doubler(twister);
+}

@@ -85,7 +85,7 @@ function Layout_compute_dists(R, SEEDS)
     local list = {}
 
     for _,S in pairs(R.seeds) do
-      if S.sig_dist then goto continue end
+      if S.sig_dist then goto continuelabel end
 
       for _,dir in pairs(geom.ALL_DIRS) do
         local N = S:neighbor(dir, nil, SEEDS)
@@ -95,7 +95,7 @@ function Layout_compute_dists(R, SEEDS)
           break;
         end
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return list
@@ -722,15 +722,15 @@ function Layout_place_all_importants(LEVEL, SEEDS)
   Layout_place_hub_gates(LEVEL, SEEDS)
 
   for _,R in pairs(LEVEL.rooms) do
-    if R.is_hallway then goto continue end
+    if R.is_hallway then goto continuelabel end
     Layout_place_importants(LEVEL, R, 1, SEEDS)
-    ::continue::
+    ::continuelabel::
   end
 
   for _,R in pairs(LEVEL.rooms) do
-    if R.is_hallway then goto continue end
+    if R.is_hallway then goto continuelabel end
     Layout_place_importants(LEVEL, R, 2, SEEDS)
-    ::continue::
+    ::continuelabel::
   end
 
   -- warn about weapons that could not be placed anywhere
@@ -748,15 +748,15 @@ function Layout_choose_face_area(A)
   local best_score = -1
 
   for _,N in pairs(A.neighbors) do
-    if not N.room then goto continue end
-    if not N.is_outdoor then goto continue end
+    if not N.room then goto continuelabel end
+    if not N.is_outdoor then goto continuelabel end
 
-    if N.mode ~= "floor" then goto continue end
-    if not N.floor_h then goto continue end
+    if N.mode ~= "floor" then goto continuelabel end
+    if not N.floor_h then goto continuelabel end
 
-    if N.zone ~= A.zone then goto continue end
+    if N.zone ~= A.zone then goto continuelabel end
 
-    if N.room.is_hallway then goto continue end
+    if N.room.is_hallway then goto continuelabel end
 
     -- ok --
 
@@ -768,7 +768,7 @@ function Layout_choose_face_area(A)
       best = N
       best_score = score
     end
-    ::continue::
+    ::continuelabel::
   end
 
   return best
@@ -2229,10 +2229,10 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     if R.is_cave or R.is_outdoor then return end
 
     for _,cg in pairs(R.ceil_groups) do
-      if cg.openness < 0.4 then goto continue end
+      if cg.openness < 0.4 then goto continuelabel end
 
       local height = cg.h - cg.max_floor_h
-      if height < 128 then goto continue end
+      if height < 128 then goto continuelabel end
 
       local tab = grab_usable_sinks(R, cg, "ceiling")
       if tab == nil then return end
@@ -2255,7 +2255,7 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
           end
         end
       end
-      ::continue::
+      ::continuelabel::
     end
   end
 
@@ -2367,17 +2367,17 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     local prob = R.theme.ceil_light_prob or THEME.ceil_light_prob or 50
 
     for _,cg in pairs(R.ceil_groups) do
-      if not rand.odds(prob) then goto continue end
+      if not rand.odds(prob) then goto continuelabel end
 
       local def = select_lamp_for_group(R, cg)
-      if not def then goto continue end
+      if not def then goto continuelabel end
 
       for _,chunk in pairs(R.ceil_chunks) do
-        if chunk.area.ceil_group ~= cg then goto continue end
-        if chunk.content then goto continue end
-        if chunk.floor_below and chunk.floor_below.content then goto continue end
+        if chunk.area.ceil_group ~= cg then goto continuelabel end
+        if chunk.content then goto continuelabel end
+        if chunk.floor_below and chunk.floor_below.content then goto continuelabel end
         if def.height > (chunk.area.ceil_h - chunk.area.floor_h) then
-          goto continue end
+          goto continuelabel end
 
         if true then
           chunk.content = "DECORATION"
@@ -2388,30 +2388,30 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
 
           chunk.ceil_above = true
         end
-        ::continue::
+        ::continuelabel::
       end
-      ::continue::
+      ::continuelabel::
     end
 
     -- allow fabrication of ceiling lights in outdoor porches
     if R.is_outdoor then
       for _,A in pairs(R.areas) do
         if A.is_porch then
-          if not rand.odds(prob) then goto continue end
+          if not rand.odds(prob) then goto continuelabel end
 
           A.lamp_def = select_lamp_for_porch(A)
-          if not A.lamp_def then goto continue end
+          if not A.lamp_def then goto continuelabel end
         end
-        ::continue::
+        ::continuelabel::
       end
 
       for _,chunk in pairs(R.floor_chunks) do
         if chunk.area.lamp_def then
-          if chunk.content then goto continue end
-          if chunk.floor_below and chunk.floor_below.content then goto continue end
+          if chunk.content then goto continuelabel end
+          if chunk.floor_below and chunk.floor_below.content then goto continuelabel end
 
           if chunk.area.lamp_def.height > (chunk.area.ceil_h - chunk.area.floor_h) then
-            goto continue end
+            goto continuelabel end
 
           chunk.content = "DECORATION"
           chunk.kind = "ceil"
@@ -2421,7 +2421,7 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
           chunk.area.bump_light = 16
 
           chunk.ceil_above = true
-          ::continue::
+          ::continuelabel::
         end
       end
     end
@@ -2650,7 +2650,7 @@ function Layout_handle_corners(LEVEL)
 
     for _,junc in pairs(corner.junctions) do
       if junc.A2 == "map_edge" then return end
-      if not junc.E1 then goto continue end
+      if not junc.E1 then goto continuelabel end
 
       -- code for fancy fenceposts
       if (junc.E1.kind == "fence" and junc.E1.area.is_outdoor) then
@@ -2699,7 +2699,7 @@ function Layout_handle_corners(LEVEL)
 
             if A.is_porch or A.is_porch_neighbor then
               tallest_h = EXTREME_H
-              goto continue
+              goto continuelabel
             end
 
             tallest_h = math.max(tallest_h, A.floor_h + assert(junc.E1.rail_offset))
@@ -2707,7 +2707,7 @@ function Layout_handle_corners(LEVEL)
             if A.floor_h then
               tallest_h = math.max(tallest_h, A.floor_h)
             end
-            ::continue::
+            ::continuelabel::
           end
 
           post_top_z = tallest_h
@@ -2718,7 +2718,7 @@ function Layout_handle_corners(LEVEL)
           corner.post_top_h = post_top_z
         end
       end
-      ::continue::
+      ::continuelabel::
     end
   end
 
@@ -2899,14 +2899,14 @@ function Layout_indoor_lighting(LEVEL)
 
     -- recurse to neighbors
     for _,C in pairs(R.conns) do
-      if C.is_cycle then goto continue end
+      if C.is_cycle then goto continuelabel end
 
       local R2 = C:other_room(R)
 
       if R2.lev_along > R.lev_along then
         visit_room(R2, R)
       end
-      ::continue::
+      ::continuelabel::
     end
   end
 

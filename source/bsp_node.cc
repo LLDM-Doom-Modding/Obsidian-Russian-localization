@@ -349,7 +349,7 @@ bool EvalPartitionWorker(quadtree_c *tree, seg_t *part, double best_cost, eval_i
         }
 
         /* check for being on the same line */
-        if (fa <= OBSIDIAN_DIST_EPSILON && fb <= OBSIDIAN_DIST_EPSILON)
+        if (fa <= OBSIDIAN_EPSILON && fb <= OBSIDIAN_EPSILON)
         {
             // this seg runs along the same line as the partition.  Check
             // whether it goes in the same direction or the opposite.
@@ -368,20 +368,20 @@ bool EvalPartitionWorker(quadtree_c *tree, seg_t *part, double best_cost, eval_i
         //       may fail to detect the sector being cut in half.  Thanks
         //       to Janis Legzdinsh for spotting this obscure bug.
 
-        if (fa <= OBSIDIAN_DIST_EPSILON || fb <= OBSIDIAN_DIST_EPSILON)
+        if (fa <= OBSIDIAN_EPSILON || fb <= OBSIDIAN_EPSILON)
         {
             if (check->linedef != NULL && check->linedef->is_precious)
                 info->cost += 40.0 * split_cost * PRECIOUS_MULTIPLY;
         }
 
         /* check for right side */
-        if (a > -OBSIDIAN_DIST_EPSILON && b > -OBSIDIAN_DIST_EPSILON)
+        if (a > -OBSIDIAN_EPSILON && b > -OBSIDIAN_EPSILON)
         {
             info->BumpRight(check->linedef);
 
             /* check for a near miss */
-            if ((a >= IFFY_LEN && b >= IFFY_LEN) || (a <= OBSIDIAN_DIST_EPSILON && b >= IFFY_LEN) ||
-                (b <= OBSIDIAN_DIST_EPSILON && a >= IFFY_LEN))
+            if ((a >= IFFY_LEN && b >= IFFY_LEN) || (a <= OBSIDIAN_EPSILON && b >= IFFY_LEN) ||
+                (b <= OBSIDIAN_EPSILON && a >= IFFY_LEN))
             {
                 continue;
             }
@@ -393,7 +393,7 @@ bool EvalPartitionWorker(quadtree_c *tree, seg_t *part, double best_cost, eval_i
             //       processing.  Thus the closer the near miss, the higher
             //       the cost.
 
-            if (a <= OBSIDIAN_DIST_EPSILON || b <= OBSIDIAN_DIST_EPSILON)
+            if (a <= OBSIDIAN_EPSILON || b <= OBSIDIAN_EPSILON)
                 qnty = IFFY_LEN / OBSIDIAN_MAX(a, b);
             else
                 qnty = IFFY_LEN / OBSIDIAN_MIN(a, b);
@@ -403,13 +403,13 @@ bool EvalPartitionWorker(quadtree_c *tree, seg_t *part, double best_cost, eval_i
         }
 
         /* check for left side */
-        if (a < OBSIDIAN_DIST_EPSILON && b < OBSIDIAN_DIST_EPSILON)
+        if (a < OBSIDIAN_EPSILON && b < OBSIDIAN_EPSILON)
         {
             info->BumpLeft(check->linedef);
 
             /* check for a near miss */
-            if ((a <= -IFFY_LEN && b <= -IFFY_LEN) || (a >= -OBSIDIAN_DIST_EPSILON && b <= -IFFY_LEN) ||
-                (b >= -OBSIDIAN_DIST_EPSILON && a <= -IFFY_LEN))
+            if ((a <= -IFFY_LEN && b <= -IFFY_LEN) || (a >= -OBSIDIAN_EPSILON && b <= -IFFY_LEN) ||
+                (b >= -OBSIDIAN_EPSILON && a <= -IFFY_LEN))
             {
                 continue;
             }
@@ -417,7 +417,7 @@ bool EvalPartitionWorker(quadtree_c *tree, seg_t *part, double best_cost, eval_i
             info->near_miss++;
 
             // the closer the miss, the higher the cost (see note above)
-            if (a >= -OBSIDIAN_DIST_EPSILON || b >= -OBSIDIAN_DIST_EPSILON)
+            if (a >= -OBSIDIAN_EPSILON || b >= -OBSIDIAN_EPSILON)
                 qnty = IFFY_LEN / -OBSIDIAN_MIN(a, b);
             else
                 qnty = IFFY_LEN / -OBSIDIAN_MAX(a, b);
@@ -706,7 +706,7 @@ void DivideOneSeg(seg_t *seg, seg_t *part, seg_t **left_list, seg_t **right_list
         a = b = 0;
 
     /* check for being on the same line */
-    if (fabs(a) <= OBSIDIAN_DIST_EPSILON && fabs(b) <= OBSIDIAN_DIST_EPSILON)
+    if (fabs(a) <= OBSIDIAN_EPSILON && fabs(b) <= OBSIDIAN_EPSILON)
     {
         AddIntersection(cut_list, seg->start, part, self_ref);
         AddIntersection(cut_list, seg->end, part, self_ref);
@@ -723,11 +723,11 @@ void DivideOneSeg(seg_t *seg, seg_t *part, seg_t **left_list, seg_t **right_list
     }
 
     /* check for right side */
-    if (a > -OBSIDIAN_DIST_EPSILON && b > -OBSIDIAN_DIST_EPSILON)
+    if (a > -OBSIDIAN_EPSILON && b > -OBSIDIAN_EPSILON)
     {
-        if (a < OBSIDIAN_DIST_EPSILON)
+        if (a < OBSIDIAN_EPSILON)
             AddIntersection(cut_list, seg->start, part, self_ref);
-        else if (b < OBSIDIAN_DIST_EPSILON)
+        else if (b < OBSIDIAN_EPSILON)
             AddIntersection(cut_list, seg->end, part, self_ref);
 
         ListAddSeg(right_list, seg);
@@ -735,11 +735,11 @@ void DivideOneSeg(seg_t *seg, seg_t *part, seg_t **left_list, seg_t **right_list
     }
 
     /* check for left side */
-    if (a < OBSIDIAN_DIST_EPSILON && b < OBSIDIAN_DIST_EPSILON)
+    if (a < OBSIDIAN_EPSILON && b < OBSIDIAN_EPSILON)
     {
-        if (a > -OBSIDIAN_DIST_EPSILON)
+        if (a > -OBSIDIAN_EPSILON)
             AddIntersection(cut_list, seg->start, part, self_ref);
-        else if (b > -OBSIDIAN_DIST_EPSILON)
+        else if (b > -OBSIDIAN_EPSILON)
             AddIntersection(cut_list, seg->end, part, self_ref);
 
         ListAddSeg(left_list, seg);
@@ -965,7 +965,7 @@ int seg_t::PointOnLineSide(double x, double y) const
 {
     double perp = PerpDist(x, y);
 
-    if (fabs(perp) <= OBSIDIAN_DIST_EPSILON)
+    if (fabs(perp) <= OBSIDIAN_EPSILON)
         return 0;
 
     return (perp < 0) ? -1 : +1;
@@ -1386,7 +1386,7 @@ void subsec_t::SanityCheckClosed() const
         double dx = seg->end->x - next->start->x;
         double dy = seg->end->y - next->start->y;
 
-        if (fabs(dx) > OBSIDIAN_DIST_EPSILON || fabs(dy) > OBSIDIAN_DIST_EPSILON)
+        if (fabs(dx) > OBSIDIAN_EPSILON || fabs(dy) > OBSIDIAN_EPSILON)
             gaps++;
 
         total++;

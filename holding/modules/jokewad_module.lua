@@ -335,24 +335,24 @@ function JOKEWAD_MODULE.populate_level(stuff, LEVEL)
       for _,S in pairs(A.seeds) do
 
         -- not on chunks with something on it
-        if S.chunk and S.chunk.content then goto continue end
+        if S.chunk and S.chunk.content then goto continuelabel end
 
         -- not by thick walls and diagonals
-        if S.diagonal then goto continue end
+        if S.diagonal then goto continuelabel end
         if S.depth and not table.empty(S.depth) then
           for _,dir_depth in pairs(S.depth) do
-            if dir_depth > 16 then goto continue end
+            if dir_depth > 16 then goto continuelabel end
           end
         end
 
         -- not on areas with liquid sinks
         if A.floor_group and A.floor_group.sink
-        and A.floor_group.sink.mat == "_LIQUID" then goto continue end
+        and A.floor_group.sink.mat == "_LIQUID" then goto continuelabel end
 
-        if A.is_road then goto continue end
+        if A.is_road then goto continuelabel end
 
         place_items(A.ceil_h - 2, S.mid_x, S.mid_y, 0)
-        ::continue::
+        ::continuelabel::
       end
     elseif A.mode == "nature" then
       local seeds_table = table.array_2D(SEED_W, SEED_H)

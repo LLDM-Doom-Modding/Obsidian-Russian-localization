@@ -25,11 +25,10 @@
 #include <stdint.h>
 
 // basic constants
+constexpr double   OBSIDIAN_EPSILON      = (1.0 / 1024.0);
 constexpr uint16_t OBSIDIAN_MSG_BUF_LEN  = 2000;
-constexpr double   OBSIDIAN_POLY_EPSILON = (1.0 / 128.0);
-constexpr double   OBSIDIAN_DIST_EPSILON = (1.0 / 1024.0);
-constexpr double   OBSIDIAN_ANG_EPSILON  = (1.0 / 1024.0);
 constexpr double   OBSIDIAN_PI           = 3.14159265358979323846;
+constexpr double   OBSIDIAN_POLY_EPSILON = (1.0 / 128.0);
 
 // basic math
 template <typename A, typename B,

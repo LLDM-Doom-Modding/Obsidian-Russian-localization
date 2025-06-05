@@ -108,26 +108,26 @@ function EXPORT_MAP.add_entity(ent, model)
     if key == "x" or key == "y" or key == "z" then
       if not origin then origin = {} end
       origin[key] = value
-      goto continue
+      goto continuelabel
     end
 
     -- ignore any model reference
-    if key == "model" then goto continue end
+    if key == "model" then goto continuelabel end
 
     -- grab the classname
     if key == "id" then
       classname = value
-      goto continue
+      goto continuelabel
     end
 
     -- convert lights
     if key == "light" then
       light = (0 + value) * 2.2
-      goto continue
+      goto continuelabel
     end
 
     export_printf("\"%s\" \"%s\"\n", tostring(key), tostring(value))
-    ::continue::
+    ::continuelabel::
   end
 
 

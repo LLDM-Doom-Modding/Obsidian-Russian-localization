@@ -829,7 +829,7 @@ void polygon_c::ClockwiseOrder()
         double angle1 = ComputeAngle(A->start->x - mid_x, A->start->y - mid_y);
         double angle2 = ComputeAngle(B->start->x - mid_x, B->start->y - mid_y);
 
-        if (angle1 + OBSIDIAN_ANG_EPSILON < angle2)
+        if (angle1 + OBSIDIAN_EPSILON < angle2)
         {
             // swap 'em
             array[i]     = B;

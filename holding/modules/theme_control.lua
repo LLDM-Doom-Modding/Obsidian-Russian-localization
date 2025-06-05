@@ -111,9 +111,9 @@ function THEME_CONTROL.get_levels(self)
 
     ::foundit::
 
-    if not option then goto continue end
+    if not option then goto continuelabel end
     THEME_CONTROL.set_a_theme(LEV, option)
-    ::continue::
+    ::continuelabel::
   end
   
 end

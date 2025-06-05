@@ -6,8 +6,9 @@ project(
   VERSION 0.1.0
 )
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 option(OBSIDIAN_GUI       "Build Sokol+Nuklear GUI" ON)
 # These are only needed if wanting to force a specific Sokol backend,
 # otherwise a platform-specific default will be selected
@@ -83,6 +84,7 @@ set(OBSIDIAN_SOURCE_FILES
     source/lib_util.cc
     source/lib_wad.cc
     source/lib_parse.cc
+    source/lib_zip.cc
     source/m_addons.cc
     source/m_cookie.cc
     source/m_lua.cc
@@ -94,7 +96,7 @@ set(OBSIDIAN_SOURCE_FILES
     source/poly_wad.cc
     source/sys_assert.cc
     source/sys_debug.cc
-    source/sys_xoshiro.cc
+    source/sys_twister.cc
     source/tx_forge.cc
     source/tx_skies.cc
 )
@@ -121,7 +123,7 @@ if (COPY_FILES)
   add_custom_command(TARGET obsidian POST_BUILD COMMAND_EXPAND_LISTS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COPY_FILES} ${DEST_DIR})
 endif()
 
-set(OBSIDIAN_LINK_LIBRARIES fastPRNG luaalloc minilua physfs-static)
+set(OBSIDIAN_LINK_LIBRARIES luaalloc minilua miniz physfs-static)
 
 if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM} MATCHES "BSD")
   set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} pthread)

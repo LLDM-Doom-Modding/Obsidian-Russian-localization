@@ -1,10 +1,11 @@
 //------------------------------------------------------------------------
-//  RANDOM NUMBER GENERATION (Xoshiro256)
+//  ARCHIVE Handling : ZIP files
 //------------------------------------------------------------------------
 //
 //  OBSIDIAN Level Maker
 //
-//  Copyright (C) 2020-2025 The OBSIDIAN Team
+//  Copyright (C) 2021-2025 The OBSIDIAN Team
+//  Copyright (C) 2009-2017 Andrew Apted
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,36 +19,18 @@
 //
 //------------------------------------------------------------------------
 
-#include "fastPRNG.h"
+#pragma once
 
-fastPRNG::fastXS64 xoshiro;
+#include <stdint.h>
 
-void xoshiro_Reseed(uint64_t newseed)
-{
-    xoshiro.seed(newseed);
-}
+#include <string>
 
-uint64_t xoshiro_UInt()
-{
-    return xoshiro.xoroshiro128p();
-}
+/* ZIP writing */
 
-float xoshiro_Float()
-{
-    return xoshiro.xoroshiro128p_UNI<float>();
-}
+bool ZIPF_OpenWrite(const std::string &filename);
+bool ZIPF_AddFile(const std::string &filename, std::string_view directory);
+bool ZIPF_AddMem(const std::string &name, uint8_t *data, size_t length);
+bool ZIPF_CloseWrite();
 
-double xoshiro_Double()
-{
-    return xoshiro.xoroshiro128p_UNI<double>();
-}
-
-int xoshiro_Between(int low, int high)
-{
-    return (int)xoshiro.xoroshiro128p_Range<float>(low, high);
-}
-
-double xoshiro_Between(double low, double high)
-{
-    return xoshiro.xoroshiro128p_Range<double>(low, high);
-}
+//--- editor settings ---
+// vi:ts=4:sw=4:noexpandtab

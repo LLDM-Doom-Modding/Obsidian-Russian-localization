@@ -25,7 +25,7 @@
 #include "main.h"
 #include "sys_assert.h"
 #include "sys_macro.h"
-#include "sys_xoshiro.h"
+#include "sys_twister.h"
 #include "tx_forge.h"
 
 uint8_t *SKY_GenGradient(int W, int H, std::vector<uint8_t> &colors)
@@ -115,9 +115,9 @@ void SKY_AddStars(uint64_t seed, uint8_t *pixels, int W, int H, color_mapping_t 
 
         while (dest < d_end)
         {
-            double v = xoshiro_Double();
-            v *= xoshiro_Double();
-            v *= xoshiro_Double();
+            double v = twister_Double();
+            v *= twister_Double();
+            v *= twister_Double();
 
             v = pow(v, powscale);
 
@@ -148,7 +148,7 @@ void SKY_AddHills(uint64_t seed, uint8_t *pixels, int W, int H, color_mapping_t 
 
     TX_SpectralSynth(seed, height_map, W, fracdim, powscale);
 
-    bool use_slope_z = (xoshiro_UInt() & 255) < 20;
+    bool use_slope_z = (twister_UInt() & 255) < 20;
 
     // convert range from 0.0 .. 1.0 to min_h . max_h
     int x, z;
@@ -299,7 +299,7 @@ void SKY_AddBuilding(uint64_t seed, uint8_t *pixels, int W, int H, std::vector<u
             {
                 uint8_t fg = colors[1];
 
-                if (((int)xoshiro_UInt() & 0xFFFF) > win_prob)
+                if (((int)twister_UInt() & 0xFFFF) > win_prob)
                 {
                     fg = (numcol >= 3) ? colors[2] : bg;
                 }

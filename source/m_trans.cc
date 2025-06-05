@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -1154,13 +1155,13 @@ void Trans_SetLanguage()
     }
 
     // see if the translation file exists
-    std::string path = StringFormat("%s/language/%s.po", install_dir.c_str(), langcode.c_str());
+    std::string path = std::format("{}/language/{}.po", install_dir, langcode);
 
     if (!FileExists(path))
     {
         // if language has a territory field (like zh_TW or en_AU) then
         // try again with the plain language code.
-        path = StringFormat("%s/language/%s.po", install_dir.c_str(), lang_plain.c_str());
+        path = std::format("{}/language/{}.po", install_dir, lang_plain);
     }
 
     FILE *fp = FileOpen(path, "rb");

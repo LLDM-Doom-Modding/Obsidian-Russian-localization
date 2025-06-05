@@ -214,13 +214,13 @@ function Fight_Simulator(monsters, weapons, stats)
     local total_weight = 0
 
     for _,P in pairs(active_mons) do
-      if P == M then goto continue end
+      if P == M then goto continuelabel end
 
       if can_infight(M.info, P.info) then
         table.insert(others, P)
         total_weight = total_weight + P.info.health
       end
-      ::continue::
+      ::continuelabel::
     end
 
     -- nothing else to fight with?

@@ -1,10 +1,4 @@
 ===========================================================================================
-BSD 2-Clause License
-===========================================================================================
-
-fastPRNG - Copyright (c) 2020 Michele Morrone
-
-===========================================================================================
 BSD 3-Clause License
 ===========================================================================================
 
@@ -104,10 +98,6 @@ Filename Formatter - Copyright (c) 2021-2024 Phytolizer
 
 OBSIDIAN/OBLIGE Level Maker - Copyright (c) 2021-2025 The OBSIDIAN Team
 				Copyright (c) 2006-2017 Andrew Apted
-
-SLUMP - Copyright (c) 2021-2025 The OBSIDIAN Team
-				Copyright (c) 2005-2007 Sam Trenholme
-				Copyright (c) 2000 David Chess
 
 ===========================================================================================
 MIT License

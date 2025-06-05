@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <bit>
+
 // Used to swap values.  Try to use superfast macros on systems
 // that support them, otherwise use regular C++ functions.
 #if defined(__GNUC__) || defined(__clang__)
@@ -82,139 +84,120 @@ static inline uint64_t __Swap64(uint64_t n)
 }
 #endif
 
-#if defined(__LITTLE_ENDIAN__) || defined(__i386__) || defined(__ia64__) || defined(_WIN32) || defined(__alpha__) ||   \
-    defined(__alpha) || defined(__arm__) || (defined(__mips__) && defined(__MIPSEL__)) || defined(__SYMBIAN32__) ||    \
-    defined(__x86_64__) || defined(__arm64__) || defined(__aarch64__)
-
 inline uint16_t LE_U16(const uint16_t x)
 {
-    return x;
+    if constexpr (std::endian::native == std::endian::big)
+        return __Swap16(x);
+    else
+        return x;
 }
 inline int16_t LE_S16(const uint16_t x)
 {
-    return (int16_t)x;
+    if constexpr (std::endian::native == std::endian::big)
+        return (int16_t)__Swap16(x);
+    else
+        return (int16_t)x;
 }
 inline uint32_t LE_U32(const uint32_t x)
 {
-    return x;
+    if constexpr (std::endian::native == std::endian::big)
+        return __Swap32(x);
+    else
+        return x;
 }
 inline int32_t LE_S32(const uint32_t x)
 {
-    return (int32_t)x;
+    if constexpr (std::endian::native == std::endian::big)
+        return (int32_t)__Swap32(x);
+    else
+        return (int32_t)x;
 }
 inline uint64_t LE_U64(const uint64_t x)
 {
-    return x;
+    if constexpr (std::endian::native == std::endian::big)
+        return __Swap64(x);
+    else
+        return x;
 }
 inline int64_t LE_S64(const uint64_t x)
 {
-    return (int64_t)x;
+    if constexpr (std::endian::native == std::endian::big)
+        return (int64_t)__Swap64(x);
+    else
+        return (int64_t)x;
 }
 inline float LE_FLOAT(const float x)
 {
-    return x;
+    if constexpr (std::endian::native == std::endian::big)
+    {
+        union {
+            float    f;
+            uint32_t u;
+        } in, out;
+        in.f  = x;
+        out.u = LE_U32(in.u);
+        return out.f;
+    }
+    else
+        return x;
 }
-
 inline uint16_t BE_U16(const uint16_t x)
 {
-    return __Swap16(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return x;
+    else
+        return __Swap16(x);
 }
 inline int16_t BE_S16(const uint16_t x)
 {
-    return (int16_t)__Swap16(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return (int16_t)x;
+    else
+        return (int16_t)__Swap16(x);
 }
 inline uint32_t BE_U32(const uint32_t x)
 {
-    return __Swap32(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return x;
+    else
+        return __Swap32(x);
 }
 inline int32_t BE_S32(const uint32_t x)
 {
-    return (int32_t)__Swap32(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return (int32_t)x;
+    else
+        return (int32_t)__Swap32(x);
 }
 inline uint64_t BE_U64(const uint64_t x)
 {
-    return __Swap64(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return x;
+    else
+        return __Swap64(x);
 }
 inline int64_t BE_S64(const uint64_t x)
 {
-    return (int64_t)__Swap64(x);
+    if constexpr (std::endian::native == std::endian::big)
+        return (int64_t)x;
+    else
+        return (int64_t)__Swap64(x);
 }
 inline float BE_FLOAT(const float x)
 {
-    union {
-        float    f;
-        uint32_t u;
-    } in, out;
-    in.f  = x;
-    out.u = BE_U32(in.u);
-    return out.f;
+    if constexpr (std::endian::native == std::endian::big)
+        return x;
+    else
+    {
+        union {
+            float    f;
+            uint32_t u;
+        } in, out;
+        in.f  = x;
+        out.u = BE_U32(in.u);
+        return out.f;
+    }
 }
-#else
-
-inline uint16_t LE_U16(const uint16_t x)
-{
-    return __Swap16(x);
-}
-inline int16_t LE_S16(const uint16_t x)
-{
-    return (int16_t)__Swap16(x);
-}
-inline uint32_t LE_U32(const uint32_t x)
-{
-    return __Swap32(x);
-}
-inline int32_t LE_S32(const uint32_t x)
-{
-    return (int32_t)__Swap32(x);
-}
-inline uint64_t LE_U64(const uint64_t x)
-{
-    return __Swap64(x);
-}
-inline int64_t LE_S64(const uint64_t x)
-{
-    return (int64_t)__Swap64(x);
-}
-inline float LE_FLOAT(const float x)
-{
-    union {
-        float    f;
-        uint32_t u;
-    } in, out;
-    in.f  = x;
-    out.u = LE_U32(in.u);
-    return out.f;
-}
-
-inline uint16_t BE_U16(const uint16_t x)
-{
-    return x;
-}
-inline int16_t BE_S16(const uint16_t x)
-{
-    return (int16_t)x;
-}
-inline uint32_t BE_U32(const uint32_t x)
-{
-    return x;
-}
-inline int32_t BE_S32(const uint32_t x)
-{
-    return (int32_t)x;
-}
-inline uint64_t BE_U64(const uint64_t x)
-{
-    return x;
-}
-inline int64_t BE_S64(const uint64_t x)
-{
-    return (int64_t)x;
-}
-inline float BE_FLOAT(const float x)
-{
-    return x;
-}
-#endif
 
 //--- editor settings ---
 // vi:ts=4:sw=4:noexpandtab

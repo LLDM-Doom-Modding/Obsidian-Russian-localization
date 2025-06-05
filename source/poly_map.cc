@@ -1492,7 +1492,7 @@ void vertex_c::AddTip(double dx, double dy, sector_c *left, sector_c *right)
     {
     }
 
-    while (after && tip->angle + OBSIDIAN_ANG_EPSILON < after->angle)
+    while (after && tip->angle + OBSIDIAN_EPSILON < after->angle)
     {
         after = after->prev;
     }
@@ -1650,8 +1650,8 @@ sector_c *vertex_c::CheckOpen(double dx, double dy) const
 
     for (tip = tip_set; tip; tip = tip->next)
     {
-        if (fabs(tip->angle - angle) < OBSIDIAN_ANG_EPSILON ||
-            fabs(tip->angle - angle) > (360.0 - OBSIDIAN_ANG_EPSILON))
+        if (fabs(tip->angle - angle) < OBSIDIAN_EPSILON ||
+            fabs(tip->angle - angle) > (360.0 - OBSIDIAN_EPSILON))
         {
             // hit a line -- hence not open
             return NULL;
@@ -1664,7 +1664,7 @@ sector_c *vertex_c::CheckOpen(double dx, double dy) const
 
     for (tip = tip_set; tip; tip = tip->next)
     {
-        if (angle + OBSIDIAN_ANG_EPSILON < tip->angle)
+        if (angle + OBSIDIAN_EPSILON < tip->angle)
         {
             // found it
             return tip->right;

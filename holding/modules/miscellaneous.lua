@@ -166,7 +166,7 @@ end
 
 function MISC_STUFF.begin_level(self, LEVEL)
   for _,opt in pairs(self.options) do
-    if opt.valuator then goto continue end
+    if opt.valuator then goto continuelabel end
 
     local name  = assert(opt.name)
     local value = opt.value
@@ -186,7 +186,7 @@ function MISC_STUFF.begin_level(self, LEVEL)
       end
     end
 
-    ::continue::
+    ::continuelabel::
   end
 
   if OB_CONFIG.outdoor_openness then

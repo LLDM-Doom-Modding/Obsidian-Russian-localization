@@ -548,7 +548,7 @@ void region_c::ClockwiseSnags()
         snag_c *A = snags[i];
         snag_c *B = snags[i + 1];
 
-        if (angles[i] < angles[i + 1] - OBSIDIAN_ANG_EPSILON)
+        if (angles[i] < angles[i + 1] - OBSIDIAN_EPSILON)
         {
             // swap 'em
             snags[i]     = B;

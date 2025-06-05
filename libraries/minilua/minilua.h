@@ -4621,6 +4621,26 @@ LUAI_FUNC int luaU_dump (lua_State* L, const Proto* f, lua_Writer w,
 #define LUA_ENV		"_ENV"
 #endif
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+/*
+* WARNING: if you change the order of this enumeration,
+* grep "ORDER RESERVED"
+*/
+enum RESERVED {
+  /* terminal symbols denoted by reserved words */
+  TK_AND = FIRST_RESERVED, TK_BREAK, TK_CONTINUE,
+  TK_DO, TK_ELSE, TK_ELSEIF, TK_END, TK_FALSE, TK_FOR, TK_FUNCTION,
+  TK_GOTO, TK_IF, TK_IN, TK_LOCAL, TK_NIL, TK_NOT, TK_OR, TK_REPEAT,
+  TK_RETURN, TK_THEN, TK_TRUE, TK_UNTIL, TK_WHILE,
+  /* other terminal symbols */
+  TK_IDIV, TK_CONCAT, TK_DOTS, TK_EQ, TK_GE, TK_LE, TK_NE,
+  TK_SHL, TK_SHR,
+  TK_DBCOLON, TK_EOS,
+  TK_FLT, TK_INT, TK_NAME, TK_STRING
+};
+
+#else
 
 /*
 * WARNING: if you change the order of this enumeration,
@@ -4638,6 +4658,8 @@ enum RESERVED {
   TK_DBCOLON, TK_EOS,
   TK_FLT, TK_INT, TK_NAME, TK_STRING
 };
+
+#endif
 
 /* number of reserved words */
 #define NUM_RESERVED	(cast_int(TK_WHILE-FIRST_RESERVED + 1))
@@ -8504,6 +8526,20 @@ void luaC_fullgc (lua_State *L, int isemergency) {
 
 #define currIsNewline(ls)	(ls->current == '\n' || ls->current == '\r')
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+/* ORDER RESERVED */
+static const char *const luaX_tokens [] = {
+    "and", "break", "continue", "do", "else", "elseif",
+    "end", "false", "for", "function", "goto", "if",
+    "in", "local", "nil", "not", "or", "repeat",
+    "return", "then", "true", "until", "while",
+    "//", "..", "...", "==", ">=", "<=", "~=",
+    "<<", ">>", "::", "<eof>",
+    "<number>", "<integer>", "<name>", "<string>"
+};
+
+#else
 
 /* ORDER RESERVED */
 static const char *const luaX_tokens [] = {
@@ -8516,6 +8552,8 @@ static const char *const luaX_tokens [] = {
     "<number>", "<integer>", "<name>", "<string>"
 };
 
+
+#endif
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 
@@ -10967,6 +11005,24 @@ void luaK_finish (FuncState *fs) {
 #define eqstr(a,b)	((a) == (b))
 
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+/*
+** nodes for block list (list of active blocks)
+*/
+typedef struct BlockCnt {
+  struct BlockCnt *previous;  /* chain */
+  int firstlabel;  /* index of first label in this block */
+  int firstgoto;  /* index of first pending goto in this block */
+  int continuelist;  /* list of jumps to the loop's test */
+  lu_byte nactvar;  /* # active locals outside the block */
+  lu_byte upval;  /* true if some variable in the block is an upvalue */
+  lu_byte isloop;  /* true if 'block' is a loop */
+  lu_byte insidetbc;  /* true if inside the scope of a to-be-closed var. */
+} BlockCnt;
+
+#else
+
 /*
 ** nodes for block list (list of active blocks)
 */
@@ -10980,6 +11036,7 @@ typedef struct BlockCnt {
   lu_byte insidetbc;  /* true if inside the scope of a to-be-closed var. */
 } BlockCnt;
 
+#endif
 
 
 /*
@@ -11562,6 +11619,22 @@ static void movegotosout (FuncState *fs, BlockCnt *bl) {
   }
 }
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+static void enterblock (FuncState *fs, BlockCnt *bl, lu_byte isloop) {
+  bl->isloop = isloop;
+  bl->continuelist = NO_JUMP;
+  bl->nactvar = fs->nactvar;
+  bl->firstlabel = fs->ls->dyd->label.n;
+  bl->firstgoto = fs->ls->dyd->gt.n;
+  bl->upval = 0;
+  bl->insidetbc = (fs->bl != NULL && fs->bl->insidetbc);
+  bl->previous = fs->bl;
+  fs->bl = bl;
+  lua_assert(fs->freereg == luaY_nvarstack(fs));
+}
+
+#else
 
 static void enterblock (FuncState *fs, BlockCnt *bl, lu_byte isloop) {
   bl->isloop = isloop;
@@ -11575,6 +11648,7 @@ static void enterblock (FuncState *fs, BlockCnt *bl, lu_byte isloop) {
   lua_assert(fs->freereg == luaY_nvarstack(fs));
 }
 
+#endif
 
 /*
 ** generates an error for an undefined 'goto'.
@@ -11845,6 +11919,38 @@ static void field (LexState *ls, ConsControl *cc) {
   }
 }
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+static void constructor (LexState *ls, expdesc *t) {
+  /* constructor -> '{' [ field { sep field } [sep] ] '}'
+     sep -> ',' | ';' */
+  FuncState *fs = ls->fs;
+  int line = ls->linenumber;
+  int pc = luaK_codeABC(fs, OP_NEWTABLE, 0, 0, 0);
+  ConsControl cc;
+  luaK_code(fs, 0);  /* space for extra arg. */
+  cc.na = cc.nh = cc.tostore = 0;
+  cc.t = t;
+  init_exp(t, VNONRELOC, fs->freereg);  /* table will be at stack top */
+  luaK_reserveregs(fs, 1);
+  init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
+  checknext(ls, '{');
+  for (;;) {
+    int itemline = ls->linenumber;
+    lua_assert(cc.v.k == VVOID || cc.tostore > 0);
+    if (ls->t.token == '}') break;
+    closelistfield(fs, &cc);
+    field(ls, &cc);
+    if (! (testnext(ls, ',') || testnext(ls, ';')))
+      if (ls->linenumber == itemline)
+        break;
+  }
+  check_match(ls, '}', '{', line);
+  lastlistfield(fs, &cc);
+  luaK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
+}
+
+#else
 
 static void constructor (LexState *ls, expdesc *t) {
   /* constructor -> '{' [ field { sep field } [sep] ] '}'
@@ -11870,6 +11976,8 @@ static void constructor (LexState *ls, expdesc *t) {
   lastlistfield(fs, &cc);
   luaK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
 }
+
+#endif
 
 /* }====================================================================== */
 
@@ -12388,6 +12496,68 @@ static void labelstat (LexState *ls, TString *name, int line) {
   createlabel(ls, name, line, block_follow(ls, 0));
 }
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+
+static void continuestat (LexState *ls) {
+  FuncState *fs = ls->fs;
+  BlockCnt *bl = fs->bl;
+  int upval = 0;
+  while (bl && !bl->isloop) {
+    upval |= bl->upval;
+    bl = bl->previous;
+  }
+  if (!bl)
+    luaX_syntaxerror(ls, "no loop to continue");
+  if (upval)
+    luaK_codeABC(fs, OP_CLOSE, bl->nactvar, 0, 0);
+  luaK_concat(fs, &bl->continuelist, luaK_jump(fs));
+}
+
+static void whilestat (LexState *ls, int line) {
+  /* whilestat -> WHILE cond DO block END */
+  FuncState *fs = ls->fs;
+  int whileinit;
+  int condexit;
+  BlockCnt bl;
+  luaX_next(ls);  /* skip WHILE */
+  whileinit = luaK_getlabel(fs);
+  condexit = cond(ls);
+  enterblock(fs, &bl, 1);
+  checknext(ls, TK_DO);
+  block(ls);
+  luaK_jumpto(fs, whileinit);
+  luaK_patchlist(fs, bl.continuelist, whileinit);  /* continue goes to start, too */
+  check_match(ls, TK_END, TK_WHILE, line);
+  leaveblock(fs);
+  luaK_patchtohere(fs, condexit);  /* false conditions finish the loop */
+}
+
+static void repeatstat (LexState *ls, int line) {
+  /* repeatstat -> REPEAT block UNTIL cond */
+  int condexit;
+  FuncState *fs = ls->fs;
+  int repeat_init = luaK_getlabel(fs);
+  BlockCnt bl1, bl2;
+  enterblock(fs, &bl1, 1);  /* loop block */
+  enterblock(fs, &bl2, 0);  /* scope block */
+  luaX_next(ls);  /* skip REPEAT */
+  statlist(ls);
+  luaK_patchtohere(fs, bl1.continuelist);
+  check_match(ls, TK_UNTIL, TK_REPEAT, line);
+  condexit = cond(ls);  /* read condition (inside scope block) */
+  leaveblock(fs);  /* finish scope */
+  if (bl2.upval) {  /* upvalues? */
+    int exit = luaK_jump(fs);  /* normal exit must jump over fix */
+    luaK_patchtohere(fs, condexit);  /* repetition must close upvalues */
+    luaK_codeABC(fs, OP_CLOSE, reglevel(fs, bl2.nactvar), 0, 0);
+    condexit = luaK_jump(fs);  /* repeat after closing upvalues */
+    luaK_patchtohere(fs, exit);  /* normal exit comes to here */
+  }
+  luaK_patchlist(fs, condexit, repeat_init);  /* close the loop */
+  leaveblock(fs);  /* finish loop */
+}
+
+#else
 
 static void whilestat (LexState *ls, int line) {
   /* whilestat -> WHILE cond DO block END */
@@ -12406,7 +12576,6 @@ static void whilestat (LexState *ls, int line) {
   leaveblock(fs);
   luaK_patchtohere(fs, condexit);  /* false conditions finish the loop */
 }
-
 
 static void repeatstat (LexState *ls, int line) {
   /* repeatstat -> REPEAT block UNTIL cond */
@@ -12432,6 +12601,7 @@ static void repeatstat (LexState *ls, int line) {
   leaveblock(fs);  /* finish loop */
 }
 
+#endif
 
 /*
 ** Read an expression and generate code to put its results in next
@@ -12461,6 +12631,7 @@ static void fixforjump (FuncState *fs, int pc, int dest, int back) {
   SETARG_Bx(*jmp, offset);
 }
 
+#ifdef LUA_OBSIDIAN_EXTENSIONS
 
 /*
 ** Generate code for a 'for' loop.
@@ -12480,6 +12651,7 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isgen) {
   block(ls);
   leaveblock(fs);  /* end of scope for declared variables */
   fixforjump(fs, prep, luaK_getlabel(fs), 0);
+  luaK_patchtohere(fs, bl.previous->continuelist);	/* continue, if any, jumps to here */
   if (isgen) {  /* generic for? */
     luaK_codeABC(fs, OP_TFORCALL, base, 0, nvars);
     luaK_fixline(fs, line);
@@ -12489,6 +12661,37 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isgen) {
   luaK_fixline(fs, line);
 }
 
+#else
+
+/*
+** Generate code for a 'for' loop.
+*/
+static void forbody (LexState *ls, int base, int line, int nvars, int isgen) {
+  /* forbody -> DO block */
+  static const OpCode forprep[2] = {OP_FORPREP, OP_TFORPREP};
+  static const OpCode forloop[2] = {OP_FORLOOP, OP_TFORLOOP};
+  BlockCnt bl;
+  FuncState *fs = ls->fs;
+  int prep, endfor;
+  checknext(ls, TK_DO);
+  prep = luaK_codeABx(fs, forprep[isgen], base, 0);
+  enterblock(fs, &bl, 0);  /* scope for declared variables */
+  adjustlocalvars(ls, nvars);
+  luaK_reserveregs(fs, nvars);
+  block(ls);
+  leaveblock(fs);  /* end of scope for declared variables */
+  fixforjump(fs, prep, luaK_getlabel(fs), 0);
+  luaK_patchtohere(fs, bl.previous->continuelist);	/* continue, if any, jumps to here */
+  if (isgen) {  /* generic for? */
+    luaK_codeABC(fs, OP_TFORCALL, base, 0, nvars);
+    luaK_fixline(fs, line);
+  }
+  endfor = luaK_codeABx(fs, forloop[isgen], base, 0);
+  fixforjump(fs, endfor, prep + 1, 1);
+  luaK_fixline(fs, line);
+}
+
+#endif
 
 static void fornum (LexState *ls, TString *varname, int line) {
   /* fornum -> NAME = exp,exp[,exp] forbody */
@@ -12827,6 +13030,13 @@ static void statement (LexState *ls) {
       gotostat(ls);
       break;
     }
+#ifdef LUA_OBSIDIAN_EXTENSIONS
+    case TK_CONTINUE: {  /* stat -> continuestat */
+      luaX_next(ls);  /* skip CONTINUE */
+      continuestat(ls);
+      break;	  /* must be last statement */
+    }
+#endif
     default: {  /* stat -> func | assignment */
       exprstat(ls);
       break;

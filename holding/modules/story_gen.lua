@@ -88,7 +88,7 @@ function STORY_GEN.generate_story()
         add_line("")
 
         cur_line = string.sub(word, 2)
-        goto continue
+        goto continuelabel
       end
 
       if cur_line == "" then
@@ -102,13 +102,13 @@ function STORY_GEN.generate_story()
 
       if e2 < MAX_WIDTH then
         cur_line = new_line
-        goto continue
+        goto continuelabel
       end
 
       maybe_add_line(cur_line)
 
       cur_line = word
-      ::continue::
+      ::continuelabel::
     end
 
     maybe_add_line(cur_line)

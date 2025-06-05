@@ -21,6 +21,8 @@
 
 #include "m_addons.h"
 
+#include <format>
+
 #include "lib_argv.h"
 #include "lib_util.h"
 #include "m_cookie.h"
@@ -38,7 +40,7 @@ std::vector<addon_info_t> all_addons;
 void VFS_AddFolder(std::string name)
 {
     std::string path  = PathAppend(install_dir, name);
-    std::string mount = StringFormat("/%s", name.c_str());
+    std::string mount = std::format("/{}", name);
     if (!PHYSFS_mount(path.c_str(), mount.c_str(), 0))
     {
         FatalError("Failed to mount '%s' folder in PhysFS:\n%s\n", name.c_str(),
@@ -63,10 +65,10 @@ bool VFS_AddArchive(std::string filename, bool options_file)
     // the current dir, look for it in the standard addons/ folder.
     if ((!FileExists(filename) && GetDirectory(filename).empty()))
     {
-        std::string new_name = StringFormat("%s/addons/%s", home_dir.c_str(), filename.c_str());
+        std::string new_name = std::format("{}/addons/{}", home_dir, filename);
         if (!FileExists(new_name))
         {
-            new_name = StringFormat("%s/addons/%s", install_dir.c_str(), filename.c_str());
+            new_name = std::format("{}/addons/{}", install_dir, filename);
         }
         filename = new_name;
     }

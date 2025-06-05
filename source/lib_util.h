@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 
+#include <charconv>
 #include <string>
 
 /* file utilities */
@@ -37,7 +38,6 @@ void        ReplaceExtension(std::string &path, std::string_view ext);
 std::string SanitizePath(std::string_view path);
 
 std::string CurrentDirectoryGet();
-bool        MakeDirectory(std::string_view dir);
 
 bool  FileExists(std::string_view name);
 FILE *FileOpen(std::string_view name, std::string_view mode);
@@ -102,7 +102,6 @@ inline int ToUpperASCII(int character)
         return character;
 }
 
-char *CStringNew(int length);
 char *CStringDup(const char *original, int limit = -1);
 char *CStringUpper(const char *name);
 void  CStringFree(const char *string);
@@ -113,19 +112,22 @@ int StringPrefixCompare(std::string_view A, std::string_view B);
 int StringCaseCompare(std::string_view A, std::string_view B);
 int StringPrefixCaseCompare(std::string_view A, std::string_view B);
 
-std::string StringFormat(std::string_view fmt, ...);
-
-std::string NumToString(int value);
-std::string NumToString(uint64_t value);
-std::string NumToString(double value);
-int         StringToInt(const std::string &value);
-double      StringToDouble(const std::string &value);
-
-char *mem_gets(char *buf, int size, const char **str_ptr);
+inline int StringToInt(std::string_view value) 
+{
+    int actual_number;
+    std::from_chars(value.data(), value.data() + value.size(), actual_number);
+    return actual_number;
+}
+inline double StringToDouble(std::string_view value) 
+{
+    double actual_number;
+    std::from_chars(value.data(), value.data() + value.size(), actual_number);
+    return actual_number;
+}
 
 /* time utilities */
 
-uint32_t TimeGetMillies();
+int64_t TimeGetMillies();
 
 /* memory utilities */
 
@@ -135,18 +137,36 @@ void  UtilFree(void *data);
 
 /* math utilities */
 
-uint32_t IntHash(uint32_t key);
-uint32_t StringHash(const std::string &str);
-uint64_t StringHash64(const std::string &str);
+inline uint64_t StringHash64(std::string_view str) 
+{
+    uint64_t value = 0xcbf29ce484222325;
+	for (const char ch : str) 
+    {
+		value = (value ^ (uint64_t)((uint8_t)ch)) * 0x100000001b3;
+	}
+	return value;
+}
+
+
+/* Thomas Wang's 32-bit Mix function */
+inline uint32_t IntHash(uint32_t key)
+{
+    key += ~(key << 15);
+    key ^= (key >> 10);
+    key += (key << 3);
+    key ^= (key >> 6);
+    key += ~(key << 11);
+    key ^= (key >> 16);
+
+    return key;
+}
 
 double PerpDist(double x, double y, double x1, double y1, double x2, double y2);
 double AlongDist(double x, double y, double x1, double y1, double x2, double y2);
 
 double CalcAngle(double sx, double sy, double ex, double ey);
-double DiffAngle(double A, double B); // A + result = B
 
 double ComputeDist(double sx, double sy, double ex, double ey);
-double ComputeDist(double sx, double sy, double sz, double ex, double ey, double ez);
 
 double PointLineDist(double x, double y, double x1, double y1, double x2, double y2);
 
@@ -157,7 +177,6 @@ std::pair<double, double> AlongCoord(double along, double px1, double py1, doubl
 
 bool VectorSameDir(double dx1, double dy1, double dx2, double dy2);
 
-int    RoundPOW2(int x);
 double ComputeAngle(double dx, double dy);
 
 //--- editor settings ---

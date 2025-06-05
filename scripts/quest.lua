@@ -464,9 +464,9 @@ function Quest_eval_divide_at_conn(C, goal, info)
 
     for _,C2 in pairs(R.conns) do
       -- never pass through connection we are examining
-      if C2 == C then goto continue end
+      if C2 == C then goto continuelabel end
 
-      if not same_quest(C2) then goto continue end
+      if not same_quest(C2) then goto continuelabel end
 
       local R2
       if C2.R1 == R then
@@ -476,10 +476,10 @@ function Quest_eval_divide_at_conn(C, goal, info)
       end
 
       -- already seen?
-      if list[R2.id] then goto continue end
+      if list[R2.id] then goto continuelabel end
 
       collect_rooms(R2, list)
-      ::continue::
+      ::continuelabel::
     end
 
     return list
@@ -505,22 +505,22 @@ function Quest_eval_divide_at_conn(C, goal, info)
     local leafs = {}
 
     for id, R in pairs(rooms) do
-      if R.is_secret then goto continue end
+      if R.is_secret then goto continuelabel end
 
-      if R.is_hallway then goto continue end
+      if R.is_hallway then goto continuelabel end
 
       -- some goals already?
-      if #R.goals > 0 then goto continue end
+      if #R.goals > 0 then goto continuelabel end
 
-      if quest.entry and quest.entry == R then goto continue end
+      if quest.entry and quest.entry == R then goto continuelabel end
 
       -- skip the room immediately next to the proposed connection
-      if C.R1 == R or C.R2 == R then goto continue end
+      if C.R1 == R or C.R2 == R then goto continuelabel end
 
       if room_exits_in_set(R, rooms) == 1 then
         table.add_unique(leafs, R)
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return leafs
@@ -845,23 +845,23 @@ function Quest_scan_all_conns(LEVEL, new_goals, do_quest)
     local quest = C.R1.quest
     assert(quest)
 
-    if do_quest and quest ~= do_quest then goto continue end
+    if do_quest and quest ~= do_quest then goto continuelabel end
 
     if need_joiner and
        not (C.kind == "joiner" and
             C.joiner_chunk.shape == "I" and
             (C.joiner_chunk.sw >= 2 or C.joiner_chunk.sh >= 2))
     then
-      goto continue
+      goto continuelabel
     end
 
     -- must be same quest on each side
-    if C.R2.quest ~= quest then goto continue end
+    if C.R2.quest ~= quest then goto continuelabel end
 
     for _,goal in pairs(quest.goals) do
       Quest_eval_divide_at_conn(C, goal, info)
     end
-    ::continue::
+    ::continuelabel::
   end
 
 
@@ -1237,13 +1237,13 @@ function Quest_create_zones(LEVEL)
       local R = C.R1
       local N = C.R2
 
-      if R.zone and N.zone then goto continue end
+      if R.zone and N.zone then goto continuelabel end
 
       if not R.zone then R, N = N, R end
-      if not R.zone then goto continue end
+      if not R.zone then goto continuelabel end
 
       -- prefer not to cross quest boundaries
-      --if C.lock and not do_locks then goto continue end
+      --if C.lock and not do_locks then goto continuelabel end
 
       if C.is_secret or C.kind == "teleporter" or C.lock then
         assign_room(N, other_zone(R.zone))
@@ -1251,13 +1251,13 @@ function Quest_create_zones(LEVEL)
         -- only do one locked connection per group
         if C.lock then return end
 
-        goto continue
+        goto continuelabel
       end
 
       if rand.odds(50) then
         assign_room(N, R.zone)
       end
-      ::continue::
+      ::continuelabel::
     end
 
 -- stderrf("spread_zones_via_conns: done = %s\n", string.bool(is_done))
@@ -1328,15 +1328,15 @@ function Quest_create_zones(LEVEL)
 
     local R = Q.entry
 
-    if not R or R.zone then goto continue end
+    if not R or R.zone then goto continuelabel end
 
     if table.has_elem(Q.rooms, LEVEL.exit_room) then
       --???  assign_room(R, exit_zone)
-      goto continue
+      goto continuelabel
     end
 
     assign_room(R, Zone_new(LEVEL))
-    ::continue::
+    ::continuelabel::
   end
 
 
@@ -1519,7 +1519,7 @@ function Quest_start_room(LEVEL)
     local best_score = 0
 
     for _,R in pairs(LEVEL.rooms) do
-      if R.quest ~= start_quest then goto continue end
+      if R.quest ~= start_quest then goto continuelabel end
 
       local score = eval_start_room(R, alt_mode)
 
@@ -1527,7 +1527,7 @@ function Quest_start_room(LEVEL)
         best_R = R
         best_score = score
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return best_R
@@ -1674,7 +1674,7 @@ function Quest_order_by_visit(LEVEL)
       local R2 = C:other_room(R)
 
       -- done the other room?
-      if R2.lev_along then goto continue end
+      if R2.lev_along then goto continuelabel end
 
       local loc = { R=R2 }
 
@@ -1693,7 +1693,7 @@ function Quest_order_by_visit(LEVEL)
       loc.cost = loc.cost + gui.random() * 0.1
 
       table.insert(next_locs, loc)
-      ::continue::
+      ::continuelabel::
     end
   end
 
@@ -1818,7 +1818,7 @@ function Quest_find_backtracks(LEVEL)
 
       if N == R2 then return { C } end
 
-      if seen[N] then goto continue end
+      if seen[N] then goto continuelabel end
 
       local seen2 = table.copy(seen)
       seen2[R1] = true
@@ -1829,7 +1829,7 @@ function Quest_find_backtracks(LEVEL)
         table.insert(list, 1, C)
         return list
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return nil  -- no path
@@ -2024,7 +2024,7 @@ function Quest_add_weapons(LEVEL)
       local score = eval_weapon_room(R)
 
       -- unusable room?
-      if Z and score < 0 then goto continue end
+      if Z and score < 0 then goto continuelabel end
 
       -- tie breaker
       score = score + gui.random() * 4
@@ -2033,7 +2033,7 @@ function Quest_add_weapons(LEVEL)
         best_R = R
         best_score = score
       end
-      ::continue::
+      ::continuelabel::
     end
 
 --  gui.debugf("|--> %s\n", best_R.name)
@@ -2212,7 +2212,7 @@ function Quest_nice_items(LEVEL)
 
     for name,info in pairs(ALL_ITEMS) do
       if (info.level or 1) > max_level then
-        goto continue
+        goto continuelabel
       end
 
       local prob
@@ -2226,7 +2226,7 @@ function Quest_nice_items(LEVEL)
       if prob and prob > 0 then
         pal[name] = prob
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return pal
@@ -2238,7 +2238,7 @@ function Quest_nice_items(LEVEL)
 
     for name,info in pairs(GAME.NICE_ITEMS) do
       if (info.level or 1) > max_level then
-        goto continue
+        goto continuelabel
       end
 
       local prob = info.add_prob
@@ -2246,7 +2246,7 @@ function Quest_nice_items(LEVEL)
       if prob and prob > 0 then
         pal[name] = info.add_prob
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return pal
@@ -2260,11 +2260,11 @@ function Quest_nice_items(LEVEL)
 
     for name,info in pairs(GAME.NICE_ITEMS) do
       if (info.level or 1) > max_level then
-        goto continue
+        goto continuelabel
       end
 
       if info.kind == "powerup" then
-        goto continue
+        goto continuelabel
       end
 
       local prob = info.start_prob or info.add_prob
@@ -2272,7 +2272,7 @@ function Quest_nice_items(LEVEL)
       if prob and prob > 0 then
         pal[name] = prob
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return pal
@@ -2284,10 +2284,10 @@ function Quest_nice_items(LEVEL)
 
     for name,info in pairs(GAME.NICE_ITEMS) do
       -- ignore secret-only items
-      if not info.add_prob then goto continue end
+      if not info.add_prob then goto continuelabel end
 
       pal[name] = info.crazy_prob or 50
-      ::continue::
+      ::continuelabel::
     end
 
     return pal
@@ -2296,7 +2296,7 @@ function Quest_nice_items(LEVEL)
 
   local function have_weapon_for_ammo(ammo)
     for name,info in pairs(GAME.WEAPONS) do
-      if info.ammo ~= ammo then goto continue end
+      if info.ammo ~= ammo then goto continuelabel end
 
       -- the player always has this weapon?
       local classname, hmodel = next(GAME.PLAYER_MODEL)
@@ -2312,7 +2312,7 @@ function Quest_nice_items(LEVEL)
 
       -- the weapon was given in an earlier map?
       if OB_CONFIG.pistol_starts == "no" and EPISODE.seen_weapons[name] then return true end
-      ::continue::
+      ::continuelabel::
     end
 
     return false
@@ -2323,17 +2323,17 @@ function Quest_nice_items(LEVEL)
     local pal = {}
 
     for name,info in pairs(ALL_ITEMS) do
-      if not info.storage_prob then goto continue end
+      if not info.storage_prob then goto continuelabel end
 
       -- check if we have a weapon which uses this ammo
       if info.kind == "ammo" and not have_weapon_for_ammo(info.give[1].ammo) then
-        goto continue
+        goto continuelabel
       end
 
       if info.storage_prob > 0 then
         pal[name] = info.storage_prob
       end
-      ::continue::
+      ::continuelabel::
     end
 
     return pal
@@ -2647,7 +2647,7 @@ function Quest_nice_items(LEVEL)
       end
 
       for count = info.min_count or 1, info.max_count do
-        if table.empty(room_tab) then goto continue end
+        if table.empty(room_tab) then goto continuelabel end
 
         local best_room
         local best_score = 10
@@ -2672,7 +2672,7 @@ function Quest_nice_items(LEVEL)
           table.kill_elem(room_tab, best_room)
         end
 
-        ::continue::
+        ::continuelabel::
       end
     end
 
@@ -3185,7 +3185,7 @@ function Quest_room_themes(LEVEL)
 
       local pick = rand.key_by_probs(tab)
       gui.printf("\nLevel light group: " .. pick .. "\n")
-      if pick == "all" then goto continue end
+      if pick == "all" then goto continuelabel end
       local color_group = LIGHT_GROUPS[pick].shades
 
       local c_tab = LIGHT_COLORS
@@ -3202,7 +3202,7 @@ function Quest_room_themes(LEVEL)
         LEVEL.light_group[c_pick] = 1
       end
 
-      ::continue::
+      ::continuelabel::
     end
   end
 

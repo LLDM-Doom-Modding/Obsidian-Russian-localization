@@ -131,11 +131,11 @@ void MarkPolyobjPoint(double x, double y)
         double y2 = L->end->y;
 
         /* check vertical range */
-        if (fabs(y2 - y1) < OBSIDIAN_DIST_EPSILON)
+        if (fabs(y2 - y1) < OBSIDIAN_EPSILON)
             continue;
 
-        if ((y > (y1 + OBSIDIAN_DIST_EPSILON) && y > (y2 + OBSIDIAN_DIST_EPSILON)) ||
-            (y < (y1 - OBSIDIAN_DIST_EPSILON) && y < (y2 - OBSIDIAN_DIST_EPSILON)))
+        if ((y > (y1 + OBSIDIAN_EPSILON) && y > (y2 + OBSIDIAN_EPSILON)) ||
+            (y < (y1 - OBSIDIAN_EPSILON) && y < (y2 - OBSIDIAN_EPSILON)))
             continue;
 
         double x_cut = x1 + (x2 - x1) * (y - y1) / (y2 - y1) - x;
@@ -164,7 +164,7 @@ void MarkPolyobjPoint(double x, double y)
 
     /* sanity check: shouldn't be directly on the line */
 #if DEBUG_POLYOBJ
-    if (fabs(best_dist) < OBSIDIAN_DIST_EPSILON)
+    if (fabs(best_dist) < OBSIDIAN_EPSILON)
     {
         DebugPrint("  Polyobj FAILURE: directly on the line (%d)\n", best_match->index);
     }
@@ -288,7 +288,7 @@ bool vertex_t::Overlaps(const vertex_t *other) const
     double dx = fabs(other->x - x);
     double dy = fabs(other->y - y);
 
-    return (dx < OBSIDIAN_DIST_EPSILON) && (dy < OBSIDIAN_DIST_EPSILON);
+    return (dx < OBSIDIAN_EPSILON) && (dy < OBSIDIAN_EPSILON);
 }
 
 struct Compare_vertex_X_pred
@@ -320,7 +320,7 @@ void DetectOverlappingVertices(void)
         {
             vertex_t *B = array[k];
 
-            if (B->x > A->x + OBSIDIAN_DIST_EPSILON)
+            if (B->x > A->x + OBSIDIAN_EPSILON)
                 break;
 
             if (A->Overlaps(B))
@@ -413,7 +413,7 @@ void DetectOverlappingLines(void)
         {
             linedef_t *B = array[k];
 
-            if (B->MinX() > A->MinX() + OBSIDIAN_DIST_EPSILON)
+            if (B->MinX() > A->MinX() + OBSIDIAN_EPSILON)
                 break;
 
             // due to DetectOverlappingVertices(), we can compare the vertex pointers
@@ -459,7 +459,7 @@ void vertex_t::AddWallTip(double dx, double dy, bool open_left, bool open_right)
     {
     }
 
-    while (after && tip->angle + OBSIDIAN_ANG_EPSILON < after->angle)
+    while (after && tip->angle + OBSIDIAN_EPSILON < after->angle)
         after = after->prev;
 
     // link it in
@@ -607,8 +607,8 @@ bool vertex_t::CheckOpen(double dx, double dy) const
 
     for (tip = tip_set; tip; tip = tip->next)
     {
-        if (fabs(tip->angle - angle) < OBSIDIAN_ANG_EPSILON ||
-            fabs(tip->angle - angle) > (360.0 - OBSIDIAN_ANG_EPSILON))
+        if (fabs(tip->angle - angle) < OBSIDIAN_EPSILON ||
+            fabs(tip->angle - angle) > (360.0 - OBSIDIAN_EPSILON))
         {
             // found one, hence closed
             return false;
@@ -621,7 +621,7 @@ bool vertex_t::CheckOpen(double dx, double dy) const
 
     for (tip = tip_set; tip; tip = tip->next)
     {
-        if (angle + OBSIDIAN_ANG_EPSILON < tip->angle)
+        if (angle + OBSIDIAN_EPSILON < tip->angle)
         {
             // found it
             return tip->open_right;

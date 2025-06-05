@@ -24,6 +24,7 @@
 #include <locale.h>
 #include <string.h>
 
+#include <format>
 #include <string>
 
 #include "csg_main.h"
@@ -36,7 +37,7 @@
 #include "m_trans.h"
 #include "physfs.h"
 #include "sys_debug.h"
-#include "sys_xoshiro.h"
+#include "sys_twister.h"
 
 #ifdef OBSIDIAN_ENABLE_GUI
 #include "sokol_app.h"
@@ -173,7 +174,7 @@ bool Main::BackupFile(const std::string &filename)
     {
         std::string backup_name = filename;
 
-        ReplaceExtension(backup_name, StringFormat("%s.%s", GetExtension(backup_name).c_str(), ".bak"));
+        ReplaceExtension(backup_name, std::format("{}.{}", GetExtension(backup_name), ".bak"));
 
         LogPrint("Backing up existing file to: %s\n", backup_name.c_str());
 
@@ -203,7 +204,7 @@ void Main_CalcNewSeed()
         string_seed = ob_get_random_phrase();
     ob_set_config("seed", string_seed.c_str());
     next_rand_seed = StringHash64(string_seed);
-    xoshiro_Reseed(next_rand_seed);
+    twister_Reseed(next_rand_seed);
 }
 
 /* ----- main program ----------------------------- */
@@ -449,7 +450,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        std::string win_title = StringFormat("%s v%s \"%s\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
+        std::string win_title = std::format("{} v{} \"{}\"", OBSIDIAN_TITLE, OBSIDIAN_SHORT_VERSION, OBSIDIAN_CODE_NAME);
         sapp_desc app = {0};
         app.init_cb = init;
         app.frame_cb = frame;

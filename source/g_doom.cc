@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include <bitset>
+#include <format>
 #include <string>
 
 #include "bsp.h"
@@ -39,7 +40,6 @@
 #include "sys_debug.h"
 #include "sys_endian.h"
 #include "sys_macro.h"
-#include "sys_xoshiro.h"
 
 extern void        CSG_DOOM_Write();
 
@@ -447,7 +447,7 @@ bool Doom::StartWAD(const std::string &filename)
 {
     if (!WAD_OpenWrite(filename))
     {
-        ob_error_message = StringFormat(_("Unable to create wad file:\n\n%s"), strerror(errno));
+        ob_error_message = std::format("{}{}", _("Unable to create wad file:\n\n"), strerror(errno));
         return false;
     }
 

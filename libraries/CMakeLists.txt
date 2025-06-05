@@ -1,6 +1,6 @@
-add_subdirectory(fastPRNG)
 add_subdirectory(luaalloc)
 add_subdirectory(minilua)
+add_subdirectory(miniz)
 add_subdirectory(physfs)
 if (OBSIDIAN_GUI)
   add_subdirectory(moonnuklear)
