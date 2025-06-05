@@ -31,6 +31,7 @@
 #include "bsp.h"
 #include "lib_util.h"
 #include "lib_wad.h"
+#include "lib_zip.h"
 #include "m_cookie.h"
 #include "m_lua.h"
 #include "m_trans.h"
@@ -1252,9 +1253,11 @@ class game_interface_c : public ::game_interface_c
 {
   private:
     std::string filename;
+    std::string zip_filename;
+    bool        compress_output;
 
   public:
-    game_interface_c() : filename("")
+    game_interface_c() : filename(""), zip_filename(""), compress_output(false)
     {
     }
 
@@ -1277,6 +1280,7 @@ bool Doom::game_interface_c::Start(std::string_view preset)
     ef_thing_mode  = 0;
 
     current_port    = ob_get_string_param("port");
+    compress_output = ob_get_bool_param("compress_output");
 
     ob_invoke_hook("pre_setup");
 
@@ -1297,9 +1301,30 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
     ReplaceExtension(filename, ".wad");
 
-    if (ob_get_bool_param("create_backups"))
+    if (FileExists(filename))
     {
-        Main::BackupFile(filename);
+        if (ob_get_bool_param("create_backups"))
+            Main::BackupFile(filename);
+        FileDelete(filename);
+    }
+
+    if (compress_output)
+    {
+        zip_filename = filename;
+        ReplaceExtension(zip_filename, ".zip");
+        if (FileExists(zip_filename))
+        {
+            if (ob_get_bool_param("create_backups"))
+            {
+                Main::BackupFile(zip_filename);
+            }
+            FileDelete(zip_filename);
+        }
+        if (!ZIPF_OpenWrite(zip_filename))
+        {
+            ob_error_message = std::format("{}", _("Error (create ZIP)"));
+            return false;
+        }
     }
 
     if (!StartWAD(filename))
@@ -1352,6 +1377,33 @@ bool Doom::game_interface_c::Finish(bool build_ok)
     {
         // remove the WAD if an error occurred
         FileDelete(filename);
+        if (compress_output)
+            FileDelete(zip_filename);
+    }
+    else
+    {
+        if (compress_output)
+        {
+            if (!ZIPF_AddFile(filename, ""))
+            {
+                LogPrint("Adding WAD to ZIP failed! Retaining original "
+                         "WAD.\n");
+                ZIPF_CloseWrite();
+                FileDelete(zip_filename);
+            }
+            else
+            {
+                if (!ZIPF_CloseWrite())
+                {
+                    LogPrint("Corrupt ZIP! Retaining original WAD.\n");
+                    FileDelete(zip_filename);
+                }
+                else
+                {
+                    FileDelete(filename);
+                }
+            }
+        }
     }
     
     return build_ok;

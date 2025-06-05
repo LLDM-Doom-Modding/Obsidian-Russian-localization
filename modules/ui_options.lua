@@ -39,6 +39,14 @@ OB_MODULES["ui_options"] =
       priority = 100,
     },
     { 
+      name="compress_output", 
+      label=_("ZIP Output"),
+      choices = YES_NO_CHOICES,
+      default = "yes",
+      tooltip = _("Automatically compress output to ZIP to save space."),
+      priority = 100,
+    },
+    { 
       name="create_backups", 
       label=_("Backup Files"),
       choices = YES_NO_CHOICES,
