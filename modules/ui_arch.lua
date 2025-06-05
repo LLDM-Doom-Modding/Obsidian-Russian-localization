@@ -93,7 +93,6 @@ OB_MODULES["ui_arch"] =
     
   side = "left",
   priority = 104,
-  engine = "!idtech_0",
   where = "arch",
 
   hooks = 
@@ -201,99 +200,3 @@ OB_MODULES["ui_arch"] =
     }]]--
   },
 }
-
---[[
-
--- WOLF 3D ENGINE MODULE
-
-UI_ARCH_WOLF_3D = { }
-
-UI_ARCH_WOLF_3D.RAMP_FACTOR =
-{
-  "0.5",  _("Very Fast Curve"),
-  "0.66", _("Fast Curve"),
-  "1",    _("Linear"),
-  "1.5",  _("Slow Curve"),
-  "2",    _("Very Slow Curve"),
-}
-
-OB_MODULES["ui_arch_wolf_3d"] =
-{
-  name = "ui_arch_wolf_3d",
-
-  label = _("Architecture"),
-    
-  -- color = { red = 125, green = 125, blue = 125 }, -- This is an example of setting a custom per-module color - Dasho
-
-  side = "left",
-  priority = 104,
-  engine = "idtech_0",
-  where = "arch",
-
-  hooks = 
-  {
-  },
-
-  options =
-  {
-
-    { 
-      name="float_size_wolf_3d", 
-      label=_("Level Size"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 36,
-      nan = _("Mix It Up,Episodic,Progressive"),
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Determines size of map (Width x Height) in grid squares."),
-      longtip = _("If you are planning to generate Binary format maps at sizes of 50 and above, Autodetailing will be enabled by default. The stability of maps with sizes 60 and beyond is not predictable unless using UDMF map format (supported engines only)."),
-      priority = 100,
-      
-    },
-
-
-    {
-      name = "float_level_upper_bound_wolf_3d",
-      label = _("Upper Bound"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 75,
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Fine tune upper limit when Level Size is set to Episodic, Progressive or Mixed."),
-      priority = 99,
-    },
-
-
-    {
-      name = "float_level_lower_bound_wolf_3d",
-      label = _("Lower Bound"),
-      valuator = "slider",
-      min = 10,
-      max = 75,
-      increment = 1,
-      default = 10,
-      presets = _("10:10 (Microscopic),16:16 (Miniature),22:22 (Tiny),30:30 (Small),36:36 (Average),42:42 (Large),48:48 (Huge),58:58 (Colossal),66:66 (Gargantuan),75:75 (Transcendent)"),
-      tooltip = _("Fine tune lower limit when Level Size is set to Episodic, Progressive or Mixed."),
-      priority = 98,
-      gap = 1,
-    },
-
-
-    {
-      name = "level_size_ramp_factor_wolf_3d",
-      label = _("Ramp Factor"),
-      tooltip = _("Determines how fast or slow larger level sizes are reached in Progressive/Episodic mode."),
-      longtip = _("Very Fast Curve: Reach half-size at 1/4th of the game.\nFast Curve: Reach half-size at 1/3rds.\nLinear: Reach half-size at half the game.\nSlow Curve: Reach half-size at 2/3rds.\nVery Slow Curve: Reach half-size at 3/4ths.\n\nObsidian default is Fast Curve."),
-      choices = UI_ARCH_WOLF_3D.RAMP_FACTOR,
-      default = "0.66",
-      priority = 97,
-      
-    },
-  },
-}
-
-]]--

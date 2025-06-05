@@ -2053,7 +2053,6 @@ function Level_choose_themes()
   -- need to do this first
   collect_mixed_themes()
 
-
   local theme = OB_CONFIG.theme
 
   -- As Original : follow the original game

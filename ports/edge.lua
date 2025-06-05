@@ -157,11 +157,9 @@ OB_PORTS["edge"] =
 {
   label = _("EDGE-Classic"),
 
-  extends = "advanced",
-
   priority = 99,
 
-  game = { chex1=0, doom1=1, doom2=1, hacx=0, harmony=0, heretic=1, ultdoom=1, tnt=1, plutonia=1, strife=0, rekkr=0 },
+  game = { doom1=1, doom2=1, heretic=1, ultdoom=1, tnt=1, plutonia=1 },
 
   tables =
   {

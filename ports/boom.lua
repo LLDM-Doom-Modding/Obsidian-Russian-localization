@@ -145,7 +145,7 @@ OB_PORTS["boom"] =
 
   priority = 102,  -- this makes it top-most, and the default engine
 
-  game = { chex1=0, doom1=1, doom2=1, hacx=0, harmony=0, strife=0, rekkr=0 },
+  game = "doomish",
 
   tables =
   {
@@ -156,42 +156,4 @@ OB_PORTS["boom"] =
   {
     all_done = BOOM.all_done
   }
-}
-
-----------------------------------------------------------------
-
--- This should not be visible in the Engine selection list; it's a shim to separate UDMF/advanced engines
-
-ADVANCED = {}
-
-
-ADVANCED.ENTITIES =
-{
-
-}
-
-
-ADVANCED.PARAMETERS =
-{
-
-}
-
-
-OB_PORTS["advanced"] =
-{
-  label = _("Advanced"),
-  priority = 95,
-
-  extends = "boom",
-
-  tables =
-  {
-    ADVANCED
-  },
-
-  hooks =
-  {
-
-  }
-
 }

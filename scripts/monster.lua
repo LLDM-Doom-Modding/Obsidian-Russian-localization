@@ -1507,7 +1507,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
         ang = geom.angle_add(ang, 180)
       end
       if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 and spot.bossgen then
-        if ob_match_game({game = {doom2=1, hacx=1}}) then
+        if ob_match_game({game = {doom2=1, tnt=1, plutonia=1}}) then
           return ang + LEVEL.id
         else
           if OB_CONFIG.length == "single" or OB_CONFIG.length == "few" then
@@ -1523,7 +1523,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
 
     -- fallback : purely random angle
     if LEVEL.is_procedural_gotcha and OB_CONFIG.bool_boss_gen == 1 and spot.bossgen then
-      if ob_match_game({game = {doom2=1, hacx=1}}) then
+      if ob_match_game({game = {doom2=1, tnt=1, plutonia=1}}) then
         return (rand.irange(0,7) * 45) + LEVEL.id
       else
         if OB_CONFIG.length == "single" or OB_CONFIG.length == "few" then

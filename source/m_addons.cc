@@ -96,7 +96,6 @@ void VFS_InitAddons()
 
     VFS_AddFolder("scripts");
     VFS_AddFolder("games");
-    VFS_AddFolder("engines");
     VFS_AddFolder("modules");
     VFS_AddFolder("data");
     VFS_AddFolder("ports");

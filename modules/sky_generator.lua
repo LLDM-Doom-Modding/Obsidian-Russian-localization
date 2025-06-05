@@ -340,9 +340,6 @@ OB_MODULES["sky_generator"] =
   where = "other",
   priority = 93,
 
-  game = {doom1=1,doom2=1,tnt=1,plutonia=1,heretic=1,hacx=1},
-  port = "!limit_enforcing",
-
   hooks =
   {
     setup = SKY_GEN.setup,

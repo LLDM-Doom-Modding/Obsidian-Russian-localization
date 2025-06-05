@@ -8,17 +8,12 @@ project(
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-option(OBSIDIAN_DEBUG_LUA "Enable Lua debugging"    OFF)
 option(OBSIDIAN_GUI       "Build Sokol+Nuklear GUI" ON)
 # These are only needed if wanting to force a specific Sokol backend,
 # otherwise a platform-specific default will be selected
 option(OBSIDIAN_SOKOL_D3D11 "Use Sokol D3D11" OFF)
 option(OBSIDIAN_SOKOL_GL    "Use Sokol GL"    OFF)
 option(OBSIDIAN_SOKOL_GLES3 "Use Sokol GLES3" OFF)
-
-if(OBSIDIAN_DEBUG_LUA)
-  add_compile_definitions(OBSIDIAN_DEBUG_LUA)
-endif()
 
 if(OBSIDIAN_GUI)
   if (NOT OBSIDIAN_SOKOL_GL AND NOT OBSIDIAN_SOKOL_D3D11 AND NOT OBSIDIAN_SOKOL_GLES3)
@@ -91,16 +86,12 @@ set(OBSIDIAN_SOURCE_FILES
     source/m_addons.cc
     source/m_cookie.cc
     source/m_lua.cc
-    source/m_luadbg.cc
     source/m_trans.cc
     source/main.cc
     source/poly_map.cc
     source/poly.cc
     source/poly_util.cc
     source/poly_wad.cc
-    source/slump_dump.cc
-    source/slump_main.cc
-    source/slump.cc
     source/sys_assert.cc
     source/sys_debug.cc
     source/sys_xoshiro.cc

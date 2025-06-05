@@ -30,7 +30,6 @@
 #include "m_trans.h"
 #include "main.h"
 #include "m_cookie.h"
-#include "m_luadbg.h"
 #include "minilua.h"
 #include "physfs.h"
 #include "sys_assert.h"
@@ -670,22 +669,6 @@ static const luaL_Reg bit_functions[] = {
     {NULL, NULL} // the end
 };
 
-// NOP dbg() for when debugger is disabled and someone has left some breakpoints
-// in code
-static bool dbg_nop_warn = false;
-static int  p_lua_nop(lua_State *L)
-{
-    (void)L;
-    if (!dbg_nop_warn)
-    {
-        dbg_nop_warn = true;
-        LogPrint("LUA: dbg() called without lua_debug being set.  Please check that "
-                   "a stray dbg call didn't get left "
-                   "in source.");
-    }
-    return 0;
-}
-
 static int p_init_lua(lua_State *L)
 {
     /* stop collector during initialization */
@@ -699,14 +682,6 @@ static int p_init_lua(lua_State *L)
 #ifdef OBSIDIAN_ENABLE_GUI
         luaopen_moonnuklear(L);
         lua_setglobal(L, "nk");
-#endif
-#ifdef OBSIDIAN_DEBUG_LUA
-        lua_newtable(L);
-        lua_setglobal(L, "__ob_debugger_source");
-        dbg_setup_default(L);
-#else
-        lua_pushcfunction(L, p_lua_nop);
-        lua_setglobal(L, "dbg");
 #endif
     }
     lua_gc(L, LUA_GCRESTART, 0);

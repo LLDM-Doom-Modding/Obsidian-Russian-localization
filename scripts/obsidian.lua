@@ -181,46 +181,6 @@ function ob_match_game(T)
   return not result
 end
 
-
-function ob_match_engine(T)
-  if not T.engine then return true end
-  if T.engine == "any" then return true end
-
-  local engine = T.engine
-  local result = true
-
-  -- negated check?
-  if type(engine) == "string" and string.sub(engine, 1, 1) == '!' then
-    engine = string.sub(engine, 2)
-    result = not result
-  end
-
-  -- normal check
-  if ob_match_word_or_table(engine, OB_CONFIG.engine) then
-    return result
-  end
-  
-  
-
-  -- handle extended engines
-
-  local engine_def = OB_ENGINES[OB_CONFIG.engine]
-
-  while engine_def do
-    if not engine_def.extends then
-      break;
-    end
-
-    if ob_match_word_or_table(engine, engine_def.extends) then
-      return result
-    end
-
-    engine_def = OB_ENGINES[engine_def.extends]
-  end
-
-  return not result
-end
-
 function ob_match_port(T)
   if not T.port then return true end
   if T.port == "any" then return true end
@@ -485,11 +445,9 @@ end
 
 
 function ob_match_conf(T)
-  assert(OB_CONFIG.engine)
   assert(OB_CONFIG.game)
   assert(OB_CONFIG.port)
 
-  if not ob_match_engine(T)     then return false end
   if not ob_match_game(T)     then return false end
   if not ob_match_port(T)   then return false end
   if not ob_match_port2(T)  then return false end
@@ -536,6 +494,20 @@ end
 
 function ob_update_games()
   local need_new = false
+  local game_choice = nil
+
+  if nk ~= nil then
+    UI_BUILD.GAMES = {}
+    for _,opt in pairs(OB_MODULES["ui_build"].options) do
+      if opt.name == "game" then
+        game_choice = opt
+        game_choice.avail_choices = {}
+        game_choice.avail_labels = {}
+        goto gamecleared
+      end
+    end
+    ::gamecleared::
+  end
 
   for name,def in pairs(OB_GAMES) do
     local valid = ob_match_conf(def)
@@ -543,19 +515,49 @@ function ob_update_games()
     if not valid and (OB_CONFIG.game == name) then
       need_new = true
     end
+
+    if nk ~= nil then
+      if valid == true then
+        table.insert(UI_BUILD.GAMES, def.name)
+        table.insert(UI_BUILD.GAMES, def.label)
+        game_choice.avail_choices[#game_choice.avail_choices+1] = def.name
+        game_choice.avail_labels[#game_choice.avail_labels+1] = def.label
+      end
+    end
   end
 
   if need_new then
-    if OB_CONFIG.engine == "idtech_0" then
-      OB_CONFIG.game = "wolf"
-    else
       OB_CONFIG.game = "doom2"
+  end
+
+  -- Fix selection index for GUI if appropriate
+  if nk ~= nil then
+    for index,name in ipairs(game_choice.avail_choices) do
+      if OB_CONFIG.game == name then
+        game_choice.choice_selection = index
+        goto continue
+      end
     end
+    ::continue::
   end
 end
 
 function ob_update_ports()
   local need_new = false
+  local port_choice = nil
+
+  if nk ~= nil then
+    UI_BUILD.PORTS = {}
+    for _,opt in pairs(OB_MODULES["ui_build"].options) do
+      if opt.name == "port" then
+        port_choice= opt
+        port_choice.avail_choices = {}
+        port_choice.avail_labels = {}
+        goto portcleared
+      end
+    end
+    ::portcleared::
+  end
 
   for name,def in pairs(OB_PORTS) do
     local valid = ob_match_conf(def)
@@ -563,25 +565,49 @@ function ob_update_ports()
     if not valid and (OB_CONFIG.port == name) then
       need_new = true
     end
+
+    if nk ~= nil then
+      if valid == true then
+        table.insert(UI_BUILD.PORTS, def.name)
+        table.insert(UI_BUILD.PORTS, def.label)
+        port_choice.avail_choices[#port_choice.avail_choices+1] = def.name
+        port_choice.avail_labels[#port_choice.avail_labels+1] = def.label
+      end
+    end
   end
 
   if need_new then
-    if OB_CONFIG.engine == "idtech_0" then
-      OB_CONFIG.port = "vanilla"
-    elseif OB_CONFIG.engine == "idtech_1" then
-      if OB_CONFIG.game == "chex1" or OB_CONFIG.game == "hacx" or OB_CONFIG.game == "harmony" or OB_CONFIG.game == "strife" or OB_CONFIG.game == "rekkr" then  -- Ugh
-        OB_CONFIG.port = "limit_enforcing"
-      else
-        OB_CONFIG.port = "boom"
+    OB_CONFIG.port = "boom"
+  end
+
+  -- Fix selection index for GUI if appropriate
+  if nk ~= nil then
+    for index,name in ipairs(port_choice.avail_choices) do
+      if OB_CONFIG.port == name then
+        port_choice.choice_selection = index
+        goto continue
       end
-    else -- shouldn't get here - Dasho
-      OB_CONFIG.port = "vanilla"
     end
+    ::continue::
   end
 end
 
 function ob_update_themes()
   local need_new = false
+  local theme_choice = nil
+
+  if nk ~= nil then
+    UI_BUILD.THEMES = {}
+    for _,opt in pairs(OB_MODULES["ui_build"].options) do
+      if opt.name == "theme" then
+        theme_choice = opt
+        theme_choice.avail_choices = {}
+        theme_choice.avail_labels = {}
+        goto themecleared
+      end
+    end
+    ::themecleared::
+  end
 
   for name,def in pairs(OB_THEMES) do
     local valid = ob_match_conf(def)
@@ -591,14 +617,30 @@ function ob_update_themes()
     end
 
     def.valid = valid
+
+    if nk ~= nil then
+      if valid == true then
+        table.insert(UI_BUILD.THEMES, def.name)
+        table.insert(UI_BUILD.THEMES, def.label)
+        theme_choice.avail_choices[#theme_choice.avail_choices+1] = def.name
+        theme_choice.avail_labels[#theme_choice.avail_labels+1] = def.label
+      end
+    end
   end
 
   if need_new then
-    if OB_CONFIG.port == "limit_enforcing" then
-      OB_CONFIG.theme = "default"
-    else
-      OB_CONFIG.theme = "original"
+    OB_CONFIG.theme = "original"
+  end
+
+  -- Fix selection index for GUI if appropriate
+  if nk ~= nil then
+    for index,name in ipairs(theme_choice.avail_choices) do
+      if OB_CONFIG.theme == name then
+        theme_choice.choice_selection = index
+        goto continue
+      end
     end
+    ::continue::
   end
 end
 
@@ -778,13 +820,7 @@ function ob_set_config(name, value)
 
 
   -- validate some important variables
-  if name == "engine" then
-    assert(OB_CONFIG.engine)
-    if not OB_ENGINES[value] then
-      gui.printf("Ignoring unknown engine: %s\n", value)
-      return
-    end
-  elseif name == "game" then
+  if name == "game" then
       assert(OB_CONFIG.game)
       if not OB_GAMES[value] then
         gui.printf("Ignoring unknown game: %s\n", value)
@@ -806,7 +842,7 @@ function ob_set_config(name, value)
 
   OB_CONFIG[name] = value
 
-  if name == "engine" or name == "game" or name == "port" then
+  if name == "game" or name == "port" then
     ob_update_all()
   end
 
@@ -886,7 +922,6 @@ function ob_read_all_config(need_full, log_only)
   do_line("---- Game Settings ----")
   do_line("")
 
-  do_value("engine",   OB_CONFIG.engine)
   do_value("game",     OB_CONFIG.game)
   do_value("port",     OB_CONFIG.port)
   do_value("length",   OB_CONFIG.length)
@@ -998,26 +1033,6 @@ function ob_load_all_games()
   if table.empty(OB_GAMES) then
     error("Failed to load any games at all")
   end
-end
-
-
-function ob_load_all_engines()
-
-  local list = gui.scan_directory("engines", "*.lua")
-
-  if not list then
-    gui.printf("FAILED: scan 'engines' directory\n")
-    return
-  end
-
-  gui.set_import_dir("engines")
-
-  for _,filename in pairs(list) do
-    gui.debugf("  %s\n", filename)
-    gui.import(filename)
-  end
-
-  gui.set_import_dir("")
 end
 
 function ob_load_all_ports()
@@ -1144,8 +1159,6 @@ function ob_init()
 
   -- load definitions for all games
 
-  gui.printf("Loading all engines...\n")
-  ob_load_all_engines()
   gui.printf("Loading all games...\n")
   ob_load_all_games()
   gui.printf("Loading all ports...\n")
@@ -1153,7 +1166,6 @@ function ob_init()
   gui.printf("Loading all modules...\n")
   ob_load_all_modules()
 
-  table.name_up(OB_ENGINES)
   table.name_up(OB_GAMES)
   table.name_up(OB_PORTS)
   table.name_up(OB_THEMES)
@@ -1176,7 +1188,6 @@ function ob_init()
     end
   end
 
-  preinit_all(OB_ENGINES)
   preinit_all(OB_GAMES)
   preinit_all(OB_PORTS)
   preinit_all(OB_THEMES)
@@ -1188,31 +1199,34 @@ function ob_init()
 
     local list = nil
 
-    if what == "engine" then
-      list = UI_BUILD.ENGINES
-    elseif what == "port" then
+    if what == "port" then
       list = UI_BUILD.PORTS
     elseif what == "game" then
       list = UI_BUILD.GAMES
     elseif what == "theme" then
       list = UI_BUILD.THEMES
+    elseif what == "length" then
+      list = UI_BUILD.LENGTHS
     else
       return
     end
 
-    for _,def in pairs(DEFS) do
-      assert(def.name and def.label)
-      table.insert(list, def.name)
-      table.insert(list, def.label)
+    if what == "length" then
+      for _,item in ipairs(LENGTH_CHOICES) do
+        table.insert(list, item)
+      end
+    else
+      for _,def in pairs(DEFS) do
+        assert(def.name and def.label)
+        table.insert(list, def.name)
+        table.insert(list, def.label)
+      end
     end
 
     -- We need to set defaults manually here because the associated
     -- modules/options have not been populated at this stage. They will
     -- be changed to existing config settings later
-    if what == "engine" then
-      assert(table.has_elem(UI_BUILD.ENGINES, "idtech_1"))
-      OB_CONFIG.engine = "idtech_1"
-    elseif what == "port" then
+    if what == "port" then
       assert(table.has_elem(UI_BUILD.PORTS, "boom"))
       OB_CONFIG.port = "boom"
     elseif what == "game" then
@@ -1221,15 +1235,12 @@ function ob_init()
     elseif what == "theme" then
       assert(table.has_elem(UI_BUILD.THEMES, "original"))
       OB_CONFIG.theme = "original"
+    elseif what == "length" then
+      assert(table.has_elem(UI_BUILD.LENGTHS, "game"))
+      OB_CONFIG.length = "game"
     end
 
   end
-
-
-  local function simple_buttons(what, default)
-    OB_CONFIG[what] = default
-  end
-
 
   local function create_mod_options()
     gui.debugf("creating module options\n", what)
@@ -1295,17 +1306,13 @@ function ob_init()
 
   OB_CONFIG.seed = nil
 
-  create_buttons("engine", OB_ENGINES)
   create_buttons("game",   OB_GAMES)
   create_buttons("port",   OB_PORTS)
   create_buttons("theme",  OB_THEMES)
-
-  simple_buttons("length",   LENGTH_CHOICES,   "game")
+  create_buttons("length", LENGTH_CHOICES)
 
   create_buttons("module", OB_MODULES)
   create_mod_options()
-
-  OB_CONFIG.engine = "idtech_1"
 
   ob_update_all()
 
@@ -1484,20 +1491,10 @@ function ob_default_filename()
     return "unused.filename"
   else
     local name_tab = {}
-    if OB_CONFIG.game == "chex1" then
-      name_tab = CHEX1.NAMES
-    elseif ob_match_game({game = "doomish"}) then
+    if ob_match_game({game = "doomish"}) then
       name_tab = DOOM.NAMES
-    elseif OB_CONFIG.game == "hacx" then
-      name_tab = HACX.NAMES
-    elseif OB_CONFIG.game == "harmony" then
-      name_tab = HARMONY.NAMES
     elseif OB_CONFIG.game == "heretic" then
       name_tab = HERETIC.NAMES
-    elseif OB_CONFIG.game == "strife" then
-      name_tab = STRIFE.NAMES
-    elseif OB_CONFIG.game == "rekkr" then
-      name_tab = REKKR.NAMES
     end
     Naming_init(name_tab)
   end
@@ -1735,15 +1732,11 @@ function ob_build_setup()
     end
   end
 
-
   local game_params = assert(GAME.PARAMETERS)
 
   table.merge_missing(game_params, GLOBAL_PARAMETERS)
 
-  -- load all the prefab definitions
-  if not ob_match_game({game = {wolf=1,spear=1,noah=1,obc=1}}) then
-    Naming_init(GAME.NAMES)
-  end
+  Naming_init(GAME.NAMES)
 
   ob_invoke_hook("setup")
 
@@ -1831,31 +1824,7 @@ function ob_build_cool_shit()
 
   coroutine.yield()
 
-  if OB_CONFIG.engine == "idtech_1" and OB_CONFIG.port == "limit_enforcing" then
-    ob_clean_up()
-    ob_sort_modules()
-    ob_add_current_game()
-    ob_add_current_port()
-    for index,mod in pairs(GAME.modules) do
-      if index > 2 and mod.tables then
-        ob_merge_table_list(mod.tables)
-      end
-    end
-    ob_invoke_hook("slump_setup")
-    ob_invoke_hook("setup")
-    assert(OB_CONFIG.slump_config)
-    return "ok" 
-  end -- Skip the rest if using Vanilla Doom/SLUMP
-
   ob_build_setup()
-
-  -- Hijack here if Wolf3D is selected
-
-  if OB_CONFIG.engine == "idtech_0" then
-    --local result = v094_build_wolf3d_shit()
-    ob_clean_up()
-    return result
-  end
 
   status = Level_make_all()
 

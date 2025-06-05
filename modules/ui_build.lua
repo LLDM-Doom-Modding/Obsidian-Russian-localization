@@ -1,6 +1,6 @@
 UI_BUILD = {}
 
-UI_BUILD.ENGINES =
+UI_BUILD.LENGTHS = 
 {
 }
 
@@ -33,14 +33,6 @@ OB_MODULES["ui_build"] =
   options =
   {
     { 
-      name="engine", 
-      label=_("Engine"),
-      choices = UI_BUILD.ENGINES,
-      default = "idtech_1",
-      tooltip = _("Selects the engine to use"),
-      priority = 100,
-    },
-    { 
         name="game", 
         label=_("Game"),
         choices = UI_BUILD.GAMES,
@@ -59,7 +51,7 @@ OB_MODULES["ui_build"] =
     { 
         name="length", 
         label=_("Length"),
-        choices = LENGTH_CHOICES,
+        choices = UI_BUILD.LENGTHS,
         default = "game",
         tooltip = _("Selects the length of the generated mapset"),
         priority = 100,

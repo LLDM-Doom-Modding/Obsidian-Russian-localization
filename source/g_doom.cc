@@ -41,9 +41,6 @@
 #include "sys_macro.h"
 #include "sys_xoshiro.h"
 
-// SLUMP for Vanilla Doom
-#include "slump.h"
-
 extern void        CSG_DOOM_Write();
 
 extern int ef_solid_type;
@@ -300,7 +297,7 @@ bool BuildNodes(std::string filename)
     // Prep AJBSP parameters
     ajbsp::buildinfo_t build_info;
     build_info.fast = true;
-    if (StringCompare(current_port, "limit_enforcing") == 0 || StringCompare(current_port, "boom") == 0)
+    if (StringCompare(current_port, "boom") == 0)
     {
         build_info.gl_nodes    = false;
         build_info.force_v5    = false;
@@ -1305,15 +1302,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
         Main::BackupFile(filename);
     }
 
-    // Need to preempt the rest of this process for now if we are using Vanilla
-    // Doom
-    if (StringCompare(current_port, "limit_enforcing") == 0)
-    {
-        map_format  = FORMAT_BINARY;
-        build_nodes = true;
-        return true;
-    }
-
     if (!StartWAD(filename))
     {
         return false;
@@ -1348,16 +1336,7 @@ bool Doom::game_interface_c::Start(std::string_view preset)
 
 bool Doom::game_interface_c::Finish(bool build_ok)
 {
-    // Skip DM_EndWAD if using Vanilla Doom
-    if (StringCompare(current_port, "limit_enforcing") != 0)
-    {
-        // TODO: handle write errors
-        EndWAD();
-    }
-    else
-    {
-        build_ok = slump::BuildLevels(filename);
-    }
+    EndWAD();
 
     if (UDMF_mode)
     {

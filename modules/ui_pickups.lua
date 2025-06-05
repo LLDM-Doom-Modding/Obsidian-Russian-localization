@@ -66,8 +66,6 @@ OB_MODULES["ui_pickups"] =
 
   where = "pickup",
   priority = 102,
-  engine = "!idtech_0",
-  port = "!limit_enforcing",
 
   hooks =
   {

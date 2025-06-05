@@ -62,12 +62,7 @@ OB_PORTS["zdoom"] =
   label = _("GZDoom"),
   priority = 100,
 
-  extends = "advanced",
-
-  game =
-  {
-    chex1=0, doom1=1, doom2=1, heretic=1, hacx=0, harmony=0, strife=0, rekkr=0
-  },
+  game = { doom1=1, doom2=1, heretic=1, ultdoom=1, tnt=1, plutonia=1 },
 
   tables =
   {

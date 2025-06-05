@@ -465,7 +465,7 @@ int main(int argc, char **argv)
         return app;
     }
 #else
-    LogEnableDebug(debug_messages);
+    LogEnableDebug(ob_get_bool_param("debug_messages"));
     if (!ob_do_build())
     {
         FatalError("FAILED!\n");

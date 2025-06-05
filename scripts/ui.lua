@@ -21,7 +21,7 @@
 
 local font_scale
 
-local UI_THEMES =
+local UI_GUI_THEMES =
 {
    ["default"] =
    {
@@ -59,8 +59,8 @@ local UI_THEMES =
 function ob_gui_init_themes(scale)
   if OB_NK_CTX == nil then return "bork" end
   if OB_NK_ATLAS == nil then return "bork" end
-  assert(UI_THEMES and UI_THEMES["default"])
-  for _,theme in pairs(UI_THEMES) do
+  assert(UI_GUI_THEMES and UI_GUI_THEMES["default"])
+  for _,theme in pairs(UI_GUI_THEMES) do
    assert(theme.normal_font_file and theme.normal_font_size and theme.bold_font_file and theme.bold_font_size) 
    theme.normal_font = OB_NK_ATLAS:add(theme.normal_font_size * scale, "data/fonts/" .. theme.normal_font_file)
    theme.normal_font:set_height(theme.normal_font_size)
@@ -71,7 +71,7 @@ function ob_gui_init_themes(scale)
       theme.bold_font = theme.normal_font
    end
   end
-  nk.style_set_font(OB_NK_CTX, UI_THEMES["default"].normal_font)
+  nk.style_set_font(OB_NK_CTX, UI_GUI_THEMES["default"].normal_font)
   font_scale = scale
   return "groovy"
 end
@@ -130,14 +130,16 @@ local module_category_labels =
    ["options"] = _("Options")
 }
 
-local current_theme = UI_THEMES["default"]
+local current_gui_theme = UI_GUI_THEMES["default"]
 
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end
 
-   nk.style_from_table(OB_NK_CTX, current_theme.colortable)
+   nk.style_from_table(OB_NK_CTX, current_gui_theme.colortable)
 
    local window_flags = 0
+
+   local need_update_all = false
 
    if OB_BUILD_ROUTINE ~= nil then
       local status = coroutine.status(OB_BUILD_ROUTINE)
@@ -154,7 +156,7 @@ function ob_gui_frame(width, height)
       if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
-      local f = current_theme.bold_font
+      local f = current_gui_theme.bold_font
       nk.style_set_font(OB_NK_CTX, f)
       nk.layout_row_dynamic(OB_NK_CTX, (f:height() * font_scale), #module_categories)
       for _, name in ipairs(module_categories) do
@@ -175,7 +177,7 @@ function ob_gui_frame(width, height)
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
       nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 75, 1)
-      f = current_theme.normal_font
+      f = current_gui_theme.normal_font
       nk.style_set_font(OB_NK_CTX, f)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
          for _,mod in pairs(OB_MODULES) do
@@ -194,6 +196,11 @@ function ob_gui_frame(width, height)
                   else
                      opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
                      opt.value = opt.avail_choices[opt.choice_selection]
+                     if opt.name == "game" or opt.name == "port" then
+                        if OB_CONFIG[opt.name] ~= opt.value then
+                           need_update_all = true
+                        end
+                     end
                      OB_CONFIG[opt.name] = opt.value
                   end
                end
@@ -221,5 +228,8 @@ function ob_gui_frame(width, height)
       nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
    end
    nk.window_end(OB_NK_CTX)
+   if need_update_all then
+      ob_update_all()
+   end
    return "ok"
 end
