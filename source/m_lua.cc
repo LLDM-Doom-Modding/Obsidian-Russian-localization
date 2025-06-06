@@ -542,11 +542,12 @@ extern int wadfab_get_line_hexen(lua_State *L);
 extern int wadfab_get_3d_floor(lua_State *L);
 extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
-int gui_start_it(lua_State *L);
-int gui_finish_it(lua_State *L);
+static int gui_start_it(lua_State *L);
+static int gui_finish_it(lua_State *L);
 #ifdef OBSIDIAN_ENABLE_GUI
-int gui_calc_seed(lua_State *L);
-int gui_directory_list(lua_State *L);
+static int gui_calc_seed(lua_State *L);
+static int gui_directory_list(lua_State *L);
+static int gui_is_directory(lua_State *L);
 #endif
 
 static const luaL_Reg gui_script_funcs[] = {
@@ -569,6 +570,7 @@ static const luaL_Reg gui_script_funcs[] = {
 #ifdef OBSIDIAN_ENABLE_GUI
     {"calc_seed", gui_calc_seed},
     {"directory_list", gui_directory_list},
+    {"is_directory", gui_is_directory},
 #endif
 
     // file & directory functions
@@ -1303,6 +1305,17 @@ bool ob_gui_frame(int width, int height)
     }
 
     return true;
+}
+int gui_is_directory(lua_State *L)
+{
+    const char *path = luaL_checkstring(L, 1);
+
+    if (!path)
+        FatalError("gui.is_directory called with no path!\n");
+
+    lua_pushboolean(L, IsDirectory(path) ? 1 : 0);
+
+    return 1;
 }
 int gui_directory_list(lua_State *L)
 {

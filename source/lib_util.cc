@@ -102,7 +102,11 @@ bool FileExists(std::string_view name)
     return _waccess(wname.c_str(), 0) == 0;
 }
 #ifdef OBSIDIAN_ENABLE_GUI
-std::vector<std::string> DirectoryList(const std::string &path)
+bool IsDirectory(const char *path)
+{
+
+}
+std::vector<std::string> DirectoryList(const char *path)
 {
 
 }
@@ -150,14 +154,23 @@ bool FileExists(std::string_view name)
     return access(std::string(name).c_str(), F_OK) == 0;
 }
 #ifdef OBSIDIAN_ENABLE_GUI
-std::vector<std::string> DirectoryList(const std::string &path)
+bool IsDirectory(const char *path)
+{
+    if (!path)
+        return false;
+    struct stat dircheck;
+    if (stat(path, &dircheck) == -1)
+        return false;
+    return S_ISDIR(dircheck.st_mode);
+}
+std::vector<std::string> DirectoryList(const char *path)
 {
     std::vector<std::string> subdirs;
 
-    if (path.empty() || !FileExists(path))
+    if (!path || !FileExists(path))
         return subdirs;
 
-    DIR *handle = opendir(path.c_str());
+    DIR *handle = opendir(path);
     if (!handle)
         return subdirs;
 

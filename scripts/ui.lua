@@ -82,29 +82,47 @@ function ob_gui_init_themes(scale)
 end
 
 -------------------------------------------------------------------------------
--- Manual Seed Entry
+-- Manual Entry
 -------------------------------------------------------------------------------
 
-local show_manual_seed = false
+local manual_entry_context = nil
 
-local input = 
+local manual_input = 
 {
    submit = "",
    flags = 0
 }
 
-local function ManualSeed(ctx, w, h)
-   if nk.popup_begin(ctx, 'dynamic', _("New Seed"), nk.WINDOW_CLOSABLE, {w/2-140, h/2-60, 280, 120}) then
+local function ManualEntry(ctx, w, h)
+   local popup_label = ""
+
+   if manual_entry_context == "seed" then
+      popup_label = _("Enter Seed")
+   elseif manual_entry_context == "filename" then
+      popup_label = _("Enter Filename")
+   elseif manual_entry_context == "path" then
+      popup_label = _("Enter Path")
+   end
+
+   if nk.popup_begin(ctx, 'dynamic', popup_label, nk.WINDOW_CLOSABLE, {w/2-140, h/2-60, 280, 120}) then
       nk.layout_row_dynamic(ctx, 25, 1)
-      input.submit, input.flags = 
-         nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, input.submit, 64,  'default')
-      if nk.button(ctx, nil, _("Submit")) or (input.flags & nk.EDIT_COMMITED ~= 0) then
-         gui.calc_seed(input.submit)
-         input.submit = ""
+      manual_input.submit, manual_input.flags = 
+         nk.edit_string(ctx, nk.EDIT_FIELD|nk.EDIT_SIG_ENTER, manual_input.submit, 64,  'default')
+      if nk.button(ctx, nil, _("Submit")) or (manual_input.flags & nk.EDIT_COMMITED ~= 0) then
+         if manual_entry_context == "seed" then
+           gui.calc_seed(manual_input.submit)
+         elseif manual_entry_context == "filename" and manual_input.submit ~= "" then
+            OB_CONFIG.output_filename = manual_input.submit
+         elseif manual_entry_context == "path" and manual_input.submit ~= "" then
+            if gui.is_directory(manual_input.submit) then
+              OB_CONFIG.output_path = manual_input.submit
+            end
+         end
+         manual_input.submit = ""
       end
       nk.popup_end(ctx)
    else 
-      show_manual_seed = false
+      manual_entry_context = nil
    end
 end
 
@@ -112,7 +130,7 @@ end
 -- Path Picker
 -------------------------------------------------------------------------------
 
-local picking path = false
+local show_path_picker = false
 
 local function PathPicker(ctx, w, h)
    if nk.popup_begin(ctx, 'dynamic', _("Select Directory"), nk.WINDOW_CLOSABLE, {w/2-w*3/8, h/2-h*3/8, w*3/4, h*3/4}) then
@@ -130,11 +148,11 @@ local function PathPicker(ctx, w, h)
       end
       nk.layout_row_dynamic(ctx, 25, 1)
       if nk.button(ctx, nil, _("Submit")) then
-         picking_path = false
+         show_path_picker = false
       end
       nk.popup_end(ctx)
    else 
-      picking_path = false
+      show_path_picker = false
    end
 end
 
@@ -185,8 +203,8 @@ function ob_gui_frame(width, height)
    end
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, window_flags) then
-      if picking_path then PathPicker(OB_NK_CTX, width, height) end
-      if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
+      if show_path_picker == true then PathPicker(OB_NK_CTX, width, height) end
+      if manual_entry_context ~= nil then ManualEntry(OB_NK_CTX, width, height) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
       local f = current_gui_theme.bold_font
@@ -240,16 +258,26 @@ function ob_gui_frame(width, height)
             end
          end
          if current_tab == "build" then
-            nk.layout_row_static(OB_NK_CTX, 25, width, 1)
-            nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
             nk.label(OB_NK_CTX, "Output Path: " .. OB_CONFIG.output_path, nk.TEXT_LEFT)
             if nk.button(OB_NK_CTX, nil, _("Select New Path")) then
-               picking_path = true
+               show_path_picker = true
             end
-            nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
-            nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename, nk.TEXT_LEFT)
+            if nk.button(OB_NK_CTX, nil, _("Enter Path")) then
+               manual_entry_context = "path"
+            end
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
+            if OB_CONFIG.compress_output == "yes" then
+               nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename .. ".zip", nk.TEXT_LEFT)
+            else
+               nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename .. ".wad", nk.TEXT_LEFT)
+            end
             if nk.button(OB_NK_CTX, nil, _("Generate New Filename")) then
                OB_CONFIG.output_filename = ob_default_filename()
+            end
+            if nk.button(OB_NK_CTX, nil, _("Enter Filename")) then
+               manual_entry_context = "filename"
             end
             nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
             if nk.button(OB_NK_CTX, nil, _("BUILD")) then
@@ -266,7 +294,7 @@ function ob_gui_frame(width, height)
          gui.calc_seed(ob_get_random_phrase())
       end
       if nk.button(OB_NK_CTX, nil, _("Enter Seed")) then
-         show_manual_seed = true
+         manual_entry_context = "seed"
       end
       nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
       nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)

@@ -922,6 +922,9 @@ function ob_read_all_config(need_full, log_only)
   do_line("---- Game Settings ----")
   do_line("")
 
+  do_value("output_path", OB_CONFIG.output_path)
+  do_line("")
+
   do_value("game",     OB_CONFIG.game)
   do_value("port",     OB_CONFIG.port)
   do_value("length",   OB_CONFIG.length)
