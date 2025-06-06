@@ -25,6 +25,9 @@
 
 #include <charconv>
 #include <string>
+#ifdef OBSIDIAN_ENABLE_GUI
+#include <vector>
+#endif
 
 /* file utilities */
 
@@ -36,8 +39,9 @@ std::string PathAppend(std::string_view parent, std::string_view child);
 bool        IsPathAbsolute(std::string_view path);
 void        ReplaceExtension(std::string &path, std::string_view ext);
 std::string SanitizePath(std::string_view path);
-
-std::string CurrentDirectoryGet();
+#ifdef OBSIDIAN_ENABLE_GUI
+std::vector<std::string> DirectoryList(const std::string &path);
+#endif
 
 bool  FileExists(std::string_view name);
 FILE *FileOpen(std::string_view name, std::string_view mode);

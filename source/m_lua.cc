@@ -542,9 +542,12 @@ extern int wadfab_get_line_hexen(lua_State *L);
 extern int wadfab_get_3d_floor(lua_State *L);
 extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
-int gui_calc_seed(lua_State *L);
 int gui_start_it(lua_State *L);
 int gui_finish_it(lua_State *L);
+#ifdef OBSIDIAN_ENABLE_GUI
+int gui_calc_seed(lua_State *L);
+int gui_directory_list(lua_State *L);
+#endif
 
 static const luaL_Reg gui_script_funcs[] = {
 
@@ -563,8 +566,9 @@ static const luaL_Reg gui_script_funcs[] = {
     {"reseed_rng", gui_reseed_rng},
     {"start_it", gui_start_it},
     {"finish_it", gui_finish_it},
-    #ifdef OBSIDIAN_ENABLE_GUI
+#ifdef OBSIDIAN_ENABLE_GUI
     {"calc_seed", gui_calc_seed},
+    {"directory_list", gui_directory_list},
 #endif
 
     // file & directory functions
@@ -1299,6 +1303,29 @@ bool ob_gui_frame(int width, int height)
     }
 
     return true;
+}
+int gui_directory_list(lua_State *L)
+{
+    const char *path = luaL_checkstring(L, 1);
+
+    if (!path)
+        FatalError("gui.directory_list called with no path!\n");
+
+    std::vector<std::string> subdirs = DirectoryList(path);
+
+    lua_createtable(L, 0, subdirs.size());
+
+    if (subdirs.empty())
+        return 1;
+    else
+    {
+        for (int index = 0; index < subdirs.size(); ++index)
+        {
+            lua_pushstring(L, subdirs[index].c_str());
+            lua_rawseti (L, -2, index+1);
+        }
+        return 1;
+    }
 }
 #endif
 

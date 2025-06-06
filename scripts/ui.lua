@@ -58,6 +58,8 @@ local UI_GUI_THEMES =
    }
 }
 
+local current_gui_theme = UI_GUI_THEMES["default"]
+
 function ob_gui_init_themes(scale)
   if OB_NK_CTX == nil then return "bork" end
   if OB_NK_ATLAS == nil then return "bork" end
@@ -113,7 +115,19 @@ end
 local picking path = false
 
 local function PathPicker(ctx, w, h)
-   if nk.popup_begin(ctx, 'dynamic', _("Select Directory"), nk.WINDOW_CLOSABLE, {w/2-140, h/2-60, 280, 120}) then
+   if nk.popup_begin(ctx, 'dynamic', _("Select Directory"), nk.WINDOW_CLOSABLE, {w/2-w*3/8, h/2-h*3/8, w*3/4, h*3/4}) then
+      local subdirs = gui.directory_list(OB_CONFIG.output_path)
+      table.sort(subdirs)
+      for _,dir in ipairs(subdirs) do
+         nk.layout_row_begin(ctx, 'dynamic', 25, 2)
+         nk.layout_row_push(ctx, 0.1)
+         nk.style_set_font(ctx, current_gui_theme.icon_font)
+         nk.label(ctx, "F", nk.TEXT_RIGHT)
+         nk.layout_row_push(ctx, 0.2)
+         nk.style_set_font(ctx, current_gui_theme.normal_font)
+         nk.label(ctx, dir, nk.TEXT_LEFT)
+         nk.layout_row_end(ctx)
+      end
       nk.layout_row_dynamic(ctx, 25, 1)
       if nk.button(ctx, nil, _("Submit")) then
          picking_path = false
@@ -150,8 +164,6 @@ local module_category_labels =
    ["experimental"] = _("Experimental"),
    ["options"] = _("Options")
 }
-
-local current_gui_theme = UI_GUI_THEMES["default"]
 
 function ob_gui_frame(width, height)
    if OB_NK_CTX == nil then return "quit" end

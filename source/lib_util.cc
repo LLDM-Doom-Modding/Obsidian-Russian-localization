@@ -101,6 +101,12 @@ bool FileExists(std::string_view name)
     std::wstring wname = UTF8ToWString(name);
     return _waccess(wname.c_str(), 0) == 0;
 }
+#ifdef OBSIDIAN_ENABLE_GUI
+std::vector<std::string> DirectoryList(const std::string &path)
+{
+
+}
+#endif
 #else // POSIX API
 static inline bool IsDirectorySeparator(const char c)
 {
@@ -143,6 +149,46 @@ bool FileExists(std::string_view name)
         return false;
     return access(std::string(name).c_str(), F_OK) == 0;
 }
+#ifdef OBSIDIAN_ENABLE_GUI
+std::vector<std::string> DirectoryList(const std::string &path)
+{
+    std::vector<std::string> subdirs;
+
+    if (path.empty() || !FileExists(path))
+        return subdirs;
+
+    DIR *handle = opendir(path.c_str());
+    if (!handle)
+        return subdirs;
+
+    for (;;)
+    {
+        const struct dirent *fdata = readdir(handle);
+        if (!fdata)
+            break;
+
+        if (strlen(fdata->d_name) == 0)
+            continue;
+
+        std::string filename = fdata->d_name;
+
+        // skip the "." and ".." dirs
+        if (filename == "." || filename == "..")
+            continue;
+
+        struct stat finfo;
+
+        if (stat(PathAppend(path, filename).c_str(), &finfo) != 0)
+            continue;
+
+        if (S_ISDIR(finfo.st_mode))
+            subdirs.push_back(filename);
+    }
+
+    closedir(handle);
+    return subdirs;
+}
+#endif
 #endif
 
 // Universal Functions
