@@ -26,6 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#else
+#include <windows.h>
 #endif
 #ifdef __MINGW32__
 #include <sys/stat.h>
@@ -104,11 +106,43 @@ bool FileExists(std::string_view name)
 #ifdef OBSIDIAN_ENABLE_GUI
 bool IsDirectory(const char *path)
 {
-
+    if (!path)
+        return false;
+    std::wstring wide_dir = UTF8ToWString(path);
+    struct _stat dircheck;
+    if (_wstat(wide_dir.c_str(), &dircheck) != 0)
+        return false;
+    return (dircheck.st_mode & _S_IFDIR);
 }
 std::vector<std::string> DirectoryList(const char *path)
 {
+    std::vector<std::string> subdirs;
 
+    if (!path || !FileExists(path))
+        return subdirs;
+
+    WIN32_FIND_DATAW fdataw;
+    HANDLE           fhandle = FindFirstFileW(UTF8ToWString(PathAppend(path, "*.*")).c_str(), &fdataw);
+
+    if (fhandle == INVALID_HANDLE_VALUE)
+        return subdirs;
+
+    do
+    {
+        std::string filename = WStringToUTF8(fdataw.cFileName);
+        if (filename == "." || filename == "..")
+        {
+            // skip the "." and ".." dirs
+        }
+        else
+        {
+            if (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                subdirs.push_back(filename);
+        }
+    } while (FindNextFileW(fhandle, &fdataw));
+
+    FindClose(fhandle);
+    return subdirs;
 }
 #endif
 #else // POSIX API
