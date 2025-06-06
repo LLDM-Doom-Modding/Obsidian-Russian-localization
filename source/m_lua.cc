@@ -1098,7 +1098,6 @@ bool ob_do_build()
     return false;
 }
 
-extern std::string batch_output_file;
 int gui_start_it(lua_State *L)
 {
     const std::string format = ob_game_format();
@@ -1121,9 +1120,9 @@ int gui_start_it(lua_State *L)
     }
 
     // this will ask for output filename (among other things)
-    game_object->Start(batch_output_file.c_str());
+    game_object->Start(ob_get_string_param("output_filename"));
 #ifdef OBSIDIAN_ENABLE_GUI
-    batch_output_file = ob_default_filename();
+    ob_set_config("seed", ob_default_filename());
 #endif
     return 0;
 }

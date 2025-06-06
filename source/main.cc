@@ -81,10 +81,7 @@ int main_action = 0;
 
 uint64_t next_rand_seed;
 
-std::string batch_output_file;
 std::string numeric_locale;
-
-std::string default_output_path;
 
 std::string string_seed;
 
@@ -142,23 +139,6 @@ static void ShowVersion()
            OBSIDIAN_VERSION);
 
     fflush(stdout);
-}
-
-static std::string Resolve_DefaultOutputPath()
-{
-    if (default_output_path.empty())
-    {
-        default_output_path = home_dir;
-    }
-    if (default_output_path[0] == '$')
-    {
-        const char *var = getenv(default_output_path.c_str() + 1);
-        if (var != nullptr)
-        {
-            return var;
-        }
-    }
-    return default_output_path;
 }
 
 static bool Verify_InstallDir(const std::string &path)
@@ -341,6 +321,7 @@ int main(int argc, char **argv)
         exit(EXIT_SUCCESS);
     }
 
+    std::string batch_output_file;
     int batch_arg = argv::Find('o', "output");
     if (batch_arg >= 0)
     {
@@ -380,7 +361,6 @@ int main(int argc, char **argv)
     config_file = PathAppend(home_dir, CONFIG_FILENAME);
     logging_file = PathAppend(home_dir, LOG_FILENAME);
 
-    Resolve_DefaultOutputPath();
     Trans_SetLanguage();
     LogInit(logging_file);
 
@@ -409,6 +389,9 @@ int main(int argc, char **argv)
 
     Script_Open();
 
+    // Set this to home dir before loading config (if present); it's ok to change afterwards
+    ob_set_config("output_path", home_dir);
+
     if (!FileExists(config_file))
     {
         Cookie_Save(config_file);
@@ -428,8 +411,10 @@ int main(int argc, char **argv)
         exit(EXIT_SUCCESS);
     }
 
-    if (batch_output_file.empty())
-        batch_output_file = ob_default_filename();
+    if (!batch_output_file.empty())
+        ob_set_config("output_filename", batch_output_file);
+    else
+        ob_set_config("output_filename", ob_default_filename());
 
     Main_CalcNewSeed();
 

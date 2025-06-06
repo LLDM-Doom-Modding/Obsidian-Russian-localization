@@ -56,7 +56,6 @@ extern int main_action;
 extern std::string ob_error_message;
 extern std::string config_file;
 extern std::string numeric_locale;
-extern std::string default_output_path;
 extern std::string string_seed;
 extern std::string selected_lang;
 

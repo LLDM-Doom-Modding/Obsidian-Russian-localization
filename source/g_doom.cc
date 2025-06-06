@@ -1291,7 +1291,7 @@ bool Doom::game_interface_c::Start(std::string_view preset)
     }
     else
     {
-        filename = PathAppend(default_output_path, preset);
+        filename = PathAppend(ob_get_string_param("output_path"), preset);
     }
 
     if (filename.empty())

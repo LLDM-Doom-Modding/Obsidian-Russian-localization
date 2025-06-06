@@ -30,6 +30,8 @@ local UI_GUI_THEMES =
       normal_font_size = 24,
       bold_font_file = "SourceSansPro-Bold.ttf",
       bold_font_size = 24,
+      icon_font_file = "bootstrap-icons.ttf",
+      icon_font_size = 24,
       colortable = 
       {
          text = nk.color_from_bytes(190, 190, 190, 255),
@@ -61,7 +63,7 @@ function ob_gui_init_themes(scale)
   if OB_NK_ATLAS == nil then return "bork" end
   assert(UI_GUI_THEMES and UI_GUI_THEMES["default"])
   for _,theme in pairs(UI_GUI_THEMES) do
-   assert(theme.normal_font_file and theme.normal_font_size and theme.bold_font_file and theme.bold_font_size) 
+   assert(theme.normal_font_file and theme.normal_font_size and theme.bold_font_file and theme.bold_font_size and theme.icon_font_file and theme.icon_font_size) 
    theme.normal_font = OB_NK_ATLAS:add(theme.normal_font_size * scale, "data/fonts/" .. theme.normal_font_file)
    theme.normal_font:set_height(theme.normal_font_size)
    if (theme.bold_font_file ~= theme.normal_font_file or theme.bold_font_size ~= theme.normal_font_size) then
@@ -70,6 +72,7 @@ function ob_gui_init_themes(scale)
    else
       theme.bold_font = theme.normal_font
    end
+   theme.icon_font = OB_NK_ATLAS:add(theme.icon_font_size * scale, "data/fonts/" .. theme.icon_font_file)
   end
   nk.style_set_font(OB_NK_CTX, UI_GUI_THEMES["default"].normal_font)
   font_scale = scale
@@ -100,6 +103,24 @@ local function ManualSeed(ctx, w, h)
       nk.popup_end(ctx)
    else 
       show_manual_seed = false
+   end
+end
+
+-------------------------------------------------------------------------------
+-- Path Picker
+-------------------------------------------------------------------------------
+
+local picking path = false
+
+local function PathPicker(ctx, w, h)
+   if nk.popup_begin(ctx, 'dynamic', _("Select Directory"), nk.WINDOW_CLOSABLE, {w/2-140, h/2-60, 280, 120}) then
+      nk.layout_row_dynamic(ctx, 25, 1)
+      if nk.button(ctx, nil, _("Submit")) then
+         picking_path = false
+      end
+      nk.popup_end(ctx)
+   else 
+      picking_path = false
    end
 end
 
@@ -152,7 +173,7 @@ function ob_gui_frame(width, height)
    end
 
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, window_flags) then
-      --if show_menu then Menubar(OB_NK_CTX) end
+      if picking_path then PathPicker(OB_NK_CTX, width, height) end
       if show_manual_seed then ManualSeed(OB_NK_CTX, width, height) end
       -- Header 
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
@@ -207,6 +228,17 @@ function ob_gui_frame(width, height)
             end
          end
          if current_tab == "build" then
+            nk.layout_row_static(OB_NK_CTX, 25, width, 1)
+            nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+            nk.label(OB_NK_CTX, "Output Path: " .. OB_CONFIG.output_path, nk.TEXT_LEFT)
+            if nk.button(OB_NK_CTX, nil, _("Select New Path")) then
+               picking_path = true
+            end
+            nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+            nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename, nk.TEXT_LEFT)
+            if nk.button(OB_NK_CTX, nil, _("Generate New Filename")) then
+               OB_CONFIG.output_filename = ob_default_filename()
+            end
             nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
             if nk.button(OB_NK_CTX, nil, _("BUILD")) then
                if OB_BUILD_ROUTINE == nil then
