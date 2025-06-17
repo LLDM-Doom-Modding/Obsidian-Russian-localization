@@ -285,6 +285,21 @@ function ob_gui_frame(width, height)
                   ob_do_build()
                end
             end
+            -- seed grid test - Dasho
+            nk.layout_row_dynamic(OB_NK_CTX, 50, 2)
+            local canvas = nk.window_get_canvas(OB_NK_CTX)
+            local rect = nk.widget_bounds(OB_NK_CTX)
+            nk.widget(OB_NK_CTX, rect)
+            local rgb = nk.color_from_bytes
+            canvas:fill_rect({rect[1]+1,rect[2]+1,rect[3]-2,rect[3]-2}, 5, rgb(0, 0, 0))
+            local inc = (rect[3]-2) / 50
+            for i = rect[1]+1, rect[1]+rect[3]-1, inc do
+               canvas:stroke_line(i, rect[2]+1, i, rect[2]+rect[3]-1, 2.0, rgb(26, 26, 238))
+            end
+            inc = (rect[3]-2) / 50
+            for i = rect[2]+1, rect[2]+rect[3]-1, inc do
+               canvas:stroke_line(rect[1]+1, i, rect[1]+rect[3]-1, i, 2.0, rgb(26, 26, 238))
+            end
          end
          nk.group_end(OB_NK_CTX)
       end
