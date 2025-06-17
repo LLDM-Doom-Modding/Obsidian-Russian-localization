@@ -21,6 +21,8 @@
 
 local font_scale
 
+local rgb = nk.color_from_bytes
+
 local UI_GUI_THEMES =
 {
    ["default"] =
@@ -34,26 +36,26 @@ local UI_GUI_THEMES =
       icon_font_size = 24,
       colortable = 
       {
-         text = nk.color_from_bytes(190, 190, 190, 255),
-         window = nk.color_from_bytes(30, 33, 40, 215),
-         header = nk.color_from_bytes(181, 45, 69, 220),
-         border = nk.color_from_bytes(51, 55, 67, 255),
-         button = nk.color_from_bytes(181, 45, 69, 255),
-         button_hover = nk.color_from_bytes(190, 50, 70, 255),
-         button_active = nk.color_from_bytes(195, 55, 75, 255),
-         toggle = nk.color_from_bytes(51, 55, 67, 255),
-         toggle_hover = nk.color_from_bytes(45, 60, 60, 255),
-         toggle_cursor = nk.color_from_bytes(181, 45, 69, 255),
-         select = nk.color_from_bytes(51, 55, 67, 255),
-         select_active = nk.color_from_bytes(181, 45, 69, 255),
-         edit = nk.color_from_bytes(51, 55, 67, 225),
-         edit_cursor = nk.color_from_bytes(190, 190, 190, 255),
-         combo = nk.color_from_bytes(51, 55, 67, 255),
-         scrollbar = nk.color_from_bytes(30, 33, 40, 255),
-         scrollbar_cursor = nk.color_from_bytes(64, 84, 95, 255),
-         scrollbar_cursor_hover = nk.color_from_bytes(70, 90, 100, 255),
-         scrollbar_cursor_active = nk.color_from_bytes(75, 95, 105, 255),
-         tab_header = nk.color_from_bytes(181, 45, 69, 220),
+         text = rgb(190, 190, 190, 255),
+         window = rgb(30, 33, 40, 215),
+         header = rgb(181, 45, 69, 220),
+         border = rgb(51, 55, 67, 255),
+         button = rgb(181, 45, 69, 255),
+         button_hover = rgb(190, 50, 70, 255),
+         button_active = rgb(195, 55, 75, 255),
+         toggle = rgb(51, 55, 67, 255),
+         toggle_hover = rgb(45, 60, 60, 255),
+         toggle_cursor = rgb(181, 45, 69, 255),
+         select = rgb(51, 55, 67, 255),
+         select_active = rgb(181, 45, 69, 255),
+         edit = rgb(51, 55, 67, 225),
+         edit_cursor = rgb(190, 190, 190, 255),
+         combo = rgb(51, 55, 67, 255),
+         scrollbar = rgb(30, 33, 40, 255),
+         scrollbar_cursor = rgb(64, 84, 95, 255),
+         scrollbar_cursor_hover = rgb(70, 90, 100, 255),
+         scrollbar_cursor_active = rgb(75, 95, 105, 255),
+         tab_header = rgb(181, 45, 69, 220),
       }
    }
 }
@@ -157,10 +159,110 @@ local function PathPicker(ctx, w, h)
 end
 
 -------------------------------------------------------------------------------
--- Main Program Window
+-- Seed Map
 -------------------------------------------------------------------------------
 
--- menuwidgets.prog = nk.progress(ctx, menuwidgets.prog, 100, 'modifiable')
+local MAP_SEEDS = nil
+local MAP_LEVEL = nil
+
+function UpdateMinimap(SEEDS, LEVEL)
+   MAP_SEEDS = SEEDS
+   MAP_LEVEL = LEVEL
+end
+
+local function DrawMinimap(canvas, SEEDS, LEVEL, x, y, map_W, map_H)
+  local S1 = SEEDS[LEVEL.walkable_x1][LEVEL.walkable_y1]
+  local S2 = SEEDS[LEVEL.walkable_x2][LEVEL.walkable_y2]
+
+  local min_x = S1.x1 - 64
+  local min_y = S1.y1 - 64
+
+  local max_x = S2.x2 + 64
+  local max_y = S2.y2 + 64
+
+  local  width = max_x - min_x
+  local height = max_y - min_y
+
+  local size = math.max(width, height)
+
+  local ofs_x = (size -  width) / 2
+  local ofs_y = (size - height) / 2
+
+
+  local function draw_edge(S, dir, color)
+    local x1,y1, x2,y2 = S:line_coords(dir)
+
+    x1 = (x1 - min_x + ofs_x) * map_W / size
+    x2 = (x2 - min_x + ofs_x) * map_W / size
+
+    y1 = (y1 - min_y + ofs_y) * map_H / size
+    y2 = (y2 - min_y + ofs_y) * map_H / size
+
+    canvas:stroke_line(x + math.floor(x1), y + math.floor(y1), x + math.floor(x2), y + math.floor(y2), 2.0, color)
+  end
+
+
+  local function visit_seed(S1, dir)
+    local S2 = S1:neighbor(dir, "NODIR", SEEDS)
+
+    if S2 == "NODIR" then return end
+
+    local A1 = S1.area
+    local A2 = S2 and S2.area
+
+    local R1 = A1 and A1.room
+    local R2 = A2 and A2.room
+
+    -- treat closets as not part of the room
+    if R1 and A1.chunk and A1.chunk.kind == "closet" then R1 = nil end
+    if R2 and A2.chunk and A2.chunk.kind == "closet" then R2 = nil end
+
+    if not (R1 or R2) then return end
+
+    if R1 == R2 then
+      -- in same room, draw area boundaries in a not-too-bright color
+      if A1.name < A2.name then
+        draw_edge(S1, dir, rgb(170, 170, 170))
+      end
+
+      return
+    end
+
+    -- ensure we only draw edges between two rooms once
+    if R1 and R2 then
+      if R1.name > R2.name then return end
+    end
+
+    local color = rgb(255, 255, 255)
+
+    if (R1 and R1.is_cave) or (R2 and R2.is_cave) then
+      color = rgb(255, 153, 51)
+    elseif (R1 and R1.is_outdoor) or (R2 and R2.is_outdoor) then
+      color = rgb(17, 170, 255)
+    end
+
+    if (R1 and R1.is_park) or (R2 and R2.is_park) then
+      color = rgb(112, 216, 114)
+    end
+
+    draw_edge(S1, dir, color)
+  end
+
+  for seed_x = 1, SEED_W do
+  for seed_y = 1, SEED_H do
+    local S = SEEDS[seed_x][seed_y]
+
+    for _,dir in pairs(geom.ALL_DIRS) do
+      visit_seed(S, dir)
+      if S.top then visit_seed(S.top, dir) end
+    end
+  end
+  end
+end
+
+-------------------------------------------------------------------------------
+-- Main Program Window
+-------------------------------------------------------------------------------
 
 local ratio = {120, 150}
 
@@ -290,7 +392,6 @@ function ob_gui_frame(width, height)
             local canvas = nk.window_get_canvas(OB_NK_CTX)
             local rect = nk.widget_bounds(OB_NK_CTX)
             nk.widget(OB_NK_CTX, rect)
-            local rgb = nk.color_from_bytes
             canvas:fill_rect({rect[1]+1,rect[2]+1,rect[3]-2,rect[3]-2}, 5, rgb(0, 0, 0))
             local inc = (rect[3]-2) / 50
             for i = rect[1]+1, rect[1]+rect[3]-1, inc do
@@ -299,6 +400,9 @@ function ob_gui_frame(width, height)
             inc = (rect[3]-2) / 50
             for i = rect[2]+1, rect[2]+rect[3]-1, inc do
                canvas:stroke_line(rect[1]+1, i, rect[1]+rect[3]-1, i, 2.0, rgb(26, 26, 238))
+            end
+            if MAP_SEEDS ~= nil and #MAP_SEEDS == SEED_W and #MAP_SEEDS[1] == SEED_H and MAP_LEVEL ~= nil then
+               DrawMinimap(canvas, MAP_SEEDS, MAP_LEVEL, rect[1], rect[2], rect[3]-2, rect[3]-2)
             end
          end
          nk.group_end(OB_NK_CTX)

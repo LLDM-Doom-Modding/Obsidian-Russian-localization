@@ -5025,6 +5025,10 @@ function Grower_create_rooms(LEVEL, SEEDS)
     end
   end
 
+  if nk ~= nil then
+    UpdateMinimap(SEEDS, LEVEL)
+  end
+
 -- FIXME : VALIDATION CRUD
     --for sx = 1, SEED_W do
     --for sy = 1, SEED_H do
