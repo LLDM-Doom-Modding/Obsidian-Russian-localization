@@ -324,10 +324,10 @@ end
 
 function ROOM_CLASS.has_sky_neighbor(R)
   for _,C in pairs(R.conns) do
-    if C.A1.room == C.A2.room then goto continuelabel end
+    if C.A1.room == C.A2.room then goto skip end
     local N = C:other_room(A)
     if N.is_outdoor and N.mode ~= "void" then return true end
-    ::continuelabel::
+    ::skip::
   end
 
   return false
@@ -395,11 +395,11 @@ function ROOM_CLASS.total_conns(R, ignore_secrets)
 
   for _,C in pairs(R.conns) do
     if ignore_secrets and C.is_secret then
-      goto continuelabel
+      goto skip
     end
 
     count = count + 1
-    ::continuelabel::
+    ::skip::
   end
 
   return count
@@ -440,10 +440,10 @@ function ROOM_CLASS.secret_entry_conn(R, skip_room)
   for _,C in pairs(R.conns) do
     local R2 = C:other_room(R)
 
-    if R2 == skip_room then goto continuelabel end
+    if R2 == skip_room then goto skip end
 
     if C then return C end
-    ::continuelabel::
+    ::skip::
   end
 
   error("Cannot find entry conn for secret room")
@@ -483,7 +483,7 @@ function ROOM_CLASS.furthest_dist_from_entry(R)
   for sy = R.sy1, R.sy2 do
     local S = SEEDS[sx][sy]
 
-    if S.room ~= R then goto continuelabel end
+    if S.room ~= R then goto skip end
 
     local ox = sel(S.x1 < ex, S.x1, S.x2)
     local oy = sel(S.y1 < ey, S.y1, S.y2)
@@ -491,7 +491,7 @@ function ROOM_CLASS.furthest_dist_from_entry(R)
     local dist = geom.dist(ex, ey, ox, oy)
 
     result = math.max(result, dist)
-    ::continuelabel::
+    ::skip::
   end
   end
 
@@ -546,8 +546,8 @@ function ROOM_CLASS.spots_do_decor(R, floor_h)
     local z1 = ent.z
     local z2 = ent.z + ent.h
 
-    if z1 >= floor_h + high_h then goto continuelabel end
-    if z2 <= floor_h then goto continuelabel end
+    if z1 >= floor_h + high_h then goto skip end
+    if z2 <= floor_h then goto skip end
 
     local content = SPOT_LEDGE
     if z1 >= floor_h + low_h then content = SPOT_LOW_CEIL end
@@ -556,7 +556,7 @@ function ROOM_CLASS.spots_do_decor(R, floor_h)
     local x2, y2 = ent.x + ent.r, ent.y + ent.r
 
     gui.spots_fill_box(x1, y1, x2, y2, content)
-    ::continuelabel::
+    ::skip::
   end
 end
 
@@ -591,7 +591,7 @@ function ROOM_CLASS.clip_spot_list(R, list, x1, y1, x2, y2, strict_mode)
 
     elseif strict_mode then
       -- drop this spot
-      goto continuelabel
+      goto skip
 
     else
       local w1 = x1 - spot.x1
@@ -602,7 +602,7 @@ function ROOM_CLASS.clip_spot_list(R, list, x1, y1, x2, y2, strict_mode)
 
       -- totally clipped?
       if math.max(w1, w2, h1, h2) < 8 then
-        goto continuelabel
+        goto skip
       end
 
       -- shrink the existing box (keep side with most free space)
@@ -622,7 +622,7 @@ function ROOM_CLASS.clip_spot_list(R, list, x1, y1, x2, y2, strict_mode)
     end
 
     table.insert(new_list, spot)
-    ::continuelabel::
+    ::skip::
   end
 
   return new_list
@@ -1036,7 +1036,7 @@ function Room_detect_porches(LEVEL, R)
 
       if A2.mode == "scenic" then
         -- ok
-        goto continuelabel
+        goto skip
       end
 
       local R2 = A2.room
@@ -1050,7 +1050,7 @@ function Room_detect_porches(LEVEL, R)
       -- same zone?
       if R2.zone ~= R.zone then
         -- ok
-        goto continuelabel
+        goto skip
       end
 
       -- TODO : if hallway is large, allow a few edges
@@ -1062,7 +1062,7 @@ function Room_detect_porches(LEVEL, R)
       if HA.floor_h + 64 < (A2.floor_h or 0) then
         return false
       end
-      ::continuelabel::
+      ::skip::
     end
 
     gui.debugf("Hallway %s is now a PORCH\n", R.name)
@@ -1350,7 +1350,7 @@ function Room_make_windows(LEVEL, A1, A2, SEEDS)
 
       if ch == '-' then
         S = S:neighbor(R_dir, nil, SEEDS)
-        goto continuelabel
+        goto skip
       end
 
       local want_len = 0 + ch
@@ -1361,7 +1361,7 @@ function Room_make_windows(LEVEL, A1, A2, SEEDS)
       for i = 1, want_len do
         S = S:neighbor(R_dir, nil, SEEDS)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1929,8 +1929,8 @@ function Room_border_up(LEVEL, SEEDS)
 
   local function decide_window_boosts()
     for _,R in pairs(LEVEL.rooms) do
-      if R.is_outdoor then goto continuelabel end
-      if R.is_cave    then goto continuelabel end
+      if R.is_outdoor then goto skip end
+      if R.is_cave    then goto skip end
 
       local prob = style_sel("windows", 0, 2, 5, 8)
       if R.is_secret then prob = prob * 2 end
@@ -1939,7 +1939,7 @@ function Room_border_up(LEVEL, SEEDS)
       if rand.odds(prob) then
         R.force_windows = true
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2013,19 +2013,19 @@ function Room_border_up(LEVEL, SEEDS)
 
   local function check_sky_closets()
     for _,A in pairs(LEVEL.areas) do
-      if A.mode ~= "chunk" then goto continuelabel end
+      if A.mode ~= "chunk" then goto skip end
 
-      if not A.room then goto continuelabel end
-      if not A.room.is_outdoor then goto continuelabel end
-      if A.room.border_type == "no_vista" then goto continuelabel end
+      if not A.room then goto skip end
+      if not A.room.is_outdoor then goto skip end
+      if A.room.border_type == "no_vista" then goto skip end
 
       local T = A.chunk
-      if T.kind ~= "closet" then goto continuelabel end
+      if T.kind ~= "closet" then goto skip end
 
       if T:is_open_to_sky(A.room, SEEDS) then
         T.open_to_sky = true
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2530,13 +2530,13 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     for _,IC in pairs(R.internal_conns) do
       local A2 = areaconn_other(IC, A)
 
-      if not A2 then goto continuelabel end
-      if A2.floor_group then goto continuelabel end
+      if not A2 then goto skip end
+      if A2.floor_group then goto skip end
 
       -- Street Mode:
       -- keep the road area from the sidewalks
       if R.is_street then
-        if A.is_road and not A2.is_road then goto continuelabel end
+        if A.is_road and not A2.is_road then goto skip end
       end
 
       -- stair connections *must* use another group.
@@ -2546,7 +2546,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       else
         visit_floor_area(R, A2, A.floor_group)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2688,8 +2688,8 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 
     for _,A1 in pairs(R.areas) do
     for _,A2 in pairs(R.areas) do
-      if A1.ceil_group ~= group1 then goto continuelabel end
-      if A2.ceil_group ~= group2 then goto continuelabel end
+      if A1.ceil_group ~= group1 then goto skip end
+      if A2.ceil_group ~= group2 then goto skip end
 
       if ceilings_must_stay_separated(R, A1, A2) then return false end
 
@@ -2705,7 +2705,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
           do_touch = true
         end
       end
-      ::continuelabel::
+      ::skip::
     end  -- A1, A2,
     end
 
@@ -2798,17 +2798,17 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       local A1 = C.A1
       local A2 = C.A2
 
-      if C.kind == "stair" then goto continuelabel end
+      if C.kind == "stair" then goto skip end
 
       local diff = math.abs(A1.floor_h - A2.floor_h)
-      if diff <= OB_CONFIG.jump_height then goto continuelabel end
+      if diff <= OB_CONFIG.jump_height then goto skip end
 
       -- FIXME : generally build single staircases (a la V6 and earlier)
 
       local junc = Junction_lookup(A1, A2)
 
       Junction_make_steps(junc)
-      ::continuelabel::
+      ::skip::
     end
   end]]
 
@@ -2882,13 +2882,13 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     end
 
     for _,A in pairs(R.areas) do
-      if A.mode ~= "floor" then goto continuelabel end
+      if A.mode ~= "floor" then goto skip end
 
       assert(A.floor_h)
 
       if A.peer and A.peer.floor_mat then
         A.floor_mat = A.peer.floor_mat
-        goto continuelabel
+        goto skip
       end
 
       if not R.floor_mats[A.floor_h] then
@@ -2917,7 +2917,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       end
 
       A.floor_mat = assert(R.floor_mats[A.floor_h])
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2930,16 +2930,16 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     assert(tab)
 
     for _,A in pairs(R.areas) do
-      if A.is_outdoor then goto continuelabel end
-      --if A.is_porch   then goto continuelabel end
+      if A.is_outdoor then goto skip end
+      --if A.is_porch   then goto skip end
 
-      if A.mode ~= "floor" then goto continuelabel end
+      if A.mode ~= "floor" then goto skip end
 
       assert(A.ceil_h)
 
       if A.peer and A.peer.ceil_mat then
         A.ceil_mat = A.peer.ceil_mat
-        goto continuelabel
+        goto skip
       end
 
       if not R.ceil_mats[A.ceil_h] then
@@ -2947,7 +2947,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       end
 
       A.ceil_mat = assert(R.ceil_mats[A.ceil_h])
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -3017,7 +3017,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 
     -- recurse to neighbors
     for _,C in pairs(R.conns) do
-      if C.is_cycle then goto continuelabel end
+      if C.is_cycle then goto skip end
 
       local R2 = C:other_room(R)
 
@@ -3026,7 +3026,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       if C.R1 == R then A2 = C.A2 else A2 = C.A1 end
 
       -- already visited it?
-      if R2.entry_h then goto continuelabel end
+      if R2.entry_h then goto skip end
 
       gui.debugf("Recursing through %s (%s)\n", C.name, C.kind)
 -- if C.kind ~= "teleporter"then
@@ -3035,7 +3035,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 
       if C.kind == "teleporter" then
         visit_room(R2, nil, nil, R, C)
-        goto continuelabel
+        goto skip
       end
 
       assert(A1.mode ~= "joiner")
@@ -3050,7 +3050,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       end
 
       visit_room(R2, next_h, A2, R, C)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -3066,13 +3066,13 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 --!!!!    error("failed to find liquid neighbor")
           A.floor_h = 977
           A.ceil_h  = 999
-          goto continuelabel
+          goto skip
         end
 
         A.floor_h  = N.floor_h - (THEME.pool_depth or 16)
         A.ceil_h   = N2.ceil_h
         A.ceil_mat = N2.ceil_mat
-        ::continuelabel::
+        ::skip::
       end
     end
   end
@@ -3100,12 +3100,12 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     -- turn cages in start rooms into a plain floor
 
     for _,A in pairs(R.areas) do
-      if A.mode ~= "cage" then goto continuelabel end
+      if A.mode ~= "cage" then goto skip end
 
       --if R.is_park or R.is_cave then
         if R.is_park or R.is_cave or want_void then
         A.mode = "void"
-        goto continuelabel
+        goto skip
       end
 
       local N
@@ -3123,7 +3123,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 
       A.ceil_h    = N.ceil_h
       A.ceil_mat  = N.ceil_mat
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -3298,7 +3298,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       -- outdoor heights are done later, get a dummy now
       if A.is_outdoor then
         A.ceil_h = A.floor_h + R.zone.sky_add_h - 8
-        goto continuelabel
+        goto skip
       end
 
       local N1 = chunk.from_area
@@ -3313,7 +3313,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
 
       A.ceil_h   = N1.ceil_h
       A.ceil_mat = N1.ceil_mat
-      ::continuelabel::
+      ::skip::
     end
 
     -- MSSP: second pass
@@ -3650,22 +3650,22 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     end
 
     for _,A in pairs(R.areas) do
-      if A.mode ~= "floor" then goto continuelabel end
+      if A.mode ~= "floor" then goto skip end
 
       -- outdoor heights are done later, get a dummy now
       if A.is_outdoor then
         A.ceil_h = A.floor_h + R.zone.sky_add_h - 8
-        goto continuelabel
+        goto skip
       end
 
       if A.peer and A.peer.ceil_h then
         A.ceil_h = A.peer.ceil_h
-        goto continuelabel
+        goto skip
       end
 
       if A.ceil_group then
         set_ceil(A, assert(A.ceil_group.h))
-        goto continuelabel
+        goto skip
       end
 
       local height = rand.pick({ 128, 192,192,192, 256,320 })
@@ -3684,7 +3684,7 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
       if A.traverse_ceil_h then new_h = math.max(new_h, A.traverse_ceil_h) end
 
       set_ceil(A, new_h)
-      ::continuelabel::
+      ::skip::
     end
 
     -- MSSP: get certain areas neighboring porches to also adopt
@@ -3759,18 +3759,18 @@ function Room_add_cage_rails(LEVEL)
 
   local function rails_in_cage(A, R)
     for _,N in pairs(A.neighbors) do
-      if N.zone ~= A.zone then goto continuelabel end
+      if N.zone ~= A.zone then goto skip end
 
       local junc = Junction_lookup(LEVEL, A, N)
 
-      if junc.E1 and junc.E1.kind ~= "nothing" then goto continuelabel end
-      if junc.E2 and junc.E2.kind ~= "nothing" then goto continuelabel end
+      if junc.E1 and junc.E1.kind ~= "nothing" then goto skip end
+      if junc.E2 and junc.E2.kind ~= "nothing" then goto skip end
 
       -- don't place railings on higher floors (it looks silly)
-      if N.floor_h and N.floor_h > A.floor_h then goto continuelabel end
+      if N.floor_h and N.floor_h > A.floor_h then goto skip end
 
       Junction_make_railing(LEVEL, junc, "FENCE_MAT_FROM_THEME", "block")
-      ::continuelabel::
+      ::skip::
     end
   end
 

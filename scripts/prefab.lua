@@ -331,14 +331,14 @@ function Fab_expansion_groups(list, axis_name, fit_size, pf_size, fabinfo)
 
   if extra < 0 then
     -- TO-DO: Fix issue with beam fit
-    if fabinfo.kind == "beam" then goto continuelabel end
+    if fabinfo.kind == "beam" then goto skip end
     local problem_string = "\n\nPREFAB DOES NOT FIT!!!\n"
     problem_string = problem_string .. "(on " .. axis_name .. " axis)\n"
     problem_string = problem_string .. "Fab info:\n"
     problem_string = problem_string .. table.tostr(fabinfo) .. "\n"
     problem_string = problem_string .. "Required: " .. fit_size .. " Prefab has: " .. pf_size .. "\n\n"
     gui.printf(problem_string)
-    ::continuelabel::
+    ::skip::
   end
 
   --assert(extra > 0)
@@ -499,10 +499,10 @@ function Fab_determine_bbox(fab)
   --       (i.e. never higher that t, never lower than b).
 
   for _,B in pairs(fab.brushes) do
-    if B[1].outlier then goto continuelabel end
-    if B[1].m == "light" then goto continuelabel end
-    if B[1].m == "rail"  then goto continuelabel end
-    if B[1].m == "spot"  then goto continuelabel end
+    if B[1].outlier then goto skip end
+    if B[1].m == "light" then goto skip end
+    if B[1].m == "rail"  then goto skip end
+    if B[1].m == "spot"  then goto skip end
 
     for _,C in pairs(B) do
 
@@ -528,7 +528,7 @@ function Fab_determine_bbox(fab)
       end
 
     end -- C
-    ::continuelabel::
+    ::skip::
   end -- B
 
   assert(x1 and y1 and x2 and y2)
@@ -1746,7 +1746,7 @@ function Fab_load_wad(def)
 
       -- check for a railing texture on this side
       local tex = side.mid_tex
-      if tex == nil or tex == "" or tex == "-" then goto continuelabel end
+      if tex == nil or tex == "" or tex == "-" then goto skip end
 
       local S = gui.wadfab_get_sector(side.sector)
       assert(S)
@@ -1773,7 +1773,7 @@ function Fab_load_wad(def)
       local B = brushlib.rail_brush(x1,y1, x2,y2, z, props)
 
       table.insert(fab.brushes, B)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1826,7 +1826,7 @@ function Fab_load_wad(def)
       -- negative value means "void" space
       if sec_idx < 0 then
         create_void_brush(coords)
-        goto continuelabel
+        goto skip
       end
 
       local S = gui.wadfab_get_sector(sec_idx)
@@ -1842,7 +1842,7 @@ function Fab_load_wad(def)
 
         create_3d_floor(exfl, coords)
       end
-      ::continuelabel::
+      ::skip::
     end
     
     local L
@@ -2023,14 +2023,14 @@ function Fab_substitutions(fab, SKIN)
     for _,name in pairs(keys) do
       local value = fab.fields[name]
 
-      if type(value) ~= "table" or string.match(name, "^forced_offsets") then goto continuelabel end
+      if type(value) ~= "table" or string.match(name, "^forced_offsets") then goto skip end
 
       if table.size(value) == 0 then
         error("Fab_substitutions: random table is empty: " .. tostring(name))
       end
 
       fab.fields[name] = rand.key_by_probs(value)
-      ::continuelabel::
+      ::skip::
     end
   end
 

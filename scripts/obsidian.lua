@@ -535,10 +535,10 @@ function ob_update_games()
     for index,name in ipairs(game_choice.avail_choices) do
       if OB_CONFIG.game == name then
         game_choice.choice_selection = index
-        goto continuelabel
+        goto skip
       end
     end
-    ::continuelabel::
+    ::skip::
   end
 end
 
@@ -585,10 +585,10 @@ function ob_update_ports()
     for index,name in ipairs(port_choice.avail_choices) do
       if OB_CONFIG.port == name then
         port_choice.choice_selection = index
-        goto continuelabel
+        goto skip
       end
     end
-    ::continuelabel::
+    ::skip::
   end
 end
 
@@ -637,10 +637,10 @@ function ob_update_themes()
     for index,name in ipairs(theme_choice.avail_choices) do
       if OB_CONFIG.theme == name then
         theme_choice.choice_selection = index
-        goto continuelabel
+        goto skip
       end
     end
-    ::continuelabel::
+    ::skip::
   end
 end
 
@@ -758,11 +758,11 @@ function ob_set_mod_option(name, option, value)
     for index,name in ipairs(opt.avail_choices) do
       if opt.value == name then
         opt.choice_selection = index
-        goto continuelabel
+        goto skip
       end
     end
     error("Option value " .. opt.value .. " not in available choices for " .. opt.name .. "!\n")
-    ::continuelabel::
+    ::skip::
   end
   
   -- no need to call ob_update_all
@@ -959,9 +959,9 @@ function ob_read_all_config(need_full, log_only)
   for _,name in pairs(table.keys_sorted(OB_MODULES)) do
     local def = OB_MODULES[name]
 
-    if ob_check_ui_module(def) then goto continuelabel end
+    if ob_check_ui_module(def) then goto skip end
 
-    if not need_full and not def.valid then goto continuelabel end
+    if not need_full and not def.valid then goto skip end
 
     do_line("@%s = %s", name, sel(def.enabled, "1", "0"))
 
@@ -991,7 +991,7 @@ function ob_read_all_config(need_full, log_only)
     end
 
     do_line("")
-    ::continuelabel::
+    ::skip::
   end
 
   do_line("-- END --")
@@ -1295,11 +1295,11 @@ function ob_init()
             for index,name in ipairs(opt.avail_choices) do
               if opt.value == name then
                 opt.choice_selection = index
-                goto continuelabel
+                goto skip
               end
             end
             error("Option value " .. opt.value .. " not in available choices for " .. opt.name .. "!\n")
-            ::continuelabel::
+            ::skip::
           end
         end -- for opt
       end
@@ -1394,10 +1394,10 @@ function ob_hexen_ceiling_check(thing_id)
         if ent.ceil and ent.ceil == true then
           on_ceiling = 1
         end
-        goto continuelabel
+        goto skip
     end
   end
-  ::continuelabel::
+  ::skip::
   
   return on_ceiling
 
@@ -1530,7 +1530,7 @@ function ob_default_filename()
    
   end
  
- ::continuelabel::
+ ::skip::
  
 end
 

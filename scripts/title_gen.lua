@@ -903,13 +903,13 @@ function Title_draw_char(T, ch)
     local x2 = info.points[i + 1].x
     local y2 = info.points[i + 1].y
 
-    if not x1 or not x2 then goto continuelabel end
+    if not x1 or not x2 then goto skip end
 
     x1 = T.along + x1 * local_w ; y1 = y1 * local_h
     x2 = T.along + x2 * local_w ; y2 = y2 * local_h
 
     Title_make_stroke(T, x1,y1, x2,y2)
-    ::continuelabel::
+    ::skip::
   end
 
   -- advance horizontally for next character
@@ -1219,13 +1219,13 @@ function Title_gen_space_scene()
       ity = ity * (1.0 - geom.dist(0, 0, dx, dy))
       ity = 240 * math.clamp(0, ity, 1)
 
-      if ity < 50 then goto continuelabel end
+      if ity < 50 then goto skip end
       
       ity = math.floor(ity)
 
       gui.title_prop("color", { ity, ity, ity })
       gui.title_draw_rect(x, y, 1, 1)
-      ::continuelabel::
+      ::skip::
     end -- x, y
     end
   end
@@ -1522,7 +1522,7 @@ function Title_gen_cave_scene()
 
       if tall_mode then
         r = (y - (dist-1)*3) * 0.5
-        if r < 0 then goto continuelabel end
+        if r < 0 then goto skip end
 
         r = 1.2 + r ^ 2.2 / 240
       end
@@ -1538,7 +1538,7 @@ function Title_gen_cave_scene()
         gui.title_prop("color", col)
         gui.title_draw_rect(math.floor(x), math.floor(y), 1, 1)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1988,7 +1988,7 @@ function Title_process_raw_fonts()
 
       if x == nil and y == nil then
         dump_line("      {}\n")
-        goto continuelabel
+        goto skip
       end
 
       x = (P.x - CH.rx[1]) / (CH.rx[2] - CH.rx[1])
@@ -2000,7 +2000,7 @@ function Title_process_raw_fonts()
       P.y = y
 
       dump_line("      { x=%1.4f, y=%1.4f }\n", x, y)
-      ::continuelabel::
+      ::skip::
     end
 
     dump_line("    }\n")

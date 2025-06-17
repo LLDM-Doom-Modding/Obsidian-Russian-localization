@@ -615,24 +615,24 @@ function Junction_init(LEVEL, SEEDS)
 
     local N = S:neighbor(dir, "NODIR", SEEDS)
 
-    if N == "NODIR" then goto continuelabel end
+    if N == "NODIR" then goto skip end
 
     -- edge of map?
     if not (N and N.area) then
       local junc = Junction_lookup(LEVEL, A, "map_edge", "create_it")
 
       junc.perimeter = junc.perimeter + 1
-      goto continuelabel
+      goto skip
     end
 
-    if N.area == S.area then goto continuelabel end
+    if N.area == S.area then goto skip end
 
     local junc = Junction_lookup(LEVEL, A, N.area)
 
     if dir < 5 then
       junc.perimeter = junc.perimeter + 1
     end
-    ::continuelabel::
+    ::skip::
   end -- A, S, dir
   end
   end
@@ -749,7 +749,7 @@ function Junction_make_wall(junc)
     --assert(A2 ~= "map_edge")
 
     -- do not need walls inside a void area
-    if A1.mode == "void" then goto continuelabel end
+    if A1.mode == "void" then goto skip end
 
     local E = { kind="wall", area=A1 }
 
@@ -769,7 +769,7 @@ function Junction_make_wall(junc)
     else
       junc.E2 = E
     end
-    ::continuelabel::
+    ::skip::
   end
 end
 
@@ -1013,13 +1013,13 @@ function Corner_init(LEVEL)
   for _,S in pairs(A.seeds) do
   for _,dir in pairs(geom.CORNERS) do
 
-    if S.diagonal and S.diagonal == (10 - dir) then goto continuelabel end
+    if S.diagonal and S.diagonal == (10 - dir) then goto skip end
 
     local corner = S:get_corner(LEVEL, dir)
 
     table.add_unique(corner.areas, A)
     table.add_unique(corner.seeds, S)
-    ::continuelabel::
+    ::skip::
   end  -- A, S, dir
   end
   end
@@ -1686,13 +1686,13 @@ function Area_locate_chunks(LEVEL, SEEDS)
       local sy2 = sy1 + dy
 
       -- we can do less checks in symmetrical rooms
-      if can_skip_for_symmetry(A.room, S) then goto continuelabel end
+      if can_skip_for_symmetry(A.room, S) then goto skip end
 
       -- save time by checking the usage prob *first*
-      if pass ~= 11 and not rand.odds(use_prob) then goto continuelabel end
+      if pass ~= 11 and not rand.odds(use_prob) then goto skip end
 
       try_chunk_at_seed(A, sx1,sy1, sx2,sy2, LEVEL)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1775,24 +1775,24 @@ function Area_find_inner_points(LEVEL, SEEDS)
 
     for _,S in pairs(A.seeds) do
       -- point is outside of area
-      if S.diagonal == 9 then goto continuelabel end
+      if S.diagonal == 9 then goto skip end
 
       -- point is part of boundary, skip it
-      if S.diagonal == 3 or S.diagonal == 7 then goto continuelabel end
+      if S.diagonal == 3 or S.diagonal == 7 then goto skip end
 
       local NA = S:neighbor(4, nil, SEEDS)
       local NB = S:neighbor(2, nil, SEEDS)
 
-      if not (NA and NA.area == A) then goto continuelabel end
-      if not (NB and NB.area == A) then goto continuelabel end
+      if not (NA and NA.area == A) then goto skip end
+      if not (NB and NB.area == A) then goto skip end
 
       local NC = NA:neighbor(2, nil, SEEDS)
       local ND = NB:neighbor(4, nil, SEEDS)
 
-      if not (NC and NC.area == A) then goto continuelabel end
+      if not (NC and NC.area == A) then goto skip end
 
       -- we should reach the same seed going both ways
-      if ND ~= NC then goto continuelabel end
+      if ND ~= NC then goto skip end
 
       -- OK --
 
@@ -1802,7 +1802,7 @@ function Area_find_inner_points(LEVEL, SEEDS)
       corner.inner_point = A
 
       table.insert(A.inner_points, corner)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1863,24 +1863,24 @@ function Area_inner_points_for_group(LEVEL, R, group, where, SEEDS)
 
   for _,S in pairs(seeds) do
     -- point is outside of area
-    if S.diagonal == 9 then goto continuelabel end
+    if S.diagonal == 9 then goto skip end
 
     -- point is part of boundary, skip it
-    if S.diagonal == 3 or S.diagonal == 7 then goto continuelabel end
+    if S.diagonal == 3 or S.diagonal == 7 then goto skip end
 
     local NA = S:neighbor(4, nil, SEEDS)
     local NB = S:neighbor(2, nil, SEEDS)
 
-    if not same_group(NA) then goto continuelabel end
-    if not same_group(NB) then goto continuelabel end
+    if not same_group(NA) then goto skip end
+    if not same_group(NB) then goto skip end
 
     local NC = NA:neighbor(2, nil, SEEDS)
     local ND = NB:neighbor(4, nil, SEEDS)
 
-    if not same_group(NC) then goto continuelabel end
+    if not same_group(NC) then goto skip end
 
     -- we should reach the same seed going both ways
-    if ND ~= NC then goto continuelabel end
+    if ND ~= NC then goto skip end
 
     -- OK --
 
@@ -1890,7 +1890,7 @@ function Area_inner_points_for_group(LEVEL, R, group, where, SEEDS)
     corner[corner_field] = group
 
     num_inner = num_inner + 1
-    ::continuelabel::
+    ::skip::
   end
 
   -- compute openness
@@ -1948,16 +1948,16 @@ function Area_spread_zones(LEVEL)
 
     for pass = 1, 2 do
       for _,N in pairs(A.neighbors) do
-        if not N.zone then goto continuelabel end
+        if not N.zone then goto skip end
 
         -- on first pass, require neighbor to be a real room
         -- [ to prevent run-ons ]
-        if pass == 1 and not N.room then goto continuelabel end
+        if pass == 1 and not N.room then goto skip end
 
         -- OK --
         A.zone = N.zone
         if N then return end
-        ::continuelabel::
+        ::skip::
       end
     end
   end
@@ -1972,13 +1972,13 @@ function Area_spread_zones(LEVEL)
     rand.shuffle(list)
 
     for _,A in pairs(list) do
-      if A.zone then goto continuelabel end
-      if A.mode == "scenic" then goto continuelabel end
+      if A.zone then goto skip end
+      if A.mode == "scenic" then goto skip end
 
       all_done = false
 
       try_set_area(A)
-      ::continuelabel::
+      ::skip::
     end -- A
 
     return all_done
@@ -2017,11 +2017,11 @@ function Area_pick_facing_rooms(LEVEL, SEEDS)
     facings = {}
 
     for _,A in pairs(LEVEL.areas) do
-      if not A.room then goto continuelabel end
+      if not A.room then goto skip end
 
-      if not (A.mode == "floor" or A.mode == "nature") then goto continuelabel end
+      if not (A.mode == "floor" or A.mode == "nature") then goto skip end
 
-      if sel(A.is_outdoor, 1, 0) ~= sel(want_outdoor, 1, 0) then goto continuelabel end
+      if sel(A.is_outdoor, 1, 0) ~= sel(want_outdoor, 1, 0) then goto skip end
 
       for _,S in pairs(A.seeds) do
       for _,dir in pairs(geom.ALL_DIRS) do
@@ -2035,7 +2035,7 @@ function Area_pick_facing_rooms(LEVEL, SEEDS)
         end
       end -- S, dir
       end
-      ::continuelabel::
+      ::skip::
     end -- A
 
 --  stderrf("facing DB:\n%s\n", table.tostr(facings))
@@ -2048,12 +2048,12 @@ function Area_pick_facing_rooms(LEVEL, SEEDS)
     local best_score = -1
 
     for _,R in pairs(LEVEL.rooms) do
-      if R.border then goto continuelabel end
+      if R.border then goto skip end
 
-      if sel(R.is_outdoor, 1, 0) ~= sel(want_outdoor, 1, 0) then goto continuelabel end
+      if sel(R.is_outdoor, 1, 0) ~= sel(want_outdoor, 1, 0) then goto skip end
 
       for _,T in pairs(scenics) do
-        if T.zone then goto continuelabel end
+        if T.zone then goto skip end
 
         local score = facings[face_id(R, T)]
 
@@ -2062,9 +2062,9 @@ function Area_pick_facing_rooms(LEVEL, SEEDS)
           best_T = T
           best_score = score
         end
-        ::continuelabel::
+        ::skip::
       end -- T
-      ::continuelabel::
+      ::skip::
     end -- R
 
     return best_R, best_T
@@ -2229,14 +2229,14 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
       for _,S in pairs(seed_list) do
         assert(S.zborder == nil)
 
-        if no_diags and S.diagonal then goto continuelabel end
+        if no_diags and S.diagonal then goto skip end
 
         local zborder = func(S)
 
         if zborder then
           table.insert(changes, { S=S, zborder=zborder })
         end
-        ::continuelabel::
+        ::skip::
       end
 
       -- apply the changes
@@ -2254,16 +2254,16 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
     for _,dir in pairs(geom.ALL_DIRS) do
       local N = S:neighbor(dir, nil, SEEDS)
-      if not N then goto continuelabel end
+      if not N then goto skip end
 
       local nz = get_zborder(N)
-      if not nz then goto continuelabel end
+      if not nz then goto skip end
 
       -- fail if we have two neighbors with differing rooms
       if zb and zb ~= nz then return nil end
 
       zb = nz
-      ::continuelabel::
+      ::skip::
     end
 
     return zb
@@ -2344,13 +2344,13 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
     for _,dir in pairs(geom.ALL_DIRS) do
       local N = S:neighbor(dir, nil, SEEDS)
-      if not N then goto continuelabel end
+      if not N then goto skip end
 
       local z = get_zborder(N)
-      if not z then goto continuelabel end
+      if not z then goto skip end
 
       counts[z] = (counts[z] or 0) + 1
-      ::continuelabel::
+      ::skip::
     end
 
     for z, num in pairs(counts) do
@@ -2375,12 +2375,12 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
     for _,dir in pairs(geom.ALL_DIRS) do
       local N = S:neighbor(dir, nil, SEEDS)
-      if not N then goto continuelabel end
+      if not N then goto skip end
 
       local z = get_zborder(N)
 
       if z and z ~= VOID then return z end
-      ::continuelabel::
+      ::skip::
     end
 
     return VOID
@@ -2510,16 +2510,16 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
       local T2 = (N and N.temp_area)
 
-      if not T2 then goto continuelabel end
-      if T2 == T1 then goto continuelabel end
+      if not T2 then goto skip end
+      if T2 == T1 then goto skip end
 
       assert(not T2.is_dead)
 
-      if S.zborder ~= N.zborder then goto continuelabel end
+      if S.zborder ~= N.zborder then goto skip end
 
       perform_merge(T1, T2)
       if dir then return true end
-      ::continuelabel::
+      ::skip::
     end  -- S, dir
     end
 
@@ -2543,12 +2543,12 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
       local changed = false
 
       for _,T1 in pairs(temp_areas) do
-        if T1.is_dead then goto continuelabel end
+        if T1.is_dead then goto skip end
 
         if try_merge_an_area(T1) then
           changed = true
         end
-        ::continuelabel::
+        ::skip::
       end
 
       prune_dead_areas()
@@ -2630,12 +2630,12 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
     -- decide whether to void them up
     -- TODO: keep an inner area when its size and views are large enough
     for _,T in pairs(temp_areas) do
-      if T.is_void then goto continuelabel end
+      if T.is_void then goto skip end
 
       if T.is_inner then
         void_up_temp(T)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2666,14 +2666,14 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
     for pass = 1, 6 do
     for _,T in pairs(temp_areas) do
-      if T.is_dead or T.is_inner or T.is_void then goto continuelabel end
+      if T.is_dead or T.is_inner or T.is_void then goto skip end
 
-      if not area_too_small(T) then goto continuelabel end
+      if not area_too_small(T) then goto skip end
 
       rand.shuffle(T.neighbors)
 
       for _,N in pairs(T.neighbors) do
-        if N.is_dead or N.is_inner or N.is_void then goto continuelabel end
+        if N.is_dead or N.is_inner or N.is_void then goto skip end
 
         -- only merge small areas with other small areas in the
         -- in first few passes (hoping they become large enough)
@@ -2682,19 +2682,19 @@ function Area_divvy_up_borders(LEVEL, SEEDS)
 
           if T.is_dead then break; end
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end  -- pass, T
     end
 
     for _,T in pairs(temp_areas) do
-      if T.is_dead or T.is_inner or T.is_void then goto continuelabel end
+      if T.is_dead or T.is_inner or T.is_void then goto skip end
 
       if area_too_small(T) then
         void_up_temp(T)
       end
-      ::continuelabel::
+      ::skip::
     end
 
     prune_dead_areas()

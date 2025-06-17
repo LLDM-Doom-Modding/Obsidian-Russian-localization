@@ -458,12 +458,12 @@ function Item_simulate_battle(LEVEL, R)
 
   local function give_monster_drops(hmodel, mon_list)
     for _,M in pairs(mon_list) do
-      if M.is_cage then goto continuelabel end
+      if M.is_cage then goto skip end
 
       if M.info.give then
         Player_give_stuff(hmodel, M.info.give)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -593,7 +593,7 @@ function Item_distribute_stats(LEVEL)
       if N.zone ~= R.zone then break; end
 
       -- never move stuff into hallways
-      if N.is_hallway then goto continuelabel end
+      if N.is_hallway then goto skip end
 
       -- give more in larger rooms
       local val = ratio * (N.svolume ^ 0.7)
@@ -602,7 +602,7 @@ function Item_distribute_stats(LEVEL)
       total = total + val
 
       ratio = ratio * 0.7
-      ::continuelabel::
+      ::skip::
     end
 
     -- handle hallways that are entered from a different zone
@@ -633,7 +633,7 @@ function Item_distribute_stats(LEVEL)
       local N_stats = N.item_stats[CL]
 
       for stat,qty in pairs(R_stats) do
-        if qty <= 0 then goto continuelabel end
+        if qty <= 0 then goto skip end
 
         local value = qty * ratio
 
@@ -652,7 +652,7 @@ function Item_distribute_stats(LEVEL)
 
 --      gui.debugf("  distributing %s:%1.1f [%s]  %s --> %s\n",
 --                 stat, value,  CL, R.name, N.name)
-        ::continuelabel::
+        ::skip::
       end
     end
   end
@@ -797,7 +797,7 @@ function Item_pickups_for_class(LEVEL, CL)
       then
         local spot = grab_a_big_spot(R)
         place_item_in_spot(item.name, spot)
-        goto continuelabel
+        goto skip
       end
 
       -- keep track of a limited number of previously chosen spots.
@@ -818,7 +818,7 @@ function Item_pickups_for_class(LEVEL, CL)
         spot.used = true
         table.insert(R.item_spots, spot)
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 

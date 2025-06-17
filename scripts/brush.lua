@@ -1023,7 +1023,7 @@ end
 function brushlib.collect_flags(coords)
   for _,C in pairs(coords) do
     -- these flags only apply to linedefs
-    if not C.x then goto continuelabel end
+    if not C.x then goto skip end
 
     if GAME.format == "doom" then
       local flags = C.flags or 0
@@ -1042,7 +1042,7 @@ function brushlib.collect_flags(coords)
         if not C.special then C.special = 0 end
       end
     end
-    ::continuelabel::
+    ::skip::
   end -- C
 end
 

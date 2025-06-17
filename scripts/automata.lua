@@ -1136,19 +1136,19 @@ function GRID_CLASS.create_blobs(grid, step_x, step_y)
   local function spawn_blobs()
     for cx = 1, W, step_x do
     for cy = 1, H, step_y do
-      if rand.odds(5) then goto continuelabel end
+      if rand.odds(5) then goto skip end
 
       local dx = rand.irange(0, step_x - 1)
       local dy = rand.irange(0, step_y - 1)
 
       if not is_free(cx+dx, cy+dy) then
-        goto continuelabel
+        goto skip
       end
 
       total_blobs = total_blobs + 1
 
       set_cell(cx+dx, cy+dy, total_blobs)
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -1179,9 +1179,9 @@ function GRID_CLASS.create_blobs(grid, step_x, step_y)
     for cx = 1, W do
     for cy = 1, H do
       local id = result[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
-      if result.regions[id].size >= 2 then goto continuelabel end
+      if result.regions[id].size >= 2 then goto skip end
 
       if rand.odds(15) then
         local dx = rand.sel(50, -1, 1)
@@ -1190,7 +1190,7 @@ function GRID_CLASS.create_blobs(grid, step_x, step_y)
         try_set_cell(cx+dx, cy   , id)
         try_set_cell(cx   , cy+dy, id)
         try_set_cell(cx+dx, cy+dy, id)
-        goto continuelabel
+        goto skip
       end
 
       local x_dir = rand.irange(-2, 2)
@@ -1201,7 +1201,7 @@ function GRID_CLASS.create_blobs(grid, step_x, step_y)
 
       if y_dir <=  1 then try_set_cell(cx, cy-1, id) end
       if y_dir >= -1 then try_set_cell(cx, cy+1, id) end
-      ::continuelabel::
+      ::skip::
     end
     end
   end
@@ -1328,7 +1328,7 @@ function GRID_CLASS.merge_small_blobs(grid, min_size)
 
     for cx = 1, grid.w do
     for cy = 1, grid.h do
-      if grid[cx][cy] ~= id then goto continuelabel end
+      if grid[cx][cy] ~= id then goto skip end
 
       for dir = 2,8,2 do
         local nx, ny = geom.nudge(cx, cy, dir)
@@ -1349,7 +1349,7 @@ function GRID_CLASS.merge_small_blobs(grid, min_size)
           end
         end
       end -- dir
-      ::continuelabel::
+      ::skip::
     end -- cx, cy
     end
 
@@ -1402,7 +1402,7 @@ function GRID_CLASS.walkify_blobs(grid, walk_rects)
 
       if cur_blob == nil then
          cur_blob = id
-         goto continuelabel
+         goto skip
       end
 
       grid.regions[cur_blob].is_walk = true
@@ -1410,7 +1410,7 @@ function GRID_CLASS.walkify_blobs(grid, walk_rects)
       if cur_blob ~= id then
         grid:merge_two_blobs(cur_blob, id)
       end
-      ::continuelabel::
+      ::skip::
     end
     end
   end
@@ -1432,10 +1432,10 @@ function GRID_CLASS.merge_diagonal_blobs(grid, diagonals)
   for cx = 1, grid.w do
   for cy = 1, grid.h do
     local C = grid[cx][cy]
-    if not C then goto continuelabel end
+    if not C then goto skip end
 
     local dir = diagonals[cx][cy]
-    if not dir then goto continuelabel end
+    if not dir then goto skip end
 
     local nx, ny = geom.nudge(cx, cy, dir)
     local ax, ay = geom.nudge(cx, cy, geom. LEFT_45[dir])
@@ -1455,17 +1455,17 @@ function GRID_CLASS.merge_diagonal_blobs(grid, diagonals)
 
 --  stderrf(": %s %s / %s %s\n", tostring(C), tostring(N), tostring(A), tostring(B))
 
-    if not (A or B) then goto continuelabel end
+    if not (A or B) then goto skip end
 
     if not A then A = B ; B = nil end
 
-    if A and A == C then goto continuelabel end
-    if B and B == C then goto continuelabel end
+    if A and A == C then goto skip end
+    if B and B == C then goto skip end
 
     if A and B then A = math.min(A, B) end
 
     grid:merge_two_blobs(C, A)
-    ::continuelabel::
+    ::skip::
   end
   end
 end
@@ -1478,7 +1478,7 @@ function GRID_CLASS.extent_of_blobs(grid)
   for cy = 1, grid.h do
     local id = grid[cx][cy]
 
-    if id == nil then goto continuelabel end
+    if id == nil then goto skip end
 
     local reg = grid.regions[id]
     assert(reg)
@@ -1492,7 +1492,7 @@ function GRID_CLASS.extent_of_blobs(grid)
       reg.cx2 = math.max(reg.cx2, cx)
       reg.cy2 = math.max(reg.cy2, cy)
     end
-    ::continuelabel::
+    ::skip::
   end
   end
 end
@@ -1515,7 +1515,7 @@ function GRID_CLASS.random_blob_cell(grid, id, req_four)
     local cx = rand.irange(reg.cx1, reg.cx2)
     local cy = rand.irange(reg.cy1, reg.cy2)
 
-    if grid[cx][cy] ~= id then goto continuelabel end
+    if grid[cx][cy] ~= id then goto skip end
 
     local score = gui.random()
 
@@ -1534,7 +1534,7 @@ function GRID_CLASS.random_blob_cell(grid, id, req_four)
       best_cy = cy
       best_score = score
     end
-    ::continuelabel::
+    ::skip::
   end
 
   return best_cx, best_cy
@@ -1550,7 +1550,7 @@ function GRID_CLASS.neighbors_of_blobs(grid)
   for cy = 1, grid.h do
     local id = grid[cx][cy]
 
-    if id == nil then goto continuelabel end
+    if id == nil then goto skip end
 
     local reg1 = grid.regions[id]
     assert(reg1)
@@ -1561,16 +1561,16 @@ function GRID_CLASS.neighbors_of_blobs(grid)
       local nb
       if grid:valid(nx, ny) then nb = grid[nx][ny] end
 
-      if not nb or nb == id then goto continuelabel end
+      if not nb or nb == id then goto skip end
 
       local reg2 = grid.regions[nb]
       assert(reg2)
 
       table.add_unique(reg1.neighbors, reg2)
       table.add_unique(reg2.neighbors, reg1)
-      ::continuelabel::
+      ::skip::
     end
-    ::continuelabel::
+    ::skip::
   end
   end
 end
@@ -1597,7 +1597,7 @@ function GRID_CLASS.spread_blob_dists(grid, field)
       end
 
       -- cannot do anything if all neighbors are unset
-      if not min_val then goto continuelabel end
+      if not min_val then goto skip end
 
       min_val = min_val + 1
 
@@ -1605,7 +1605,7 @@ function GRID_CLASS.spread_blob_dists(grid, field)
         B1[field] = min_val
         changes   = true
       end
-      ::continuelabel::
+      ::skip::
     end
 
   until not changes

@@ -100,11 +100,11 @@ function Monster_pacing(LEVEL)
         if R.is_secret and OB_CONFIG.secret_monsters == "yesyes" then
           R.pressure = rand.sel(75, "medium", "high")
         end
-        goto continuelabel
+        goto skip
       end
 
       table.insert(room_list, R)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -181,16 +181,16 @@ function Monster_pacing(LEVEL)
     local count = 0
 
     for _,C in pairs(R.conns) do
-      if C.lock then goto continuelabel end
-      if C.is_secret then goto continuelabel end
-      if C.kind == "teleporter" then goto continuelabel end
+      if C.lock then goto skip end
+      if C.is_secret then goto skip end
+      if C.kind == "teleporter" then goto skip end
 
       local N = C:other_room(R)
 
       if N.pressure then return false end
 
       count = count + 1
-      ::continuelabel::
+      ::skip::
     end
 
     return (count >= 2)
@@ -225,15 +225,15 @@ function Monster_pacing(LEVEL)
 
     -- avoid being same as a direct neighbor
     for _,C in pairs(R.conns) do
-      if C.lock then goto continuelabel end
-      if C.is_secret then goto continuelabel end
+      if C.lock then goto skip end
+      if C.is_secret then goto skip end
 
       local N = C:other_room(R)
 
       if N.pressure then
         tab[N.pressure] = tab[N.pressure] / 4
       end
-      ::continuelabel::
+      ::skip::
     end
 
     -- enforce the quotas
@@ -422,12 +422,12 @@ function Monster_zone_palettes(LEVEL)
     local size  = table.size(pal)
 
     for mon,qty in pairs(pal) do
-      if qty <= 0 then goto continuelabel end
+      if qty <= 0 then goto skip end
 
       local info = assert(GAME.MONSTERS[mon])
 
       total = total + info.damage * qty
-      ::continuelabel::
+      ::skip::
     end
 
     -- tie breaker    
@@ -590,7 +590,7 @@ function Monster_split_spots(list, max_size)
 
     if XN < 2 and YN < 2 then
       table.insert(new_list, spot)
-      goto continuelabel
+      goto skip
     end
 
     for x = 1, XN do
@@ -610,7 +610,7 @@ function Monster_split_spots(list, max_size)
       table.insert(new_list, new_spot)
     end
     end
-    ::continuelabel::
+    ::skip::
   end
 
   return new_list
@@ -775,14 +775,14 @@ function Monster_visibility(R)
 
   local function spread_vis(source_vis)
     for _,A in pairs(spot_list) do
-      if A.vis ~= source_vis then goto continuelabel end
+      if A.vis ~= source_vis then goto skip end
 
       for _,B in pairs(spot_list) do
         if not B.vis and check_spot_to_spot(A, B) then
           B.vis = source_vis + 1
         end
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1173,7 +1173,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
 
     for _,spot in pairs(R.mon_spots) do
       -- already processed?
-      if spot.marked then goto continuelabel end
+      if spot.marked then goto skip end
 
       spot.marked = true
 
@@ -1185,14 +1185,14 @@ function Monster_fill_room(LEVEL, R, SEEDS)
       -- TODO: more than one ambush focus per room
       local ambush_focus = R.ambush_focus
 
-      if not ambush_focus then goto continuelabel end
+      if not ambush_focus then goto skip end
 
       local ax = ambush_focus.x
       local ay = ambush_focus.y
       local az = ambush_focus.z
 
       -- too close?
-      if geom.dist(mx, my, ax, ay) < 80 then goto continuelabel end
+      if geom.dist(mx, my, ax, ay) < 80 then goto skip end
 
       spot.ambush_angle = geom.calc_angle(ax - mx, ay - my)
 
@@ -1207,7 +1207,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
       then
         spot.ambush = ambush_focus
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1808,7 +1808,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
       if fit_num <= 0 then
         spot.find_score = -1
         spot.find_cost = 9e9
-        goto continuelabel
+        goto skip
       end
 
       total = total + 1
@@ -1846,7 +1846,7 @@ function Monster_fill_room(LEVEL, R, SEEDS)
 
       -- tie breeker
       spot.find_cost = spot.find_cost + gui.random()
-      ::continuelabel::
+      ::skip::
     end
 
 

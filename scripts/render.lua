@@ -4493,14 +4493,14 @@ function Render_cells(LEVEL, area)
 
       -- check if result would be updated.
       -- this does a distance check too (val is zero for far away lights)
-      if val <= result then goto continuelabel end
+      if val <= result then goto skip end
 
       -- check if line of sight is blocked
       -- [ this is expensive, so call it AFTER distance test ]
       if not gui.trace_ray(L.x, L.y, L.z, cell_x, cell_y, cell_z, "v") then
         result = val
       end
-      ::continuelabel::
+      ::skip::
     end
 
     return result

@@ -65,7 +65,7 @@ function Cave_brush(area, x, y)
 
   for _,side in pairs(CELL_CORNERS) do
     -- create a triangle when cell straddles a diagonal seed
-    if diag_map[x][y] == 10 - side then goto continuelabel end
+    if diag_map[x][y] == 10 - side then goto skip end
 
     local dx, dy = geom.delta(side)
 
@@ -79,7 +79,7 @@ function Cave_brush(area, x, y)
     fy = fy + (area.delta_y_map[cx][cy] or 0)
 
     table.insert(coords, { x=fx, y=fy })
-    ::continuelabel::
+    ::skip::
   end
 
   return coords
@@ -401,7 +401,7 @@ function Cave_cell_touches_room(area, cx, cy, R, SEEDS)
     local sx = area.base_sx + math.floor((nx - 1) / 2)
     local sy = area.base_sy + math.floor((ny - 1) / 2)
 
-    if not Seed_valid(sx, sy) then goto continuelabel end
+    if not Seed_valid(sx, sy) then goto skip end
 
     local S1 = SEEDS[sx][sy]
     local S2 = S1.top
@@ -429,7 +429,7 @@ function Cave_cell_touches_room(area, cx, cy, R, SEEDS)
 
     if S1 and S1.area and S1.area.room == R then return true end
     if S2 and S2.area and S2.area.room == R then return true end
-    ::continuelabel::
+    ::skip::
   end
 
   return false
@@ -570,14 +570,14 @@ function Cave_generate_cave(R, area, SEEDS)
 
       if not walk_id then
         walk_id = reg
-        goto continuelabel
+        goto skip
       end
 
       if walk_id ~= reg then
         -- not valid : the empty areas are disjoint
         return false
       end
-      ::continuelabel::
+      ::skip::
     end
 
     cave.walk_id = walk_id
@@ -1258,7 +1258,7 @@ step:dump("Step:")
 
       for x = cx1, cx2 do
       for y = cy1, cy2 do
-        if step[x][y] ~= 1 then goto continuelabel end
+        if step[x][y] ~= 1 then goto skip end
 
         for dir = 2,8,2 do
           local nx, ny = geom.nudge(x, y, dir)
@@ -1266,7 +1266,7 @@ step:dump("Step:")
             table.insert(pos_list, { x=nx, y=ny, prev=prev_B })
           end
         end
-        ::continuelabel::
+        ::skip::
       end -- x, y
       end
     end
@@ -1278,10 +1278,10 @@ step:dump("Step:")
       local pos = table.remove(pos_list, rand.irange(1, #pos_list))
 
       -- ignore out-of-date positions
-      if free[pos.x][pos.y] ~= 0 then goto continuelabel end
+      if free[pos.x][pos.y] ~= 0 then goto skip end
 
       grow_an_area(pos.x, pos.y, pos.prev)
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1294,24 +1294,24 @@ step:dump("Step:")
     for y = 1, H do
       local B1 = area.blobs[x][y]
 
-      if not (B1 and B1.neighbors) then goto continuelabel end
+      if not (B1 and B1.neighbors) then goto skip end
 
       for dir = 2,4,2 do
         local nx, ny = geom.nudge(x, y, dir)
 
-        if not cave:valid(nx, ny) then goto continuelabel end
+        if not cave:valid(nx, ny) then goto skip end
 
         local B2 = area.blobs[nx][ny]
 
-        if not (B2 and B2.neighbors) then goto continuelabel end
+        if not (B2 and B2.neighbors) then goto skip end
 
         if B2 ~= B1 then
           table.add_unique(B1.neighbors, B2)
           table.add_unique(B2.neighbors, B1)
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end  -- x, y
     end
 
@@ -1421,13 +1421,13 @@ function Cave_bunch_areas(R, mode, LEVEL)
 
     for B,_ in pairs(list) do
       for _,N in pairs(B.neighbors) do
-        if list[N] then goto continuelabel end
-        if N.near_bunch then goto continuelabel end
+        if list[N] then goto skip end
+        if N.near_bunch then goto skip end
 
-        if touches_the_list(N, list, B) then goto continuelabel end
+        if touches_the_list(N, list, B) then goto skip end
 
         table.insert(poss, N)
-        ::continuelabel::
+        ::skip::
       end
     end
 
@@ -1522,7 +1522,7 @@ function Cave_heights_near_area(R, B)
     for dir = 2,4 do
       local nx, ny = geom.nudge(x, y, dir)
 
-      if not cave:valid(nx, ny) then goto continuelabel end
+      if not cave:valid(nx, ny) then goto skip end
 
       local B1 = area.blobs[x][y]
       local B2 = area.blobs[nx][ny]
@@ -1531,7 +1531,7 @@ function Cave_heights_near_area(R, B)
         B1, B2 = B2, B1
       end
 
-      if not B2 or (B1 ~= B) or (B2 == B) then goto continuelabel end
+      if not B2 or (B1 ~= B) or (B2 == B) then goto skip end
 
       if B2.floor_h then
         min_floor_h = math.min(min_floor_h, B2.floor_h)
@@ -1542,7 +1542,7 @@ function Cave_heights_near_area(R, B)
         min_ceil_h = math.min(min_ceil_h, B2.ceil_h)
         max_ceil_h = math.max(max_ceil_h, B2.ceil_h)
       end
-      ::continuelabel::
+      ::skip::
     end
   end -- x, y
   end
@@ -1611,17 +1611,17 @@ function Cave_floor_heights(R, entry_h)
 
     -- determine minimum of all areas touching the river
     for _,B in pairs(area.walk_floors) do
-      if B.liquid_bunch ~= bunch_B then goto continuelabel end
+      if B.liquid_bunch ~= bunch_B then goto skip end
 
       for _,N in pairs(B.neighbors) do
-        if N.liquid_bunch then goto continuelabel end
+        if N.liquid_bunch then goto skip end
 
         if N.floor_h then
           h = math.min(h, N.floor_h - diff_h)
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end
 
     for _,B in pairs(area.walk_floors) do
@@ -1639,17 +1639,17 @@ function Cave_floor_heights(R, entry_h)
     --| (to prevent those areas becoming lower than the river).
 
     for _,B in pairs(area.walk_floors) do
-      if B.liquid_bunch ~= bunch_B then goto continuelabel end
+      if B.liquid_bunch ~= bunch_B then goto skip end
 
       for _,N in pairs(B.neighbors) do
-        if N.liquid_bunch then goto continuelabel end
+        if N.liquid_bunch then goto skip end
 
         if not N.floor_h then
           N.floor_h = h + rand.pick({8, 16, 24})
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1782,7 +1782,7 @@ function Cave_floor_heights(R, entry_h)
 
   local function update_walk_ways()
     for _,B in pairs(area.walk_floors) do
-      if not B.children then goto continuelabel end
+      if not B.children then goto skip end
 
       for _,SINK in pairs(B.children) do
         SINK.floor_h = B.floor_h + SINK.floor_dz
@@ -1791,7 +1791,7 @@ function Cave_floor_heights(R, entry_h)
           SINK.ceil_h = B.ceil_h + SINK.ceil_dz
         end
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -1839,17 +1839,17 @@ function Cave_floor_heights(R, entry_h)
     local h = bunch_B.ceil_h or 0
 
     for _,B in pairs(area.walk_floors) do
-      if B.sky_bunch ~= bunch_B then goto continuelabel end
+      if B.sky_bunch ~= bunch_B then goto skip end
 
       for _,N in pairs(B.neighbors) do
-        if N.sky_bunch then goto continuelabel end
+        if N.sky_bunch then goto skip end
 
         if N.ceil_h then
           h = math.max(h, N.ceil_h)
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end
 
     h = h + rand.pick({ 32,48,64,96 })
@@ -2074,13 +2074,13 @@ function Cave_lake_fences(R)
     for x = R.sx1, R.sx2 do
     for y = R.sy1, R.sy2 do
       local S = SEEDS[x][y]
-      if S.room ~= R then goto continuelabel end
+      if S.room ~= R then goto skip end
 
       cx1 = (x - area.base_sx) * 2 + 1
       cy1 = (y - area.base_sy) * 2 + 1
 
       for _,dir in pairs(geom.CORNERS) do
-        if not Cave_is_edge(S, dir, SEEDS) then goto continuelabel end
+        if not Cave_is_edge(S, dir, SEEDS) then goto skip end
 
         local A_dir = geom. LEFT_45[dir]
         local B_dir = geom.RIGHT_45[dir]
@@ -2088,8 +2088,8 @@ function Cave_lake_fences(R)
         local A = S:neighbor(A_dir)
         local B = S:neighbor(B_dir)
 
-        if not A or (A.room ~= S.room) then goto continuelabel end
-        if not B or (B.room ~= S.room) then goto continuelabel end
+        if not A or (A.room ~= S.room) then goto skip end
+        if not B or (B.room ~= S.room) then goto skip end
 
         if A:need_lake_fence(B_dir) or
            B:need_lake_fence(A_dir)
@@ -2097,9 +2097,9 @@ function Cave_lake_fences(R)
           local cx, cy = geom.pick_corner(dir, cx1, cy1, cx1+1, cy1+1)
           area.blobs[cx][cy] = area.fence_blob
         end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end -- x, y
     end
   end
@@ -2124,14 +2124,14 @@ function Cave_lake_fences(R)
   for y = R.sy1, R.sy2 do
     local S = SEEDS[x][y]
 
-    if S.room ~= R then goto continuelabel end
+    if S.room ~= R then goto skip end
 
     for dir = 2,8,2 do
       if S:need_lake_fence(dir) then
         try_fence_run(S, dir)
       end
     end
-    ::continuelabel::
+    ::skip::
   end -- sx, sy
   end
 
@@ -2266,7 +2266,7 @@ function Cave_make_waterfalls(R)
 
       -- too large?
       -- we skip the main lake (only test cases beginning at a pool)
-      if w > 15 or h > 15 then goto continuelabel end
+      if w > 15 or h > 15 then goto skip end
 
       local DIRS = { 2,4,6,8 }
       rand.shuffle(DIRS)
@@ -2276,7 +2276,7 @@ function Cave_make_waterfalls(R)
           break;
         end
       end
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2306,7 +2306,7 @@ function Cave_make_waterfalls(R)
       if not N then return false end
 
       -- allow fences
-      if N.is_fence then goto continuelabel end
+      if N.is_fence then goto skip end
 
       -- this check prevents odd-looking falls (want only a single side of
       -- the LOW_POOL to be visible)
@@ -2317,7 +2317,7 @@ function Cave_make_waterfalls(R)
       if N ~= walk_B then return false end
 
       dir = 10 - dir
-      ::continuelabel::
+      ::skip::
     end
 
     return true
@@ -2412,11 +2412,11 @@ function Cave_make_waterfalls(R)
 
       if ch == 'F' and i == 1 and string.sub(str, 3, 3) == 'F' then
         area.blobs[nx][ny] = HIGH_POOL
-        goto continuelabel
+        goto skip
       end
 
       area.blobs[nx][ny] = LOW_POOL
-      ::continuelabel::
+      ::skip::
     end
 
     return true
@@ -2488,12 +2488,12 @@ function Cave_make_waterfalls(R)
     for y = R.sy1, R.sy2 do
       local S = SEEDS[x][y]
 
-      if S.room ~= R then goto continuelabel end
+      if S.room ~= R then goto skip end
 
       for dir = 2,8,2 do
         try_fence_fall(S, dir)
       end
-      ::continuelabel::
+      ::skip::
     end -- sx, sy
     end
   end
@@ -2636,7 +2636,7 @@ function Cave_decorations(R)
       if table.empty(locs) then break; end
 
       local loc = table.remove(locs, 1)
-      if loc.dead then goto continuelabel end
+      if loc.dead then goto skip end
 
       add_torch(loc.cx, loc.cy, torch_ent)
 
@@ -2645,7 +2645,7 @@ function Cave_decorations(R)
       kill_nearby_locs(locs, loc.cx, loc.cy)
 
       quota = quota - 1
-      ::continuelabel::
+      ::skip::
     end
   end
 
@@ -2935,7 +2935,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
     for cy = 1, area.ch do
       local val = area.walk_map[cx][cy]
 
-      if val == nil then goto continuelabel end
+      if val == nil then goto skip end
 
       area.blobs[cx][cy] = FL
 
@@ -2943,7 +2943,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
       FL.cy1 = math.min(FL.cy1 or  9999, cy)
       FL.cx2 = math.max(FL.cx2 or -9999, cx)
       FL.cy2 = math.max(FL.cy2 or -9999, cy)
-      ::continuelabel::
+      ::skip::
     end -- cx, cy
     end
   end
@@ -3035,14 +3035,14 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
     for nx = cx-1, cx+1 do
     for ny = cy-1, cy+1 do
-      if nx < 1 or nx > area.cw then goto continuelabel end
-      if ny < 1 or ny > area.ch then goto continuelabel end
+      if nx < 1 or nx > area.cw then goto skip end
+      if ny < 1 or ny > area.ch then goto skip end
 
       local v2 = area.walk_map[nx][ny]
 
       -- touches a walk chunk?
       if v2 and v2 < 0 then return -1 end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -3362,11 +3362,11 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
       if check_river_point(P.x, P.y-1) > 0 then area.blobs[P.x][P.y-1] = RIVER end
       if check_river_point(P.x, P.y+1) > 0 then area.blobs[P.x][P.y+1] = RIVER end
 
-      if math.abs(P.x - points[1].x) < 2 then goto continuelabel end
+      if math.abs(P.x - points[1].x) < 2 then goto skip end
 
       if check_river_point(P.x, P.y-2) > 0 then area.blobs[P.x][P.y-2] = RIVER end
       if check_river_point(P.x, P.y+2) > 0 then area.blobs[P.x][P.y+2] = RIVER end
-      ::continuelabel::
+      ::skip::
     end
 
 
@@ -3389,7 +3389,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
     for cx = B.cx1, B.cx2 do
     for cy = B.cy1, B.cy2 do
-      if blob_map[cx][cy] ~= B.id then goto continuelabel end
+      if blob_map[cx][cy] ~= B.id then goto skip end
 
       for _,dir in pairs(geom.ALL_DIRS) do
         local nx, ny = geom.nudge(cx, cy, dir)
@@ -3397,7 +3397,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
         local n_id = blob_map[nx][ny]
         if not n_id then return false end
-        if n_id == B.id then goto continuelabel end
+        if n_id == B.id then goto skip end
 
         local N = blob_map.regions[n_id]
         assert(N)
@@ -3405,9 +3405,9 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
         if N.floor_id ~= B.floor_id then return false end
 
         if N.is_tower then return false end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -3511,22 +3511,22 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
     for x = cx1, cx2 do
     for y = cy1, cy2 do
-      if blob_map[x][y] ~= B.id then goto continuelabel end
+      if blob_map[x][y] ~= B.id then goto skip end
 
       local nx, ny = geom.nudge(x, y, dir)
 
-      if not blob_map:valid(nx, ny) then goto continuelabel end
+      if not blob_map:valid(nx, ny) then goto skip end
 
       local id = blob_map[nx][ny]
-      if id == nil then goto continuelabel end
-      if id == B.id then goto continuelabel end
+      if id == nil then goto skip end
+      if id == B.id then goto skip end
 
       if not counts[id] then
         counts[id] = 1 + gui.random() / 10  -- tie breaker
       else
         counts[id] = counts[id] + 1
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -3637,7 +3637,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
     B.floor_id = f_id
 
     for _,st in pairs(stairs) do
-      if not st.is_contained then goto continuelabel end
+      if not st.is_contained then goto skip end
 
       if st.src == B then
         if not hill_change_floor(st.dest, f_id,  old, stairs) then
@@ -3650,7 +3650,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
           return false
         end
       end
-      ::continuelabel::
+      ::skip::
     end
 
     return true
@@ -3720,18 +3720,18 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
         if B.floor_id ~= old then
           table.remove(unfilled, i)
-          goto continuelabel
+          goto skip
         end
 
         local use_id = get_a_neighbor(B)
-        if not use_id then goto continuelabel end
+        if not use_id then goto skip end
 
         if not hill_change_floor(B, use_id,  old, stairs) then
           return false
         end
 
         changes = true
-        ::continuelabel::
+        ::skip::
       end
 
     until not changes
@@ -3947,7 +3947,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
     for cx = B.cx1, B.cx2 do
     for cy = B.cy1, B.cy2 do
-      if blob_map[cx][cy] ~= B.id then goto continuelabel end
+      if blob_map[cx][cy] ~= B.id then goto skip end
 
       for _,dir in pairs(geom.ALL_DIRS) do
         local nx, ny = geom.nudge(cx, cy, dir)
@@ -3955,7 +3955,7 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
 
         local n_id = blob_map[nx][ny]
         if not n_id then return false end
-        if n_id == B.id then goto continuelabel end
+        if n_id == B.id then goto skip end
 
         local N = blob_map.regions[n_id]
         assert(N)
@@ -3963,9 +3963,9 @@ function Cave_build_a_park(LEVEL, R, entry_h, SEEDS)
         if N.floor_id ~= B.floor_id then return false end
 
         if N.is_tower then return false end
-        ::continuelabel::
+        ::skip::
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -4677,7 +4677,7 @@ stderrf("  picked chain from blob %d --> %d\n", B.id, C.id)
     for cx = 1, area.cw do
       for cy = 1, area.ch do
         local id = blob_map[cx][cy]
-        if not id then goto continuelabel end
+        if not id then goto skip end
 
         local reg = blob_map.regions[id]
 
@@ -4686,7 +4686,7 @@ stderrf("  picked chain from blob %d --> %d\n", B.id, C.id)
         info.floor_mat = R.floor_mat
 
         area.blobs[cx][cy] = info
-        ::continuelabel::
+        ::skip::
       end
     end
 
@@ -4930,15 +4930,15 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cx = 1, area.cw do
     for cy = 1, area.ch do
       local id = blob_map[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
       local reg = blob_map.regions[id]
-      if reg.room_dist then goto continuelabel end
+      if reg.room_dist then goto skip end
 
       if Cave_cell_touches_room(area, cx, cy, room, SEEDS) then
         reg.room_dist = 0
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -4950,15 +4950,15 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cx = 1, area.cw do
     for cy = 1, area.ch do
       local id = blob_map[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
       local reg = blob_map.regions[id]
-      if reg.mapedge_dist then goto continuelabel end
+      if reg.mapedge_dist then goto skip end
 
       if Cave_cell_touches_map_edge(LEVEL, area, cx, cy) then
         reg.mapedge_dist = 0
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -4971,7 +4971,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cy = 1, area.ch do
       local val = area.walk_map[cx][cy]
 
-      if val == nil then goto continuelabel end
+      if val == nil then goto skip end
 
       area.blobs[cx][cy] = FL
 
@@ -4979,7 +4979,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
       FL.cy1 = math.min(FL.cy1 or  9999, cy)
       FL.cx2 = math.max(FL.cx2 or -9999, cx)
       FL.cy2 = math.max(FL.cy2 or -9999, cy)
-      ::continuelabel::
+      ::skip::
     end -- sx, sy
     end
   end
@@ -5116,34 +5116,34 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cx = 1, area.cw do
     for cy = 1, area.ch do
       local id = blob_map[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
       local reg = blob_map.regions[id]
 
-      if not (reg.room_dist and reg.mapedge_dist) then goto continuelabel end
+      if not (reg.room_dist and reg.mapedge_dist) then goto skip end
 
       if reg.mapedge_dist * 2.4 <= reg.room_dist  then
         area.blobs[cx][cy] = CLIFF
       elseif reg.mapedge_dist * 2.2 <= reg.room_dist  then
         area.blobs[cx][cy] = WATERFALLS
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
     if THEME.cliff_trees then
       for id, reg in pairs(blob_map.regions) do
         local cx, cy = blob_map:random_blob_cell(id)
-        if not cx then goto continuelabel end
+        if not cx then goto skip end
 
         local B = area.blobs[cx][cy]
         assert(B)
 
-        if not B.floor_h then goto continuelabel end
-        if B.floor_h < CLIFF.floor_h then goto continuelabel end
+        if not B.floor_h then goto skip end
+        if B.floor_h < CLIFF.floor_h then goto skip end
 
         -- don't place trees too close to the rooms... -MSSP
-        if reg.room_dist < 1 then goto continuelabel end
+        if reg.room_dist < 1 then goto skip end
 
         local mx = area.base_x + (cx-1) * 64 + 32
         local my = area.base_y + (cy-1) * 64 + 32
@@ -5151,7 +5151,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
         local tree = rand.key_by_probs(THEME.cliff_trees)
 
         Trans.entity(tree, mx, my, B.floor_h)
-        ::continuelabel::
+        ::skip::
       end
     end
 
@@ -5192,34 +5192,34 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cx = 1, area.cw do
     for cy = 1, area.ch do
       local id = blob_map[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
       local reg = blob_map.regions[id]
 
-      if not (reg.room_dist and reg.mapedge_dist) then goto continuelabel end
+      if not (reg.room_dist and reg.mapedge_dist) then goto skip end
 
       if reg.mapedge_dist * 0.4 >= reg.room_dist  then
         area.blobs[cx][cy] = CLIFF
       elseif reg.mapedge_dist * 1.0 >= reg.room_dist  then
         area.blobs[cx][cy] = CLIFF2
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
     if THEME.cliff_trees then
       for id, reg in pairs(blob_map.regions) do
         local cx, cy = blob_map:random_blob_cell(id)
-        if not cx then goto continuelabel end
+        if not cx then goto skip end
 
         local B = area.blobs[cx][cy]
         assert(B)
 
-        if not B.floor_h then goto continuelabel end
-        if B.floor_h < CLIFF2.floor_h then goto continuelabel end
+        if not B.floor_h then goto skip end
+        if B.floor_h < CLIFF2.floor_h then goto skip end
 
         -- don't place trees too close to the rooms... -MSSP
-        if reg.room_dist < 1 then goto continuelabel end
+        if reg.room_dist < 1 then goto skip end
 
         local mx = area.base_x + (cx-1) * 64 + 32
         local my = area.base_y + (cy-1) * 64 + 32
@@ -5227,7 +5227,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
         local tree = rand.key_by_probs(THEME.cliff_trees)
 
         Trans.entity(tree, mx, my, B.floor_h)
-        ::continuelabel::
+        ::skip::
       end
     end
 
@@ -5294,11 +5294,11 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     for cx = 1, area.cw do
     for cy = 1, area.ch do
       local id = blob_map[cx][cy]
-      if not id then goto continuelabel end
+      if not id then goto skip end
 
       local reg = blob_map.regions[id]
 
-      if not (reg.room_dist and reg.mapedge_dist) then goto continuelabel end
+      if not (reg.room_dist and reg.mapedge_dist) then goto skip end
 
       if reg.mapedge_dist * 1.8 <= reg.room_dist  then
         area.blobs[cx][cy] = CLIFF
@@ -5307,7 +5307,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
       elseif reg.mapedge_dist * 0.4 <= reg.room_dist  then
         area.blobs[cx][cy] = CLIFF3
       end
-      ::continuelabel::
+      ::skip::
     end
     end
 
@@ -5318,24 +5318,24 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
     if THEME.cliff_trees then
       for id, reg in pairs(blob_map.regions) do
         local cx, cy = blob_map:random_blob_cell(id)
-        if not cx then goto continuelabel end
+        if not cx then goto skip end
 
         local B = area.blobs[cx][cy]
         assert(B)
 
-        if not B.floor_h then goto continuelabel end
+        if not B.floor_h then goto skip end
         if B.floor_h < CLIFF3.floor_h then
           if FL.is_liquid then
-            goto continuelabel
+            goto skip
           end
         end
 
         -- less chance of using a tree on highest cliff
-        if rand.odds(30) then goto continuelabel end
-        if B.floor_h > CLIFF2.floor_h and rand.odds(70) then goto continuelabel end
+        if rand.odds(30) then goto skip end
+        if B.floor_h > CLIFF2.floor_h and rand.odds(70) then goto skip end
 
         -- don't place trees too close to the rooms... -MSSP
-        if reg.room_dist and reg.room_dist < 1 then goto continuelabel end
+        if reg.room_dist and reg.room_dist < 1 then goto skip end
 
         -- OK --
         local mx = area.base_x + (cx-1) * 64 + 32
@@ -5344,7 +5344,7 @@ function Cave_build_a_scenic_vista(LEVEL, area, SEEDS)
         local tree = rand.key_by_probs(THEME.cliff_trees)
 
         Trans.entity(tree, mx, my, B.floor_h)
-        ::continuelabel::
+        ::skip::
       end
     end
 
