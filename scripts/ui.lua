@@ -333,28 +333,51 @@ function ob_gui_frame(width, height)
       f = current_gui_theme.normal_font
       nk.style_set_font(OB_NK_CTX, f)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
-         for _,mod in pairs(OB_MODULES) do
+         for name,mod in pairs(OB_MODULES) do
             if mod.valid == true and mod.where == current_tab then
-               for _,opt in pairs(mod.options) do
-                  nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
-                  nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                  if opt.choices == YES_NO_CHOICES then
-                     if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
-                        opt.value = "yes"
-                        OB_CONFIG[opt.name] = "yes"
+               if string.sub(name, 1, 3) == "ui_" then
+                  for _,opt in pairs(mod.options) do
+                     nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+                     nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
+                     if opt.choices == YES_NO_CHOICES then
+                        if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
+                           opt.value = "yes"
+                           OB_CONFIG[opt.name] = "yes"
+                        else
+                           opt.value = "no"
+                           OB_CONFIG[opt.name] = "no"
+                        end
                      else
-                        opt.value = "no"
-                        OB_CONFIG[opt.name] = "no"
+                        opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                        opt.value = opt.avail_choices[opt.choice_selection]
+                        if opt.name == "game" or opt.name == "port" then
+                           if OB_CONFIG[opt.name] ~= opt.value then
+                              need_update_all = true
+                           end
+                        end
+                        OB_CONFIG[opt.name] = opt.value
                      end
-                  else
-                     opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                     opt.value = opt.avail_choices[opt.choice_selection]
-                     if opt.name == "game" or opt.name == "port" then
-                        if OB_CONFIG[opt.name] ~= opt.value then
-                           need_update_all = true
+                  end
+               else
+                  if nk.tree_push(OB_NK_CTX, 'node', mod.label or name, 'minimized', 'widgets basic') then
+                     for _,opt in pairs(mod.options) do
+                        nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
+                        nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
+                        if opt.choices == YES_NO_CHOICES then
+                           if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
+                              opt.value = "yes"
+                              OB_CONFIG[opt.name] = "yes"
+                           else
+                              opt.value = "no"
+                              OB_CONFIG[opt.name] = "no"
+                           end
+                        else
+                           opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
+                           opt.value = opt.avail_choices[opt.choice_selection]
+                           OB_CONFIG[opt.name] = opt.value
                         end
                      end
-                     OB_CONFIG[opt.name] = opt.value
+                     nk.tree_pop(OB_NK_CTX)
                   end
                end
             end
