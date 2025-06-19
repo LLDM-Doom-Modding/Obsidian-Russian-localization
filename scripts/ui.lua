@@ -261,6 +261,34 @@ local function DrawMinimap(canvas, SEEDS, LEVEL, x, y, map_W, map_H)
 end
 
 -------------------------------------------------------------------------------
+-- Module Option Widget
+-------------------------------------------------------------------------------
+
+local need_update_all = false
+
+local function DoModuleOption(ctx, opt)
+   nk.label(ctx, opt.label, nk.TEXT_LEFT)
+   if opt.choices == YES_NO_CHOICES then
+      if nk.checkbox(ctx, "", opt.value == "yes") then
+         opt.value = "yes"
+         OB_CONFIG[opt.name] = "yes"
+      else
+         opt.value = "no"
+         OB_CONFIG[opt.name] = "no"
+      end
+   else
+      opt.choice_selection = nk.combo(ctx, opt.avail_labels, opt.choice_selection, 25, {200,200})
+      opt.value = opt.avail_choices[opt.choice_selection]
+      if opt.name == "game" or opt.name == "port" then
+         if OB_CONFIG[opt.name] ~= opt.value then
+            need_update_all = true
+         end
+      end
+      OB_CONFIG[opt.name] = opt.value
+   end
+end
+
+-------------------------------------------------------------------------------
 -- Main Program Window
 -------------------------------------------------------------------------------
 
@@ -292,7 +320,7 @@ function ob_gui_frame(width, height)
 
    local window_flags = 0
 
-   local need_update_all = false
+   need_update_all = false
 
    if OB_BUILD_ROUTINE ~= nil then
       local status = coroutine.status(OB_BUILD_ROUTINE)
@@ -338,44 +366,13 @@ function ob_gui_frame(width, height)
                if string.sub(name, 1, 3) == "ui_" then
                   for _,opt in pairs(mod.options) do
                      nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
-                     nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                     if opt.choices == YES_NO_CHOICES then
-                        if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
-                           opt.value = "yes"
-                           OB_CONFIG[opt.name] = "yes"
-                        else
-                           opt.value = "no"
-                           OB_CONFIG[opt.name] = "no"
-                        end
-                     else
-                        opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                        opt.value = opt.avail_choices[opt.choice_selection]
-                        if opt.name == "game" or opt.name == "port" then
-                           if OB_CONFIG[opt.name] ~= opt.value then
-                              need_update_all = true
-                           end
-                        end
-                        OB_CONFIG[opt.name] = opt.value
-                     end
+                     DoModuleOption(OB_NK_CTX, opt)
                   end
                else
-                  if nk.tree_push(OB_NK_CTX, 'node', mod.label or name, 'minimized', 'widgets basic') then
+                  if nk.tree_push(OB_NK_CTX, 'node', mod.label or name, 'minimized', name) then
                      for _,opt in pairs(mod.options) do
                         nk.layout_row_static(OB_NK_CTX, 25, width/2, 2)
-                        nk.label(OB_NK_CTX, opt.label, nk.TEXT_LEFT)
-                        if opt.choices == YES_NO_CHOICES then
-                           if nk.checkbox(OB_NK_CTX, "", opt.value == "yes") then
-                              opt.value = "yes"
-                              OB_CONFIG[opt.name] = "yes"
-                           else
-                              opt.value = "no"
-                              OB_CONFIG[opt.name] = "no"
-                           end
-                        else
-                           opt.choice_selection = nk.combo(OB_NK_CTX, opt.avail_labels, opt.choice_selection, 25, {200,200})
-                           opt.value = opt.avail_choices[opt.choice_selection]
-                           OB_CONFIG[opt.name] = opt.value
-                        end
+                        DoModuleOption(OB_NK_CTX, opt)
                      end
                      nk.tree_pop(OB_NK_CTX)
                   end

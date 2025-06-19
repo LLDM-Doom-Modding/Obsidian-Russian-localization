@@ -66,6 +66,8 @@ EDGE.PARAMETERS =
 
 function EDGE.remap_music()
 
+  if OB_CONFIG.shuffle_music_edge == "no" then return end
+
   local music_list = table.copy(GAME.RESOURCES.MUSIC_LUMPS)
   
   local data =
@@ -146,6 +148,18 @@ OB_MODULES["edge_music_swapper"] =
 
   port = "edge",
   tooltip=_("Shuffles songs using DDFPLAY."),
+
+  options =
+  {
+    {
+      name = "shuffle_music_edge",
+      label=_("Shuffle Music via DDFPLAY"),
+      choices= YES_NO_CHOICES,
+      default = "yes",
+      priority = 10,
+      tooltip = _("Toggle DDF playlist shuffling."),
+    }
+  },
 
   hooks =
   {

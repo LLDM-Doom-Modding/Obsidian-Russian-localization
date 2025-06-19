@@ -354,7 +354,7 @@ OB_MODULES["sky_generator"] =
       choices= YES_NO_CHOICES,
       default = "yes",
       priority = 10,
-      tooltip = _("This forces the sky background (behind the hills and clouds) to either be night or day. Default means vanilla Oblige behavior of picking one episode to be night. Random means 50% chance of night or day to be picked per episode."),
+      tooltip = _("Toggle custom sky generation."),
     },
 
     {
