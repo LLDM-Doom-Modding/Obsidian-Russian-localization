@@ -378,6 +378,7 @@ int fsky_free(lua_State *L)
     if (sky_pixels)
     {
         delete[] sky_pixels;
+        sky_pixels = nullptr;
     }
 
     return 0;
