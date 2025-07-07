@@ -30,6 +30,7 @@
 #include "luaalloc.h"
 #include "m_trans.h"
 #include "main.h"
+#include "m_addons.h"
 #include "m_cookie.h"
 #include "minilua.h"
 #include "physfs.h"
@@ -544,6 +545,7 @@ extern int wadfab_get_thing(lua_State *L);
 extern int wadfab_get_thing_hexen(lua_State *L);
 static int gui_start_it(lua_State *L);
 static int gui_finish_it(lua_State *L);
+static int gui_get_detected_addons(lua_State *L);
 #ifdef OBSIDIAN_ENABLE_GUI
 static int gui_calc_seed(lua_State *L);
 static int gui_directory_list(lua_State *L);
@@ -567,6 +569,7 @@ static const luaL_Reg gui_script_funcs[] = {
     {"reseed_rng", gui_reseed_rng},
     {"start_it", gui_start_it},
     {"finish_it", gui_finish_it},
+    {"get_detected_addons", gui_get_detected_addons},
 #ifdef OBSIDIAN_ENABLE_GUI
     {"calc_seed", gui_calc_seed},
     {"directory_list", gui_directory_list},
@@ -1155,7 +1158,23 @@ int gui_finish_it(lua_State *L)
 #endif
     return 0;
 }
-
+int gui_get_detected_addons(lua_State *L)
+{
+    int count   = all_addons.size();
+    lua_createtable(L, 0, count);
+    if (!count)
+        return 1;
+    else
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            lua_pushinteger(L, i+1);
+            lua_pushstring(L, all_addons[i].name.c_str());
+            lua_settable(L, -3);
+        }
+        return 1;
+    }
+}
 #ifdef OBSIDIAN_ENABLE_GUI
 int gui_calc_seed(lua_State *L)
 {

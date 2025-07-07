@@ -26,7 +26,9 @@
 #include <string>
 
 bool Cookie_Load(const std::string &filename);
+void Cookie_LoadAddons(const std::string &filename);
 std::string Cookie_LoadLanguage(const std::string &filename);
+
 bool Cookie_Save(const std::string &filename);
 
 void Cookie_ParseArguments(void);

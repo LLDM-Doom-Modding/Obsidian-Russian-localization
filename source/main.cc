@@ -385,7 +385,10 @@ int main(int argc, char **argv)
 
     VFS_InitAddons();
 
-    VFS_ParseCommandLine();
+    if (FileExists(config_file))
+        Cookie_LoadAddons(config_file);
+
+    VFS_ScanForAddons();
 
     Script_Open();
 

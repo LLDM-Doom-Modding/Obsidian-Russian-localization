@@ -298,7 +298,7 @@ local current_tab = "build"
 
 local module_categories = 
 {
-   "build", "arch", "combat", "pickup", "other", "experimental", "debug", "options"
+   "build", "arch", "combat", "pickup", "other", "debug", "options", "addons"
 }
 
 local module_category_labels = 
@@ -309,8 +309,8 @@ local module_category_labels =
    ["pickup"] = _("Pickups"),
    ["other"] = _("Other"),
    ["debug"] = _("Debug"),
-   ["experimental"] = _("Experimental"),
-   ["options"] = _("Options")
+   ["options"] = _("Options"),
+   ["addons"] = _("Addons")
 }
 
 function ob_gui_frame(width, height)

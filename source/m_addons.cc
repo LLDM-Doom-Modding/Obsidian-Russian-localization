@@ -37,13 +37,13 @@ std::map<std::string, int> initial_enabled_addons;
 std::vector<addon_info_t> all_addons;
 
 // Will check install, then home directory (if different)
-void VFS_AddFolder(std::string name)
+static void VFS_AddFolder(std::string_view name)
 {
     std::string path  = PathAppend(install_dir, name);
     std::string mount = std::format("/{}", name);
     if (!PHYSFS_mount(path.c_str(), mount.c_str(), 0))
     {
-        FatalError("Failed to mount '%s' folder in PhysFS:\n%s\n", name.c_str(),
+        FatalError("Failed to mount '%s%s' folder in PhysFS:\n%s\n", path.c_str(), mount.c_str(),
                    PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
         return;                                   /* NOT REACHED */
     }
@@ -53,10 +53,10 @@ void VFS_AddFolder(std::string name)
         PHYSFS_mount(path.c_str(), mount.c_str(), 0); // this one can fail if not present, that's fine
     }
 
-    DebugPrint("mounted folder '%s'\n", name.c_str());
+    DebugPrint("mounted folder '%s%s'\n", path.c_str(), mount.c_str());
 }
 
-bool VFS_AddArchive(std::string filename, bool options_file)
+static bool VFS_AddArchive(std::string filename)
 {
     LogPrint("  using: %s\n", filename.c_str());
 
@@ -75,16 +75,8 @@ bool VFS_AddArchive(std::string filename, bool options_file)
 
     if (!PHYSFS_mount(filename.c_str(), "/", 0))
     {
-        if (options_file)
-        {
-            LogPrint("Failed to mount '%s' archive in PhysFS:\n%s\n", filename.c_str(),
-                     PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-        }
-        else
-        {
-            FatalError("Failed to mount '%s' archive in PhysFS:\n%s\n", filename.c_str(),
-                       PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-        }
+        LogPrint("Failed to mount '%s' archive in PhysFS:\n%s\n", filename.c_str(),
+                    PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 
         return false;
     }
@@ -104,59 +96,6 @@ void VFS_InitAddons()
     VFS_AddFolder("addons");
 
     LogPrint("DONE.\n\n");
-}
-
-void VFS_ParseCommandLine()
-{
-    int arg   = argv::Find('a', "addon");
-    int count = 0;
-
-    if (arg < 0)
-    {
-        return;
-    }
-
-    arg++;
-
-    LogPrint("Command-line addons....\n");
-
-    for (; arg < argv::list.size() && !argv::IsOption(arg); arg++, count++)
-    {
-        VFS_AddArchive(argv::list[arg], false /* options_file */);
-    }
-
-    if (!count)
-    {
-        FatalError("Missing filename for --addon option\n");
-    }
-
-    LogPrint("DONE\n\n");
-}
-
-void VFS_OptParse(const std::string &name)
-{
-    // just remember it now
-    if (initial_enabled_addons.find(name) == initial_enabled_addons.end())
-    {
-        initial_enabled_addons[name] = 1;
-    }
-}
-
-void VFS_OptWrite(FILE *fp)
-{
-    fprintf(fp, "---- Enabled Addons ----\n\n");
-
-    for (unsigned int i = 0; i < all_addons.size(); i++)
-    {
-        const addon_info_t *info = &all_addons[i];
-
-        if (info->enabled)
-        {
-            fprintf(fp, "addon = %s\n", info->name.c_str());
-        }
-    }
-
-    fprintf(fp, "\n");
 }
 
 void VFS_ScanForAddons()
@@ -189,23 +128,23 @@ void VFS_ScanForAddons()
         {
             addon_info_t info;
 
-            info.name = *p;
+            info.name = std::format("addon_{}", *p);
 
             info.enabled = false;
 
-            if (initial_enabled_addons.find(*p) != initial_enabled_addons.end())
+            if (initial_enabled_addons.find(info.name) != initial_enabled_addons.end())
             {
                 info.enabled = true;
             }
 
-            LogPrint("  found: %s%s\n", info.name.c_str(), info.enabled ? " (Enabled)" : " (Disabled)");
+            LogPrint("  found: %s%s\n", *p, info.enabled ? " (Enabled)" : " (Disabled)");
 
             all_addons.push_back(info);
 
             // if enabled, install into the VFS
             if (info.enabled)
             {
-                VFS_AddArchive(info.name, true /* options_file */);
+                VFS_AddArchive(*p);
             }
         }
     }

@@ -26,6 +26,7 @@
 
 #include "lib_argv.h"
 #include "lib_util.h"
+#include "m_addons.h"
 #include "m_lua.h"
 #include "main.h"
 #include "sys_assert.h"
@@ -220,12 +221,6 @@ std::string Cookie_LoadLanguage(const std::string &filename)
 {
     std::string ret = "auto";
 
-    context = cookie_context_e::Load;
-
-    keep_seed = false;
-
-    active_module.clear();
-
     setlocale(LC_NUMERIC, "C");
 
     FILE *cookie_fp = FileOpen(filename, "r");
@@ -317,6 +312,119 @@ bool Cookie_Load(const std::string &filename)
 
     setlocale(LC_NUMERIC, numeric_locale.c_str());
     return true;
+}
+
+static bool Cookie_CheckAddon(std::string_view buf)
+{
+    if (buf.find('=') == std::string_view::npos)
+    {
+        // Skip blank lines, comments, etc
+        return true;
+    }
+
+    while (!buf.empty() && IsSpaceASCII(buf.front()))
+    {
+        buf.remove_prefix(1);
+    }
+
+    if (buf.empty() || !(IsAlphaASCII(buf.front()) || buf.front() == '@'))
+    {
+        LogPrint("Weird config line: [%s]\n", std::string(buf).c_str());
+        return false;
+    }
+
+    std::string_view::size_type pos = buf.find('=');
+
+    // Shouldn't happen but still
+    if (pos == std::string_view::npos)
+    {
+        LogPrint("Malformed config line: [%s]\n", std::string(buf).c_str());
+        return false;
+    }
+
+    std::string name = std::string(buf.substr(0, pos));
+
+    if (StringPrefixCompare(name, "addon_") != 0)
+        return false;
+
+    if (pos + 1 >= buf.size())
+    {
+        LogPrint("Value missing!\n");
+        return false;
+    }
+
+    std::string value = std::string(buf.substr(pos + 1));
+
+    while (!name.empty() && IsSpaceASCII(name.back()))
+    {
+        name.pop_back();
+    }
+    while (!value.empty() && IsSpaceASCII(value.front()))
+    {
+        value.erase(value.begin());
+    }
+    while (!value.empty() && IsSpaceASCII(value.back()))
+    {
+        value.pop_back();
+    }
+    if (name.empty() || value.empty())
+    {
+        LogPrint("Name or value missing!\n");
+        return false;
+    }
+    else if (value == "yes")
+        initial_enabled_addons[name] = 1;
+
+    return true;
+}
+
+void Cookie_LoadAddons(const std::string &filename)
+{
+    setlocale(LC_NUMERIC, "C");
+
+    FILE *cookie_fp = FileOpen(filename, "r");
+
+    if (!cookie_fp)
+        return;
+
+    LogPrint("Loading config file: %s\n", filename.c_str());
+
+    int error_count = 0;
+
+    std::string buffer;
+    int         c = EOF;
+    for (;;)
+    {
+        buffer.clear();
+        while ((c = fgetc(cookie_fp)) != EOF)
+        {
+            if (c == '\n' || c == '\r')
+                break;
+            else
+                buffer.push_back(c);
+        }
+
+        if (!Cookie_CheckAddon(buffer))
+        {
+            error_count += 1;
+        }
+
+        if (feof(cookie_fp) || ferror(cookie_fp))
+            break;
+    }
+
+    fclose(cookie_fp);
+
+    if (error_count > 0)
+    {
+        LogPrint("DONE (found %d parse errors)\n\n", error_count);
+    }
+    else
+    {
+        LogPrint("DONE.\n\n");
+    }
+
+    setlocale(LC_NUMERIC, numeric_locale.c_str());
 }
 
 bool Cookie_Save(const std::string &filename)

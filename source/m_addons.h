@@ -29,11 +29,7 @@
 #include <vector>
 
 void VFS_InitAddons();
-void VFS_ParseCommandLine();
 void VFS_ScanForAddons();
-
-void VFS_OptParse(const std::string &name);
-void VFS_OptWrite(FILE *fp);
 
 // util functions
 uint8_t *VFS_LoadFile(const char *filename, int *length);

@@ -1166,6 +1166,16 @@ function ob_init()
   ob_load_all_ports()
   gui.printf("Loading all modules...\n")
   ob_load_all_modules()
+  for _,addon in pairs(gui.get_detected_addons()) do
+    local addy = 
+    {
+      name = addon,
+      label = string.sub(addon, 7), -- drop the addon_ prefix
+      choices = YES_NO_CHOICES,
+      default = "no"
+    }
+    table.add_unique(OB_MODULES["ui_addons"].options, addy)
+  end
 
   table.name_up(OB_GAMES)
   table.name_up(OB_PORTS)
