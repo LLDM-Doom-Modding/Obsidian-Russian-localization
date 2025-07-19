@@ -123,7 +123,7 @@ if (COPY_FILES)
   add_custom_command(TARGET obsidian POST_BUILD COMMAND_EXPAND_LISTS COMMAND ${CMAKE_COMMAND} -E copy_if_different ${COPY_FILES} ${DEST_DIR})
 endif()
 
-set(OBSIDIAN_LINK_LIBRARIES luaalloc minilua miniz physfs-static)
+set(OBSIDIAN_LINK_LIBRARIES luaalloc minilua miniz physfs)
 
 if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM} MATCHES "BSD")
   set(OBSIDIAN_LINK_LIBRARIES ${OBSIDIAN_LINK_LIBRARIES} pthread)

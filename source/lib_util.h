@@ -152,6 +152,13 @@ inline uint64_t StringHash64(std::string_view str)
 	return value;
 }
 
+struct MapStringHash64
+{
+    size_t operator()(const std::string &k) const
+    {
+        return StringHash64(k);
+    }
+};
 
 /* Thomas Wang's 32-bit Mix function */
 inline uint32_t IntHash(uint32_t key)

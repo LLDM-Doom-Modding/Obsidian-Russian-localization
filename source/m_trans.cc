@@ -55,10 +55,10 @@
 //    will always be valid.  Since we never change anything in it
 //    once the PO file is loaded, that assumptions should hold.
 //
-#include <map>
+#include <unordered_map>
 
-static std::map<std::string, std::string>           trans_store;
-static std::map<std::string, std::string>::iterator trans_iter;
+static std::unordered_map<std::string, std::string, MapStringHash64>           trans_store;
+static std::unordered_map<std::string, std::string, MapStringHash64>::iterator trans_iter;
 
 //----------------------------------------------------------------------
 

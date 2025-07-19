@@ -29,7 +29,6 @@
 
 bool ZIPF_OpenWrite(const std::string &filename);
 bool ZIPF_AddFile(const std::string &filename, std::string_view directory);
-bool ZIPF_AddMem(const std::string &name, uint8_t *data, size_t length);
 bool ZIPF_CloseWrite();
 
 //--- editor settings ---

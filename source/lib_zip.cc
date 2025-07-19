@@ -70,16 +70,6 @@ bool ZIPF_AddFile(const std::string &filename, std::string_view directory)
                                   filename.c_str(), NULL, 0, MZ_DEFAULT_COMPRESSION);
 }
 
-// Calling function is responsible for freeing *data
-bool ZIPF_AddMem(const std::string &name, uint8_t *data, size_t length)
-{
-    if (!zip_writer)
-    {
-        return false;
-    }
-    return mz_zip_writer_add_mem(zip_writer, name.c_str(), data, length, MZ_DEFAULT_COMPRESSION);
-}
-
 bool ZIPF_CloseWrite(void)
 {
     current_zip.clear();
