@@ -392,6 +392,9 @@ int main(int argc, char **argv)
 
     Script_Open();
 
+    // Give RNG an initial seed
+    twister_Init();
+
     // Set this to home dir before loading config (if present); it's ok to change afterwards
     ob_set_config("output_path", home_dir);
 

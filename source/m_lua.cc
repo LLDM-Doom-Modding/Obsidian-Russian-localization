@@ -1130,9 +1130,6 @@ int gui_start_it(lua_State *L)
 
     // this will ask for output filename (among other things)
     game_object->Start(ob_get_string_param("output_filename"));
-#ifdef OBSIDIAN_ENABLE_GUI
-    ob_set_config("seed", ob_default_filename());
-#endif
     return 0;
 }
 int gui_finish_it(lua_State *L)

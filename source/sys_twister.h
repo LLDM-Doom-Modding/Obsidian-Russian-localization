@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 
+void twister_Init();
 void twister_Reseed(uint64_t newseed);
 uint64_t twister_UInt();
 double twister_Double(); // Returns in the range of 0.0-1.0

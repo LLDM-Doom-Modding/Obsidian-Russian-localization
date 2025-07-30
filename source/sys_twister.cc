@@ -20,10 +20,17 @@
 
 #include <random>
 
+#include "lib_util.h"
+
 //#include "Rand.h" // from Steve
 
 static std::mt19937_64 twister;
 static std::uniform_real_distribution<double> the_doubler(0.0, 1.0);
+
+void twister_Init()
+{
+    twister.seed(TimeGetMillies());
+}
 
 void twister_Reseed(uint64_t newseed)
 {
