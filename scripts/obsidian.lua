@@ -767,16 +767,6 @@ function ob_set_mod_option(name, option, value)
   -- (nothing ever depends on custom options)
 end
 
-function ob_mod_enabled(name)
-  local mod = OB_MODULES[name]
-  if not mod then
-    gui.printf("ob_mod_enabled: Ignoring unknown module: %s\n", name)
-    return 0
-  else
-    if mod.enabled and mod.valid then return 1 else return 0 end
-  end
-end
-
 function ob_add_language(langcode, fullname)
 
   assert(langcode and fullname)
@@ -1655,7 +1645,7 @@ function ob_sort_modules()
   -- [ ignore the special UI modules/panels ]
 
   for _,mod in pairs(OB_MODULES) do
-    if mod.enabled and mod.valid and not ob_check_ui_module(mod) then
+    if mod.valid and not ob_check_ui_module(mod) then
       table.insert(GAME.modules, mod)
     end
   end
@@ -1679,26 +1669,21 @@ end
 
 
 function ob_invoke_hook(name, ...)
-  -- two passes, for example: setup and setup2,
-  for pass = 1,2 do
-    if string.match(name, "^pre_setup") then goto skip end
-    for _,mod in pairs(GAME.modules) do
+  for _,mod in pairs(GAME.modules) do
+    local func = mod.hooks and mod.hooks[name]
+    if func then
+      func(mod, ...)
+    end
+  end
+  ::skip::
+  for _,mod in pairs(OB_MODULES) do
+    if ob_check_ui_module(mod) then
       local func = mod.hooks and mod.hooks[name]
+
       if func then
         func(mod, ...)
       end
     end
-    ::skip::
-    for _,mod in pairs(OB_MODULES) do
-      if ob_check_ui_module(mod) then
-       local func = mod.hooks and mod.hooks[name]
-
-        if func then
-          func(mod, ...)
-        end
-      end
-    end
-    name = name .. "2"
   end
 end
 

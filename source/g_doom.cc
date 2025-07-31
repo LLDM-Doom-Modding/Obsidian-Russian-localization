@@ -1282,8 +1282,6 @@ bool Doom::game_interface_c::Start(std::string_view preset)
     current_port    = ob_get_string_param("port");
     compress_output = ob_get_bool_param("compress_output");
 
-    ob_invoke_hook("pre_setup");
-
     // If not a bare filename, use as-is
     if (GetFilename(preset) != preset)
     {

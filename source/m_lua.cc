@@ -1050,21 +1050,6 @@ bool ob_hexen_ceiling_check(int thing_id)
     return StringToInt(param);
 }
 
-bool ob_mod_enabled(const std::string &module_name)
-{
-    if (!Script_CallFunc("ob_mod_enabled", 1, {module_name}))
-    {
-        return false;
-    }
-
-    int param = luaL_optinteger(LUA_ST, -1, 0);
-
-    // remove result from lua stack
-    lua_pop(LUA_ST, 1);
-
-    return param;
-}
-
 std::string ob_default_filename()
 {
     if (!Script_CallFunc("ob_default_filename", 1))

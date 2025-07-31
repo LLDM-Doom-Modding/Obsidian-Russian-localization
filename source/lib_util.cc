@@ -219,8 +219,8 @@ std::vector<std::string> DirectoryList(const char *path)
 
         std::string filename = fdata->d_name;
 
-        // skip the "." and ".." dirs
-        if (filename == "." || filename == "..")
+        // skip the "." dir
+        if (filename == ".")
             continue;
 
         struct stat finfo;
