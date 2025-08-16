@@ -1202,7 +1202,7 @@ bool ob_gui_init_ctx(void *context)
     return true;
 }
 
-bool ob_gui_init_themes(void *atlas, float font_scale)
+bool ob_gui_init_themes(void *atlas)
 {
     SYS_ASSERT(atlas);
 
@@ -1241,9 +1241,7 @@ bool ob_gui_init_themes(void *atlas, float font_scale)
         return false;
     }
 
-    lua_pushnumber(LUA_ST, font_scale);
-
-    status = lua_pcall(LUA_ST, 1, 1, -2);
+    status = lua_pcall(LUA_ST, 0, 1, -2);
 
     if (status != 0)
     {
@@ -1269,7 +1267,7 @@ bool ob_gui_init_themes(void *atlas, float font_scale)
     return true;
 }
 
-bool ob_gui_frame(int width, int height)
+bool ob_gui_frame(int width, int height, float scale)
 {
     lua_getglobal(LUA_ST, "ob_gui_frame");
 
@@ -1282,7 +1280,9 @@ bool ob_gui_frame(int width, int height)
 
     lua_pushinteger(LUA_ST, height);
 
-    int status = lua_pcall(LUA_ST, 2, 1, -3);
+    lua_pushnumber(LUA_ST, scale);
+
+    int status = lua_pcall(LUA_ST, 3, 1, -3);
 
     if (status != 0)
     {

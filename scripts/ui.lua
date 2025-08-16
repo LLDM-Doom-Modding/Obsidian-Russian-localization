@@ -19,8 +19,6 @@
 
 -- CAVEMAN SHIT BELOW THIS LINE --
 
-local font_scale
-
 local rgb = nk.color_from_bytes
 
 local UI_GUI_THEMES =
@@ -62,24 +60,23 @@ local UI_GUI_THEMES =
 
 local current_gui_theme = UI_GUI_THEMES["default"]
 
-function ob_gui_init_themes(scale)
+function ob_gui_init_themes()
   if OB_NK_CTX == nil then return "bork" end
   if OB_NK_ATLAS == nil then return "bork" end
   assert(UI_GUI_THEMES and UI_GUI_THEMES["default"])
   for _,theme in pairs(UI_GUI_THEMES) do
    assert(theme.normal_font_file and theme.normal_font_size and theme.bold_font_file and theme.bold_font_size and theme.icon_font_file and theme.icon_font_size) 
-   theme.normal_font = OB_NK_ATLAS:add(theme.normal_font_size * scale, "data/fonts/" .. theme.normal_font_file)
+   theme.normal_font = OB_NK_ATLAS:add(theme.normal_font_size, "data/fonts/" .. theme.normal_font_file)
    theme.normal_font:set_height(theme.normal_font_size)
    if (theme.bold_font_file ~= theme.normal_font_file or theme.bold_font_size ~= theme.normal_font_size) then
-      theme.bold_font = OB_NK_ATLAS:add(theme.bold_font_size * scale, "data/fonts/" .. theme.bold_font_file)
+      theme.bold_font = OB_NK_ATLAS:add(theme.bold_font_size, "data/fonts/" .. theme.bold_font_file)
       theme.bold_font:set_height(theme.bold_font_size)
    else
       theme.bold_font = theme.normal_font
    end
-   theme.icon_font = OB_NK_ATLAS:add(theme.icon_font_size * scale, "data/fonts/" .. theme.icon_font_file)
+   theme.icon_font = OB_NK_ATLAS:add(theme.icon_font_size, "data/fonts/" .. theme.icon_font_file)
   end
   nk.style_set_font(OB_NK_CTX, UI_GUI_THEMES["default"].normal_font)
-  font_scale = scale
   return "groovy"
 end
 
@@ -313,8 +310,12 @@ local module_category_labels =
    ["addons"] = _("Addons")
 }
 
-function ob_gui_frame(width, height)
+function ob_gui_frame(width, height, scale)
    if OB_NK_CTX == nil then return "quit" end
+
+   width = width / scale
+
+   height = height / scale
 
    nk.style_from_table(OB_NK_CTX, current_gui_theme.colortable)
 
@@ -339,10 +340,10 @@ function ob_gui_frame(width, height)
       nk.style_push_vec2(OB_NK_CTX, "window.spacing", {0,0})
       local f = current_gui_theme.bold_font
       nk.style_set_font(OB_NK_CTX, f)
-      nk.layout_row_dynamic(OB_NK_CTX, (f:height() * font_scale), #module_categories)
+      nk.layout_row_dynamic(OB_NK_CTX, f:height(), #module_categories)
       for _, name in ipairs(module_categories) do
          -- make sure button perfectly fits text 
-         local text_width = f:width(f:height() * font_scale, module_category_labels[name]) * font_scale
+         local text_width = f:width(f:height(), module_category_labels[name])
          local widget_width = text_width + 3 * nk.style_get_vec2(OB_NK_CTX, "button.padding")[1]
          if current_tab == name then
             -- active tab gets highlighted 
@@ -357,7 +358,7 @@ function ob_gui_frame(width, height)
       end
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
-      nk.layout_row_dynamic(OB_NK_CTX, height - (f:height() * font_scale) - 75, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - f:height() - 75, 1)
       f = current_gui_theme.normal_font
       nk.style_set_font(OB_NK_CTX, f)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then

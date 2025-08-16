@@ -229,7 +229,7 @@ void init(void)
         nk_font_atlas_init_default(atlas);
         nk_font_atlas_begin(atlas);
 
-        if (ob_gui_init_themes(atlas, sapp_dpi_scale()))
+        if (ob_gui_init_themes(atlas))
         {
             const void *image; int w, h;
             image = nk_font_atlas_bake(atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
@@ -260,7 +260,7 @@ void frame(void)
 {
     ctx = snk_new_frame();
 
-    running = ob_gui_frame(sapp_width(), sapp_height());
+    running = ob_gui_frame(sapp_width(), sapp_height(), sapp_dpi_scale());
 
     // the sokol_gfx draw pass
     sg_pass pass = {0};
@@ -452,8 +452,9 @@ int main(int argc, char **argv)
         app.height = WINDOW_HEIGHT;
         app.window_title = CStringDup(win_title.c_str());
         app.ios_keyboard_resizes_canvas = true;
-        app.icon.sokol_default = true;
+        app.icon.sokol_default = false;
         app.logger.func = slog_func;
+        app.high_dpi = true;
         return app;
     }
 #else
