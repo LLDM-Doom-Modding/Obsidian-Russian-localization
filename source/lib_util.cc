@@ -104,7 +104,7 @@ std::string GetAbsolutePath(const char *path)
         abs_path = WStringToUTF8(abs_wpath);
     return abs_path;
 }
-std::vector<std::string> DirectoryList(const char *path)
+std::vector<std::string> DirectoryList(const char *path, bool show_hidden)
 {
     std::vector<std::string> subdirs;
 
@@ -127,7 +127,15 @@ std::vector<std::string> DirectoryList(const char *path)
         else
         {
             if (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                subdirs.push_back(filename);
+            {
+                if (fdataw.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+                {
+                    if (show_hidden)
+                        subdirs.push_back(filename);
+                }
+                else
+                    subdirs.push_back(filename);
+            }
         }
     } while (FindNextFileW(fhandle, &fdataw));
 
