@@ -137,9 +137,11 @@ local need_refresh = false
 
 local dir_contents = {}
 
+local show_hidden = false
+
 local function SelectableDirectoryList(directory)
    local results = {}
-   local dir_list = gui.directory_list(directory)
+   local dir_list = gui.directory_list(directory, show_hidden and 1 or 0)
    table.sort(dir_list)
    for i = 1, #dir_list, 1 do
       results[i] = {dir_list[i], false}
@@ -159,6 +161,31 @@ local function PathPicker(ctx, w, h)
       end
       nk.layout_row_dynamic(ctx, 25, 1)
       nk.label(ctx, current_dir, nk.TEXT_LEFT)
+      nk.layout_row_dynamic(ctx, 25, 4)
+      nk.style_set_font(ctx, current_gui_theme.icon_font)
+      if nk.button(ctx, nil, "H") then
+         current_dir = OB_CONFIG.output_path
+         need_refresh = true
+      end
+      if nk.button(ctx, nil, "U") then
+         current_dir = gui.absolute_path(current_dir .. "/..")
+         need_refresh = true
+      end
+      if nk.button(ctx, nil, "R") then
+         need_refresh = true
+      end
+      if show_hidden then
+         if nk.button(ctx, nil, "e") then
+            show_hidden = false
+            need_refresh = true
+         end
+      else
+         if nk.button(ctx, nil, "E") then
+            show_hidden = true
+            need_refresh = true
+         end
+      end
+      nk.style_set_font(ctx, current_gui_theme.normal_font)
       for _,dir in ipairs(dir_contents) do
          nk.layout_row_begin(ctx, 'dynamic', 25, 2)
          nk.layout_row_push(ctx, 0.05)
@@ -176,11 +203,7 @@ local function PathPicker(ctx, w, h)
          end
          nk.layout_row_end(ctx)
       end
-      nk.layout_row_dynamic(ctx, 25, 4)
-      if nk.button(ctx, nil, _("Up A Level")) then
-         current_dir = gui.absolute_path(current_dir .. "/..")
-         need_refresh = true
-      end
+      nk.layout_row_dynamic(ctx, 25, 3)
       if nk.button(ctx, nil, _("Open")) then
          for _,dir in ipairs(dir_contents) do
             if dir[2] then
@@ -191,14 +214,23 @@ local function PathPicker(ctx, w, h)
          end
          ::foundselected::
       end
-      if nk.button(ctx, nil, _("Refresh")) then
-         need_refresh = true
-      end
-      if nk.button(ctx, nil, _("Use")) then
+      if nk.button(ctx, nil, _("Use Current")) then
          OB_CONFIG.output_path = current_dir
-         current_dir = ""
-         need_refresh = false
-         dir_contents = {}
+         --current_dir = ""
+         --need_refresh = false
+         --dir_contents = {}
+      end
+      if nk.button(ctx, nil, _("Use Selected")) then
+         for _,dir in ipairs(dir_contents) do
+            if dir[2] then
+               OB_CONFIG.output_path = gui.absolute_path(current_dir .. "/" .. dir[1])
+               goto foundselected
+            end
+         end
+         ::foundselected::
+         --current_dir = ""
+         --need_refresh = false
+         --dir_contents = {}
       end
       nk.popup_end(ctx)
    else 
@@ -423,7 +455,7 @@ function ob_gui_frame(width, height, scale)
       nk.layout_row_dynamic(OB_NK_CTX, height - f:height(), 1)
       f = current_gui_theme.normal_font
       nk.style_set_font(OB_NK_CTX, f)
-      if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
+      if nk.group_begin(OB_NK_CTX, "Notebook", 0) then
          for name,mod in pairs(OB_MODULES) do
             if mod.valid == true and mod.where == current_tab then
                if string.sub(name, 1, 3) == "ui_" then
@@ -503,6 +535,8 @@ function ob_gui_frame(width, height, scale)
             end
          end
          nk.group_end(OB_NK_CTX)
+      else
+         error("HUH")
       end
       --nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
       --nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)

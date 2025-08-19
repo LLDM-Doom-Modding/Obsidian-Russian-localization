@@ -40,7 +40,7 @@ void        ReplaceExtension(std::string &path, std::string_view ext);
 #ifdef OBSIDIAN_ENABLE_GUI
 bool IsDirectory(const char *path);
 std::string GetAbsolutePath(const char *path);
-std::vector<std::string> DirectoryList(const char *path);
+std::vector<std::string> DirectoryList(const char *path, bool show_hidden = false);
 #endif
 
 bool  FileExists(std::string_view name);

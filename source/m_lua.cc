@@ -1337,10 +1337,12 @@ int gui_directory_list(lua_State *L)
 {
     const char *path = luaL_checkstring(L, 1);
 
+    bool show_hidden = luaL_optinteger(L, 2, 0);
+
     if (!path)
         FatalError("gui.directory_list called with no path!\n");
 
-    std::vector<std::string> subdirs = DirectoryList(path);
+    std::vector<std::string> subdirs = DirectoryList(path, show_hidden);
 
     lua_createtable(L, 0, subdirs.size());
 

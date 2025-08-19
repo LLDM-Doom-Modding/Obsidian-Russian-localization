@@ -186,7 +186,7 @@ std::string GetAbsolutePath(const char *path)
         abs_path = path;
     return abs_path;
 }
-std::vector<std::string> DirectoryList(const char *path)
+std::vector<std::string> DirectoryList(const char *path, bool show_hidden)
 {
     std::vector<std::string> subdirs;
 
@@ -210,6 +210,10 @@ std::vector<std::string> DirectoryList(const char *path)
 
         // skip the "." and ".." dirs
         if (filename == "." || filename == "..")
+            continue;
+
+        // skip hidden dirs (maybe)
+        if (!show_hidden && filename[0] == '.')
             continue;
 
         struct stat finfo;
