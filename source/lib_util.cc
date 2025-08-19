@@ -50,26 +50,6 @@ static inline bool IsDirectorySeparator(const char c)
 {
     return (c == '\\' || c == '/' || c == ':'); // Kester added ':'
 }
-bool IsPathAbsolute(std::string_view path)
-{
-    SYS_ASSERT(!path.empty());
-
-    // Check for Drive letter, colon and slash...
-    if (path.size() > 2 && path[1] == ':' && (path[2] == '\\' || path[2] == '/') && IsAlphaASCII(path[0]))
-    {
-        return true;
-    }
-    else if (path.size() == 2 && path[1] == ':' && IsAlphaASCII(path[0]))
-    {
-        return true;
-    }
-
-    // Check for share name...
-    if (path.size() > 1 && path[0] == '\\' && path[1] == '\\')
-        return true;
-
-    return false;
-}
 FILE *FileOpen(std::string_view name, std::string_view mode)
 {
     std::wstring wname = UTF8ToWString(name);
@@ -150,15 +130,6 @@ static inline bool IsDirectorySeparator(const char c)
 {
     return (c == '\\' || c == '/');
 }
-bool IsPathAbsolute(std::string_view path)
-{
-    SYS_ASSERT(!path.empty());
-
-    if (IsDirectorySeparator(path[0]))
-        return true;
-    else
-        return false;
-}
 FILE *FileOpen(std::string_view name, std::string_view mode)
 {
     SYS_ASSERT(!name.empty());
@@ -197,6 +168,14 @@ bool IsDirectory(const char *path)
         return false;
     return S_ISDIR(dircheck.st_mode);
 }
+std::string GetAbsolutePath(const char *path)
+{
+    SYS_ASSERT(path);
+    std::string abs_path(PATH_MAX, '\0');
+    if (!realpath(path, abs_path.data()))
+        abs_path = path;
+    return abs_path;
+}
 std::vector<std::string> DirectoryList(const char *path)
 {
     std::vector<std::string> subdirs;
@@ -219,8 +198,8 @@ std::vector<std::string> DirectoryList(const char *path)
 
         std::string filename = fdata->d_name;
 
-        // skip the "." dir
-        if (filename == ".")
+        // skip the "." and ".." dirs
+        if (filename == "." || filename == "..")
             continue;
 
         struct stat finfo;
@@ -307,19 +286,6 @@ std::string PathAppend(std::string_view parent, std::string_view child)
     new_path.append(child);
 
     return new_path;
-}
-
-std::string SanitizePath(std::string_view path)
-{
-    std::string sani_path;
-    for (const char ch : path)
-    {
-        if (ch == '\\')
-            sani_path.push_back('/');
-        else
-            sani_path.push_back(ch);
-    }
-    return sani_path;
 }
 
 std::string GetDirectory(std::string_view path)

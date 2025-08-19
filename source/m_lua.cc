@@ -548,6 +548,7 @@ static int gui_finish_it(lua_State *L);
 static int gui_get_detected_addons(lua_State *L);
 #ifdef OBSIDIAN_ENABLE_GUI
 static int gui_calc_seed(lua_State *L);
+static int gui_absolute_path(lua_State *L);
 static int gui_directory_list(lua_State *L);
 static int gui_is_directory(lua_State *L);
 #endif
@@ -572,6 +573,7 @@ static const luaL_Reg gui_script_funcs[] = {
     {"get_detected_addons", gui_get_detected_addons},
 #ifdef OBSIDIAN_ENABLE_GUI
     {"calc_seed", gui_calc_seed},
+    {"absolute_path", gui_absolute_path},
     {"directory_list", gui_directory_list},
     {"is_directory", gui_is_directory},
 #endif
@@ -1315,6 +1317,19 @@ int gui_is_directory(lua_State *L)
         FatalError("gui.is_directory called with no path!\n");
 
     lua_pushboolean(L, IsDirectory(path) ? 1 : 0);
+
+    return 1;
+}
+int gui_absolute_path(lua_State *L)
+{
+    const char *path = luaL_checkstring(L, 1);
+
+    if (!path)
+        FatalError("gui.directory_list called with no path!\n");
+
+    std::string abs_path = GetAbsolutePath(path);
+
+    lua_pushstring(L, abs_path.c_str());
 
     return 1;
 }

@@ -131,27 +131,81 @@ end
 
 local show_path_picker = false
 
+local current_dir = ""
+
+local need_refresh = false
+
+local dir_contents = {}
+
+local function SelectableDirectoryList(directory)
+   local results = {}
+   local dir_list = gui.directory_list(directory)
+   table.sort(dir_list)
+   for i = 1, #dir_list, 1 do
+      results[i] = {dir_list[i], false}
+   end
+   return results
+end
+
 local function PathPicker(ctx, w, h)
    if nk.popup_begin(ctx, 'dynamic', _("Select Directory"), nk.WINDOW_CLOSABLE, {w/2-w*3/8, h/2-h*3/8, w*3/4, h*3/4}) then
-      local subdirs = gui.directory_list(OB_CONFIG.output_path)
-      table.sort(subdirs)
-      for _,dir in ipairs(subdirs) do
-         nk.layout_row_begin(ctx, 'dynamic', 25, 2)
-         nk.layout_row_push(ctx, 0.1)
-         nk.style_set_font(ctx, current_gui_theme.icon_font)
-         nk.label(ctx, "F", nk.TEXT_RIGHT)
-         nk.layout_row_push(ctx, 0.2)
-         nk.style_set_font(ctx, current_gui_theme.normal_font)
-         nk.label(ctx, dir, nk.TEXT_LEFT)
-         nk.layout_row_end(ctx)
+      if current_dir == "" then
+         current_dir = OB_CONFIG.output_path
+         need_refresh = true
+      end
+      if need_refresh then
+         dir_contents = SelectableDirectoryList(current_dir)
+         need_refresh = false
       end
       nk.layout_row_dynamic(ctx, 25, 1)
-      if nk.button(ctx, nil, _("Submit")) then
-         show_path_picker = false
+      nk.label(ctx, current_dir, nk.TEXT_LEFT)
+      for _,dir in ipairs(dir_contents) do
+         nk.layout_row_begin(ctx, 'dynamic', 25, 2)
+         nk.layout_row_push(ctx, 0.05)
+         nk.style_set_font(ctx, current_gui_theme.icon_font)
+         nk.label(ctx, "F", nk.TEXT_RIGHT)
+         nk.layout_row_push(ctx, 0.95)
+         nk.style_set_font(ctx, current_gui_theme.normal_font)
+         dir[2] = nk.selectable(ctx, nil, dir[1], nk.TEXT_LEFT, dir[2])
+         if dir[2] then -- Deselect other entries
+            for _,dir2 in ipairs(dir_contents) do
+               if dir[1] ~= dir2[1] then
+                  dir2[2] = false
+               end
+            end
+         end
+         nk.layout_row_end(ctx)
+      end
+      nk.layout_row_dynamic(ctx, 25, 4)
+      if nk.button(ctx, nil, _("Up A Level")) then
+         current_dir = gui.absolute_path(current_dir .. "/..")
+         need_refresh = true
+      end
+      if nk.button(ctx, nil, _("Open")) then
+         for _,dir in ipairs(dir_contents) do
+            if dir[2] then
+               current_dir = gui.absolute_path(current_dir .. "/" .. dir[1])
+               need_refresh = true
+               goto foundselected
+            end
+         end
+         ::foundselected::
+      end
+      if nk.button(ctx, nil, _("Refresh")) then
+         need_refresh = true
+      end
+      if nk.button(ctx, nil, _("Use")) then
+         OB_CONFIG.output_path = current_dir
+         current_dir = ""
+         need_refresh = false
+         dir_contents = {}
       end
       nk.popup_end(ctx)
    else 
       show_path_picker = false
+      current_dir = ""
+      need_refresh = false
+      dir_contents = {}
    end
 end
 
@@ -288,8 +342,6 @@ end
 -------------------------------------------------------------------------------
 -- Main Program Window
 -------------------------------------------------------------------------------
-
-local ratio = {120, 150}
 
 local current_tab = "build"
 

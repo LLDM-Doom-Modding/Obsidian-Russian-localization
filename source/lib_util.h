@@ -36,11 +36,10 @@ std::string GetStem(std::string_view path);
 std::string GetDirectory(std::string_view path);
 std::string GetExtension(std::string_view path);
 std::string PathAppend(std::string_view parent, std::string_view child);
-bool        IsPathAbsolute(std::string_view path);
 void        ReplaceExtension(std::string &path, std::string_view ext);
-std::string SanitizePath(std::string_view path);
 #ifdef OBSIDIAN_ENABLE_GUI
 bool IsDirectory(const char *path);
+std::string GetAbsolutePath(const char *path);
 std::vector<std::string> DirectoryList(const char *path);
 #endif
 
