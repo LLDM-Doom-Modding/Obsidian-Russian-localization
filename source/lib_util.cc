@@ -94,6 +94,16 @@ bool IsDirectory(const char *path)
         return false;
     return (dircheck.st_mode & _S_IFDIR);
 }
+std::string GetAbsolutePath(const char *path)
+{
+    SYS_ASSERT(path);
+    std::string abs_path = path;
+    std::wstring wpath = UTF8ToWString(path);
+    std::wstring abs_wpath(_MAX_PATH, '\0');
+    if (_wfullpath(abs_wpath.data(), wpath.c_str(), _MAX_PATH))
+        abs_path = WStringToUTF8(abs_wpath);
+    return abs_path;
+}
 std::vector<std::string> DirectoryList(const char *path)
 {
     std::vector<std::string> subdirs;
