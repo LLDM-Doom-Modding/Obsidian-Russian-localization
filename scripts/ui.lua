@@ -310,6 +310,8 @@ local module_category_labels =
    ["addons"] = _("Addons")
 }
 
+local active_nk_window = false
+
 function ob_gui_frame(width, height, scale)
    if OB_NK_CTX == nil then return "quit" end
 
@@ -333,7 +335,15 @@ function ob_gui_frame(width, height, scale)
       end
    end
 
+   -- Sometimes while resizing the program window, the window_end call from the previous frame
+   -- will be missed. This check helps issue a window_end command if needed and avoids NK_ASSERT
+   -- failures on debug builds - Dasho
+   if active_nk_window then
+     nk.window_end(OB_NK_CTX)
+   end
+
    if nk.window_begin(OB_NK_CTX, "OBSIDIAN Level Maker", {0, 0, width, height}, window_flags) then
+      active_nk_window = true
       if show_path_picker == true then PathPicker(OB_NK_CTX, width, height) end
       if manual_entry_context ~= nil then ManualEntry(OB_NK_CTX, width, height) end
       -- Header 
@@ -444,10 +454,11 @@ function ob_gui_frame(width, height, scale)
       end
       --nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
       --nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
+      nk.window_end(OB_NK_CTX)
+      active_nk_window = false
+      if need_update_all then
+         ob_update_all()
+      end
+      return "ok"
    end
-   nk.window_end(OB_NK_CTX)
-   if need_update_all then
-      ob_update_all()
-   end
-   return "ok"
 end

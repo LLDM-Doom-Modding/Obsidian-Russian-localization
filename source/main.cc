@@ -54,8 +54,6 @@
 #define NK_INCLUDE_STANDARD_VARARGS
 #include "nuklear.h"
 #include "sokol_nuklear.h"
-static constexpr uint16_t WINDOW_WIDTH = 1024;
-static constexpr uint16_t WINDOW_HEIGHT = 768;
 #endif
 
 std::string        home_dir;
@@ -448,8 +446,8 @@ int main(int argc, char **argv)
         app.cleanup_cb = cleanup;
         app.event_cb = input;
         app.enable_clipboard = true;
-        app.width = WINDOW_WIDTH;
-        app.height = WINDOW_HEIGHT;
+        app.width = 0;
+        app.height = 0;
         app.window_title = CStringDup(win_title.c_str());
         app.ios_keyboard_resizes_canvas = true;
         app.icon.sokol_default = false;
