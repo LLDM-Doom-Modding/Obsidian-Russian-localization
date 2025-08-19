@@ -358,7 +358,7 @@ function ob_gui_frame(width, height, scale)
       end
       nk.style_pop_vec2(OB_NK_CTX)
       -- Body
-      nk.layout_row_dynamic(OB_NK_CTX, height - f:height() - 75, 1)
+      nk.layout_row_dynamic(OB_NK_CTX, height - f:height(), 1)
       f = current_gui_theme.normal_font
       nk.style_set_font(OB_NK_CTX, f)
       if nk.group_begin(OB_NK_CTX, "Notebook", nk.WINDOW_BORDER) then
@@ -381,35 +381,32 @@ function ob_gui_frame(width, height, scale)
             end
          end
          if current_tab == "build" then
+            nk.layout_row_dynamic(OB_NK_CTX, 5, 1)
             nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
-            nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
             nk.label(OB_NK_CTX, "Output Path: " .. OB_CONFIG.output_path, nk.TEXT_LEFT)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 2)
             if nk.button(OB_NK_CTX, nil, _("Select New Path")) then
                show_path_picker = true
             end
             if nk.button(OB_NK_CTX, nil, _("Enter Path")) then
                manual_entry_context = "path"
             end
-            nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
+            nk.layout_row_dynamic(OB_NK_CTX, 5, 1)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
             if OB_CONFIG.compress_output == "yes" then
-               nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename .. ".zip", nk.TEXT_LEFT)
+               nk.label(OB_NK_CTX, "Output Filename: " .. string.sub(OB_CONFIG.output_filename, 1, -5) .. ".zip", nk.TEXT_LEFT)
             else
-               nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename .. ".wad", nk.TEXT_LEFT)
+               nk.label(OB_NK_CTX, "Output Filename: " .. OB_CONFIG.output_filename, nk.TEXT_LEFT)
             end
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 2)
             if nk.button(OB_NK_CTX, nil, _("Generate New Filename")) then
                OB_CONFIG.output_filename = ob_default_filename()
             end
             if nk.button(OB_NK_CTX, nil, _("Enter Filename")) then
                manual_entry_context = "filename"
             end
-            nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
-            if nk.button(OB_NK_CTX, nil, _("BUILD")) then
-               if OB_BUILD_ROUTINE == nil then
-                  ob_do_build()
-               end
-            end
             -- seed grid test - Dasho
-            nk.layout_row_dynamic(OB_NK_CTX, 50, 2)
+            --[[nk.layout_row_dynamic(OB_NK_CTX, 50, 2)
             local canvas = nk.window_get_canvas(OB_NK_CTX)
             local rect = nk.widget_bounds(OB_NK_CTX)
             nk.widget(OB_NK_CTX, rect)
@@ -424,20 +421,29 @@ function ob_gui_frame(width, height, scale)
             end
             if MAP_SEEDS ~= nil and #MAP_SEEDS == SEED_W and #MAP_SEEDS[1] == SEED_H and MAP_LEVEL ~= nil then
                DrawMinimap(canvas, MAP_SEEDS, MAP_LEVEL, rect[1], rect[2], rect[3]-2, rect[3]-2)
+            end]]--
+            nk.layout_row_dynamic(OB_NK_CTX, 5, 1)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
+            nk.label(OB_NK_CTX, _("Seed") .. ": " .. OB_CONFIG.seed, nk.TEXT_LEFT)
+            nk.layout_row_dynamic(OB_NK_CTX, 25, 2)
+            if nk.button(OB_NK_CTX, nil, _("New Random Seed")) then
+               gui.calc_seed(ob_get_random_phrase())
+            end
+            if nk.button(OB_NK_CTX, nil, _("Enter Seed")) then
+               manual_entry_context = "seed"
+            end
+            nk.layout_row_dynamic(OB_NK_CTX, 5, 1)
+            nk.layout_row_static(OB_NK_CTX, 25, width/2, 1)
+            if nk.button(OB_NK_CTX, nil, _("GO!")) then
+               if OB_BUILD_ROUTINE == nil then
+                  ob_do_build()
+               end
             end
          end
          nk.group_end(OB_NK_CTX)
       end
-      nk.layout_row_dynamic(OB_NK_CTX, 25, 3)
-      nk.label(OB_NK_CTX, _("Seed") .. ": " .. OB_CONFIG.seed, nk.TEXT_LEFT)
-      if nk.button(OB_NK_CTX, nil, _("New Random Seed")) then
-         gui.calc_seed(ob_get_random_phrase())
-      end
-      if nk.button(OB_NK_CTX, nil, _("Enter Seed")) then
-         manual_entry_context = "seed"
-      end
-      nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
-      nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
+      --nk.layout_row_dynamic(OB_NK_CTX, 25, 1)
+      --nk.label(OB_NK_CTX, _("Status") .. ": " .. OB_BUILD_STATUS, nk.TEXT_LEFT)
    end
    nk.window_end(OB_NK_CTX)
    if need_update_all then
