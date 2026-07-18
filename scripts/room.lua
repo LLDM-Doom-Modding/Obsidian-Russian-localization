@@ -3835,6 +3835,10 @@ function Room_floor_ceil_heights(LEVEL, SEEDS)
     if not R.is_outdoor then
       ceil_vary_group_heights(R)
     end
+
+    for _, group in pairs(R.ceil_groups) do
+      Area_inner_points_for_group(LEVEL, R, group, "ceil", SEEDS)
+    end
   end
 
 

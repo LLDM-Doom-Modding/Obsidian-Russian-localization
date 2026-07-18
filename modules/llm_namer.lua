@@ -67,7 +67,9 @@ LLM_NAME.PROMPT_FLAVOR_CHOICES =
   "dn3d", _("Duke Nukem"),
   "black_metal", _("Black Metal"),
   "ecchi", _("HDoom"),
-  "action", _("Action Movie")
+  "action", _("Action Movie"),
+  "meguca", _("Meguca"),
+  "meguca_suffering", _("Meguca is Suffering")
 }
 
 -- semantics translation table
@@ -1571,9 +1573,61 @@ LLM_NAME.prompt_flavors =
 {
   -- these are substituted to the "Generate a Doom map name that " part of the instructional line
   dn3d = "Generate a Doom map name that leans towards an extremely euphemistic and badly suggestive 80's comedic porn parody title that's rather blue and practically lewd if not laughable. The name ",
-  black_metal = "Generate a Doom map name that sounds like a hardcore black metal band song title. The name ",
+  black_metal = "Generate a Doom map name that sounds like a hardcore black metal band song title. _REPLACER_ The name ",
   ecchi = "Generate a Doom map name that sounds like a fully English-translated Japanese ecchi hentai anime, game, or light novel title. The name ",
-  action = "Generate a Doom map name that sounds like a classic and explosively thrilling action movie title, quote, or one-liner. The name "
+  action = "Generate a Doom map name that sounds like a classic and explosively thrilling action movie title, quote, or one-liner. _REPLACER_ The name ",
+  meguca = "Generate a Doom map name that sounds like an classic cute and fluffy lighthearted soft slice-of-life magical girl and romantic shoujo anime or episode. _REPLACER_" ..
+    "Dark-themed instructions are only for flavoring, do not make the name dark. The name ",
+  meguca_suffering = "Generate a Doom map name that sounds like a heavy-handed and dark, serious-themed shonen-oriented magical girl anime or episode with themes of despair, loss, and existential realizations. The name "
+}
+
+LLM_NAME.prompt_sub_flavors =
+{
+  action = 
+  {
+    source =
+    {
+      "_REPLACER_",
+    },
+
+    replacers =
+    {
+      "",
+      "Use an intimidating and provoactive action movie quote."
+    }
+  },
+
+  black_metal = 
+  {
+    source =
+    {
+      "_REPLACER_",
+    },
+
+    replacers =
+    {
+      "",
+      "Use a short philosphical phrase as a name.",
+      "Focus on creating a song single title.",
+      "Focus on creating an album title."
+    }
+  },
+
+  meguca =
+  {
+    source =
+    {
+      "_REPLACER_"
+    },
+
+    replacers =
+    {
+      "",
+      "Use and create your own cute Japanese manga onomatopoeia similar to 'fuwa fuwa' as non-dictionary name.",
+      "Use sweet romantic shoujo manga verbiage in the name.",
+      "Use flowery and lighthearted-feeling name."
+    }
+  }
 }
 
 LLM_NAME.story_components =
@@ -1685,35 +1739,17 @@ LLM_NAME.story_components =
     "Cripple the invasion convoy.",
 
     -- Power/Infrastructure Objectives
-    "Activate vents; clear toxic mist.",
-    "Recharge the plasma foundry.",
-    "Restart the gravity clamps.",
-    "Power the ancient conduits.",
-    "Restart the buried control grid.",
-    "Restore the atmosphere seals.",
-    "Energize the defense grid.",
-    "Overcharge the red-key relay.",
-    "Restore power to the tram.",
-    "Ignite the incinerator stacks.",
-    "Restart the coolant pumps.",
-    "Prime the backup generators.",
-    "Unlock the command bunker.",
-    "Open the blast-shutter maze.",
-    "Reboot the UAC mainframe.",
-    "Raise the containment bridges.",
-    "Vent pressure from the reactor.",
-    "Reactivate the cargo crushers.",
-    "Cycle the airlock doors.",
-    "Power the crusher hallway.",
+    "Destroy corrupted toxic scrubbers.",
+    "Destroy the hellified plasma foundry.",
+    "Restart the abandoned defense grid.",
+    "Prime the facility backup generators.",
+    "Destroy the UAC mainframe and data.",
+    "Destroy reactor through vent closure.",
     "Start the lava-flow turbines.",
-    "Enable the bridge controls.",
-    "Spin up the teleport pads.",
-    "Route power to the armory.",
-    "Reset the security junction.",
+    "Gain access and loot UAC armory.",
+    "Raze the security junction.",
     "Restart the drainage machinery.",
-    "Open the quarantine sluices.",
-    "Charge the exit beacon.",
-    "Power the Hell portal suppressors.",
+    "Power-up the Hell portal suppressors.",
 
     -- Acquisition/MacGuffin Objectives
     "Acquire the blue access key.",
@@ -1728,13 +1764,13 @@ LLM_NAME.story_components =
     "Locate the rogue cult leader.",
     "Find the lost UAC blueprints.",
     "Recover the Hell-binding artifact.",
-    "Steal the commander’s access chip.",
+    "Steal the commander's access chip.",
     "Claim the sealed armory code.",
     "Retrieve the black archive drive.",
     "Find the missing marine tags.",
     "Recover the corrupted data core.",
     "Seize the portal calibration lens.",
-    "Take the priest’s rune tablet.",
+    "Take the priest's rune tablet.",
     "Grab the reactor override key.",
     "Extract the demonic tissue sample.",
     "Secure the emergency beacon.",
@@ -1950,7 +1986,7 @@ LLM_NAME.story_components =
     tech = {
       "Cygon Research Division, deep-space UAC materials testing and containment site",
       "New Attica Survey Complex, planetary mapping and pre-colonization analysis facility",
-      "Nexus Forward Station, strategic relay hub for interstellar operations and logistics routing",
+      "Nexera Forward Station, strategic relay hub for interstellar operations and logistics routing",
       "Illuminari Observation Tower, high-altitude surveillance and communications intercept structure",
       "Apex Systems Laboratory, advanced weapons and propulsion research subdivision",
       "Elysium Containment Chapel, converted UAC facility used for civilian quarantine and psychological stabilization",
@@ -2225,14 +2261,16 @@ story intro here
 story ending here 
 </S2>
 
-The text in each tag section must at least be _WORD_COUNT_ words, maximum of 4 paragraphs with proper spacing.]],
+The text in each tag section must at least be _WORD_COUNT_ words, separated into paragraphs with proper spacing.]],
 
     game =
 [[There are three chapters and the story is an intro and end for each,
 making six intermissions overall. Each chapter has new twists and revalations.
+The text in each tag section must at least be _WORD_COUNT_ words, separated into paragraphs with proper spacing.
 
 SYSTEM: Use the following tagged structure and do not use any Markdown formatting.
-Please do not add other blocks than is found in the example:
+Please do not add other blocks than is found in the example.
+The following example must absolutely be followed:
 
 <S1> 
 chapter 1 intro here
@@ -2256,9 +2294,7 @@ chapter 3 intro here
 
 <S6> 
 chapter 3 ending here
-</S6>
-
-The text in each tag section must at least be _WORD_COUNT_ words, maximum of 4 paragraphs with proper spacing.]]
+</S6>]]
   },
 
   mcguffins = {
@@ -3409,7 +3445,7 @@ function LLM_NAME.do_it()
     file:close()
 
     local cmd =
-      'start "" /b curl --max-time 120 -sS ' ..
+      'start "" /b curl --max-time 180 -sS ' ..
       '-H "Content-Type: application/json" '..
       '"' .. LLM_NAME.endpoint .. '"' ..
       ' -d @ollama_payload.json'
@@ -3680,7 +3716,8 @@ function LLM_NAME.do_it()
     -- optionally normalize control chars
     s = s:gsub("\t", "\\t")
 
-    -- cuz it happens
+    -- convert special unicode quote symbols to normal
+    s = s:gsub("‘", "\\'")
     s = s:gsub("’", "\\'")
 
     return s
@@ -3707,6 +3744,7 @@ _NAME_LENGTH_
 - 1 name only
 - do not add any comment or explanation, give only the name
 - no quotation marks, no camelcase, no snakecase
+- avoid words with hard starting consonants like "Kh", "Kr", "Ky"
 
 ]]..
 level_data
@@ -3716,6 +3754,15 @@ level_data
       prompt = string.gsub(prompt,
       "Generate a Doom map name that ",
       LLM_NAME.prompt_flavors[PARAM.prompt_flavor])
+    end
+
+    -- sub-flavor injection
+    if LLM_NAME.prompt_sub_flavors[PARAM.prompt_flavor] then
+      local tab = LLM_NAME.prompt_sub_flavors[PARAM.prompt_flavor]
+      assert(tab)
+
+      prompt = string.gsub(prompt, tab.source[1],
+        rand.pick(tab.replacers))
     end
 
     -- LLM temperature variation, later maps have crazier names
@@ -3802,10 +3849,10 @@ Rules:
 - pure fictional non real-world location
 - absolutely avoid any use of italics, bold, or any Markdown formatting
 - no explanations, no commentary, no follow-up questions
-- Hell is always the ultimate enemy, but the immediate mission threat may be a person, faction, archive, ritual, weapon shipment, infestation, command post, collaborator, or cover-up
+- Hell is always the ultimate enemy and its demons are the immediate mission threat but be a person, faction, archive, ritual, weapon shipment, infestation, command post, collaborator, or cover-up may interfere
 - the selected Story Plot controls the actual objective and resolution
 - if the acronym UAC is used, it means "Union Aerospace Corporation"
-- please do not mention the smell of ozone, or nexus points, sub-levels unless asked for by location
+- please do not mention the smell of ozone, nexus points, junction points, or sub-levels
 - avoid inventing a larger hidden crisis to make the ending feel more important
 - do not invent a larger hidden portal, reactor, core, energy-source, breach, or anomaly plot.
 - do not mention Earth, it is only for locational context
@@ -4009,7 +4056,7 @@ _FORMAT_
           local noun_replacers = {}
           for _,N in ipairs(LLM_NAME.story_components.replacers) do
             noun_replacers[N] = namelib.generate_unique_noun("exotic")
-            assert(name, "Received no answer from Ollama instance! " .. 
+            assert(name, "Received no answer from Ollama instance! " ..
             "Is it on? Why does life have to be this way?!")
             name = string.gsub(name, N, noun_replacers[N])
           end

@@ -1545,7 +1545,11 @@ function MARINE_CLOSET_TUNE.all_done()
 "        Painchance 168;",
 "        Painchance 168;\n" ..
 "        PainThreshold 25;")
-  else
+
+    scripty = string.gsub(scripty,
+"        Height 56;",
+"        Height 16;")
+else
     if PARAM.m_c_sprites == "no" then
       scripty = scripty .. MARINE_CLOSET_TUNE.TEMPLATES.MWEAK
     else

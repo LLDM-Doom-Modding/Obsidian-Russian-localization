@@ -1460,6 +1460,7 @@ DOOM.THEMES =
       gtd_computers_lite5 = 25,
       gtd_computers_blue_shawn = 25,
       gtd_dh_comp = 50,
+      gtd_silver_pillars_blue_computers = 50,
       --
       gtd_black_mirror = 50,
       gtd_data_center = 50,
@@ -1986,6 +1987,7 @@ DOOM.THEMES =
       gtd_computers_lite5 = 18,
       gtd_computers_blue_shawn = 18,
       gtd_dh_comp = 25,
+      gtd_silver_pillars_blue_computers = 25,
       --
       gtd_black_mirror = 40,
       gtd_data_center = 35,

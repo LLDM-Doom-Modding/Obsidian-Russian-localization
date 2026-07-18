@@ -5,7 +5,7 @@ PREFABS.Cage_dem_windows_ambush1 =
   file   = "cage/dem_cages.wad",
   map    = "MAP19",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "urban",
 
@@ -145,7 +145,7 @@ PREFABS.Cage_dem_windows_ambushd1 =
   file   = "cage/dem_cages.wad",
   map    = "MAP22",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "urban",
 
@@ -287,7 +287,7 @@ PREFABS.Cage_dem_windows_ambusho1 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "urban",
 
@@ -429,7 +429,7 @@ PREFABS.Cage_dem_windows_ambush7 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "tech",
 
@@ -505,7 +505,7 @@ PREFABS.Cage_dem_windows_ambusho7 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "tech",
 
@@ -581,7 +581,7 @@ PREFABS.Cage_dem_windows_ambush10 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "tech",
 
@@ -650,7 +650,7 @@ PREFABS.Cage_dem_windows_ambusho10 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "tech",
 
@@ -784,7 +784,7 @@ PREFABS.Cage_dem_windows_ambush16 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "hell",
 
@@ -851,7 +851,7 @@ PREFABS.Cage_dem_windows_ambushd7 =
 
   port = "zdoom",
 
-  prob   = 800,
+  prob   = 500,
 
   theme  = "hell",
 

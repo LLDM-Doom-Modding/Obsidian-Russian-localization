@@ -292,3 +292,39 @@ PREFABS.Pic_black_mirror_3 =
     NOISE3A = 2
   }
 }
+
+--
+
+PREFABS.Pic_tech_spbc_1 =
+{
+  file = "picture/gtd_pic_tech_comp_set.wad",
+  map = "MAP15",
+
+  prob = 5000,
+
+  group = "gtd_silver_pillars_blue_computers",
+
+  where = "seeds",
+  height = 128,
+
+  seed_w = 2,
+  seed_h = 1,
+
+  deep = 16,
+
+  bound_z1 = 0,
+  bound_z2 = 128,
+
+  x_fit = "frame",
+  y_fit = "top"
+}
+
+PREFABS.Pic_tech_spbc_2 =
+{
+  template = "Pic_tech_spbc_1",
+  map = "MAP16",
+
+  prob = 7500,
+
+  seed_w = 3
+}

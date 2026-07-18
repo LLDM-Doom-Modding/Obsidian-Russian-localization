@@ -553,13 +553,13 @@ OTEX_RESOURCE_DB = {
         flats = {},
         textures = {'OSKY49', 'OSKY47', 'OSKY46', 'OSKY43', 'OSKY42', 'OSKY45', 'OSKY44', 'OSKY40', 'OSKY41', 'OSKY48'}
     },
-    ["KEYS"] = {
+    --[[["KEYS"] = {
         has_flats = false,
         has_textures = true,
         has_all = false,
         flats = {},
         textures = {'OKEYSN01', 'OKEYSG01', 'OKEYSB01', 'OKEYSY01', 'OKEYSO01', 'OKEYSR01'}
-    },
+    },]]
     ["MRLT"] = {
         has_flats = true,
         has_textures = false,
