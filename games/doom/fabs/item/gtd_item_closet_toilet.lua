@@ -34,3 +34,22 @@ PREFABS.Item_closet_toilet_room_filthy =
   map = "MAP02",
   prob = 80,
 }
+
+PREFABS.Item_closet_cat_litter_box =
+{
+  template   = "Item_closet_toilet_room",
+  map = "MAP03",
+
+  env = "!outdoor",
+
+  port = "zdoom",
+  prob = 120,
+
+  seed_w = 2,
+  seed_h = 1,
+
+  over = nil,
+
+  x_fit = { 24,32 },
+  y_fit = { 20,24 }
+}

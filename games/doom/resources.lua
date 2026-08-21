@@ -77,7 +77,7 @@ DOOM.RESOURCES.PALETTES =
 --------------------------------------------------------------------
 
 -- Left out the non-level and wolfenstein level music - Dasho
-DOOM.RESOURCES.MUSIC_LUMPS = 
+DOOM.RESOURCES.MUSIC_LUMPS =
 {
   "D_RUNNIN",
   "D_STALKS",
@@ -943,4 +943,12 @@ function DOOM.all_done()
   gui.wad_merge_sections("games/doom/data/lift_flat.wad")
   gui.wad_merge_sections("games/doom/data/vine_dude.wad")
   gui.wad_merge_sections("games/doom/data/logos.wad")
+
+  if OB_CONFIG.game == "doom1"
+  and OB_CONFIG.game == "ultdoom"
+  and OB_CONFIG.game == "tnt"
+  and OB_CONFIG.game == "plutonia"
+  then
+    gui.wad_merge_sections("games/doom/data/short_bars")
+  end
 end

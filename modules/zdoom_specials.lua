@@ -523,7 +523,7 @@ function ZDOOM_SPECIALS.do_special_stuff()
       fog_intensity = "" .. ZDOOM_SPECIALS.FOG_INTENSITY[PARAM.fog_intensity]
     end
 
-    if PARAM.night_fog_intensity == "mixed" then
+    if PARAM.fog_night_intensity == "mixed" then
       night_fog_intensity = "" .. rand.irange(16,368)
     else
       night_fog_intensity = "" .. ZDOOM_SPECIALS.FOG_INTENSITY[PARAM.fog_intensity]

@@ -179,7 +179,7 @@ PREFABS.Decor_tech_spbc_1 =
   bound_z1 = 0,
   bound_z2 = 96,
 
-  z_fit = { 60,62 , 91,93}
+  z_fit = {60,62 , 91,93}
 }
 
 PREFABS.Decor_tech_sbpc_2 =
@@ -187,5 +187,36 @@ PREFABS.Decor_tech_sbpc_2 =
   template = "Decor_tech_spbc_1",
   map = "MAP16",
 
-  z_fit = { 56,57 , 91,93}
+  z_fit = {56,57 , 91,93}
+}
+
+PREFABS.Decor_tech_sbpc_3 =
+{
+  template = "Decor_tech_spbc_1",
+  map = "MAP16",
+
+  prob = 7500,
+  size = 96,
+
+  z_fit = {56,57 , 91,93}
+}
+
+PREFABS.Decor_tech_sbpc_4_bottom_only =
+{
+  template = "Decor_tech_spbc_1",
+  map = "MAP17",
+
+  height = 64,
+
+  z_fit = "top"
+}
+
+PREFABS.Decor_tech_sbpc_5_bottom_only =
+{
+  template = "Decor_tech_spbc_1",
+  map = "MAP18",
+
+  height = 64,
+
+  z_fit = "top"
 }

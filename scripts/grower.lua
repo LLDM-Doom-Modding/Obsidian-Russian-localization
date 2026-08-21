@@ -4551,8 +4551,69 @@ gui.debugf("=== Coverage seeds: %d/%d  rooms: %d/%d\n",
         end
       end
     end
+  end
+
+  -- grow barely grown rooms
+  for _,R in pairs(LEVEL.rooms) do
+    R.is_last_grown = true
+
+    for _,A in pairs(R.areas) do
+      A:calc_volume()
+      R.svolume = R.svolume + A.svolume
+    end
+
+    local tries = 1
+    while R.svolume <= 16 and tries <= 3 do
+      local str = "#" .. tries .. ": Grow barely grown rooms -> " .. R.id .. ": " .. R.svolume
+      Grower_grammatical_room(SEEDS, LEVEL, R, "grow")
+      Grower_grammatical_room(SEEDS, LEVEL, R, "decorate")
+      R.svolume = 0
+      for _,A in pairs(R.areas) do
+        A:calc_volume()
+        R.svolume = R.svolume + A.svolume
+      end
+
+      for _,A in pairs(R.areas) do
+        A:calc_volume()
+        R.svolume = R.svolume + A.svolume
+      end
+      str = str .. "->" .. R.svolume .. " of " .. R.floor_limit
+      if R.symmetry then str = str .. " sym" end
+      gui.printf(str .. "\n")
+
+      if R.symmetry and R.svolume < R.floor_limit then
+        gui.printf("Symmetry disabled on this room.\n")
+        R.symmetry = {}
+        R.symmetry = nil
+        Grower_grammatical_room(SEEDS, LEVEL, R, "grow")
+        Grower_grammatical_room(SEEDS, LEVEL, R, "decorate")
+        tries = tries + 1
+      end
+      tries = tries + 1
+    end
+  end
+
+
+  -- cull rooms that ended up ungrown still
+  -- but we will allow some if secrets style is high enough
+  local cull_threshold = style_sel("secrets", 100, 70, 30, 0)
+
+  if not LEVEL.is_procedural_gotcha then
+
+    for _,R in pairs(LEVEL.rooms) do
+      --gui.printf("ROOM_" .. R.id .. " has " .. R:prelim_conn_num(LEVEL) .. " initial conns.\n")
+      if rand.odds(cull_threshold) then
+        if R.svolume <= 12 and R:prelim_conn_num(LEVEL) == 1 then
+          Grower_kill_room(SEEDS, LEVEL, R)
+          gui.printf(R.id .. " still too small: removed. \n")
+        end
+      else
+        gui.printf(R.id .. " still too small: not culled due to secrets style. \n")
+      end
+    end
 
   end
+
 end
 
 

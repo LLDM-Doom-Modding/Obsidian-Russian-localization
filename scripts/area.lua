@@ -442,13 +442,105 @@ function AREA_CLASS.get_fseed_coord(A)
   return ""
 end
 
+function AREA_CLASS.set_floor_mat(A, t)
+  A.floor_mat = t
+
+  local info = debug.getinfo(2, "Sln")
+
+  if A.fm_history then
+    A.fm_history = A.fm_history .. "->" .. info.name .. ":" .. (t or "NIL")
+  else
+    A.fm_history = info.name .. ":" .. (t or "NIL")
+  end
+end
+
+function AREA_CLASS.set_ceil_mat(A, t)
+  if t then
+    A.ceil_mat = t
+  else
+    t = "FAIL"
+  end
+
+  local info = debug.getinfo(2, "Sln")
+  --print(info.source, info.currentline, info.name)
+
+  if A.cm_history then
+    A.cm_history = A.cm_history .. "->" .. info.currentline .. "." .. info.name .. "=" .. t
+  elseif not A.cm_history then
+    A.cm_history = info.currentline .. "." .. info.name .. "=" .. t
+  end
+end
 
 function AREA_CLASS.set_floor(A, h)
   A.floor_h = h
 end
 
 function AREA_CLASS.set_ceil(A, h)
-  A.ceil_h = h
+  if h then
+    A.ceil_h = h
+  else
+    h = "FAIL"
+  end
+
+  local info = debug.getinfo(2, "Sln")
+  --print(info.source, info.currentline, info.name)
+
+  if A.ch_history then
+    A.ch_history = A.ch_history .. "->" .. info.currentline .. "." .. info.name .. "=" .. h
+  elseif not A.ch_history then
+    A.ch_history = info.currentline .. "." .. info.name .. "=" .. h
+  end
+end
+
+function AREA_CLASS.set_ceil_group(A, cg)
+  A.ceil_group = cg
+
+  local d_info = debug.getinfo(2, "Sln")
+  --print(info.source, info.currentline, info.name)
+
+  local low_area, high_area, info
+  if A.chunk and A.chunk.dest_area and A.chunk.dest_area.floor_h then
+    if A.chunk.from_area.floor_h > A.chunk.dest_area.floor_h then
+      high_area, low_area = A.chunk.from_area, A.chunk.dest_area
+    else
+      high_area, low_area = A.chunk.dest_area, A.chunk.from_area
+    end
+  end
+
+  if high_area and cg == high_area.ceil_group then
+    info = d_info.currentline .. "." .. d_info.name .. ":HIGH." .. cg.id
+  elseif low_area and cg == low_area.ceil_group then
+    info = d_info.currentline .. "." .. d_info.name .. ":LOW." .. cg.id
+  else
+    info = d_info.currentline .. "." .. d_info.name .. ":SAME." .. cg.id
+  end
+
+  if A.cg_history then
+    A.cg_history = A.cg_history .. "->" .. info
+  elseif not A.cg_history then
+    A.cg_history = info
+  end
+end
+
+function AREA_CLASS.set_floor_group(A, fg)
+  A.floor_group = fg
+end
+
+function AREA_CLASS.set_lighting(A, l)
+  if l then
+    A.lighting = l
+  else
+    l = "FAIL"
+  end
+
+  local d_info = debug.getinfo(2, "Sln")
+  --print(info.source, info.currentline, info.name)
+
+  if A.l_history then
+    A.l_history = A.l_history .. "->" .. d_info.currentline .. "." .. d_info.name .. ":" .. l
+  else
+    A.l_history = d_info.currentline .. "." .. d_info.name .. ":" .. l
+  end
 end
 
 
@@ -1282,7 +1374,6 @@ end
 
 
 function Corner_is_at_area_corner(corner)
-
   -- corner isn't at a corner when along parallel walls
   local wall_count = 0
   for _,junc in pairs(corner.junctions) do
@@ -1308,36 +1399,70 @@ function Corner_is_at_area_corner(corner)
   end
 
   -- corner is definitely at a corner if more than two areas meet
-  if #corner.areas > 2 then return true end
+  if #corner.areas > 2 then
+    return true
+  end
 
   -- corner is definitely at a corner if one seed has an area
   -- that doesn't match all the others
   if #corner.seeds == 4 then
 
+    -- corner sits between diagonals that are not parallel
+    local dir_score = 0
+    local diag_count = 0
+
+    -- NW
+    if corner.seeds[1].diagonal and corner.seeds[1].diagonal == 1 then
+      diag_count = diag_count + 1
+      dir_score = dir_score + 1
+    end
+    -- SW
+    if corner.seeds[2].diagonal and corner.seeds[2].diagonal == 7 then
+      diag_count = diag_count + 1
+      dir_score = dir_score + 7
+    end
+    -- NE
+    if corner.seeds[3].diagonal and corner.seeds[3].diagonal == 3 then
+      diag_count = diag_count + 1
+      dir_score = dir_score + 3
+    end
+    -- SE
+    if corner.seeds[4].diagonal and corner.seeds[4].diagonal == 9 then
+      diag_count = diag_count + 1
+      dir_score = dir_score + 9
+    end
+
+    if diag_count >= 2 and dir_score ~= 10 then
+      return true
+    end
+
+    -- compare NW
     if corner.seeds[1].area ~= corner.seeds[2].area and
     corner.seeds[1].area ~= corner.seeds[3].area and
     corner.seeds[1].area ~= corner.seeds[4].area then
       return true
     end
 
+    -- compare SW
     if corner.seeds[2].area ~= corner.seeds[1].area and
     corner.seeds[2].area ~= corner.seeds[3].area and
     corner.seeds[2].area ~= corner.seeds[4].area then
       return true
     end
 
+    -- compare NE
     if corner.seeds[3].area ~= corner.seeds[1].area and
     corner.seeds[3].area ~= corner.seeds[3].area and
     corner.seeds[3].area ~= corner.seeds[4].area then
       return true
     end
 
+    -- compare SE
     if corner.seeds[4].area ~= corner.seeds[1].area and
     corner.seeds[4].area ~= corner.seeds[2].area and
     corner.seeds[4].area ~= corner.seeds[3].area then
       return true
     end
-
   end
 
   -- corner is by at least one diagonal and is between two areas
@@ -1345,7 +1470,7 @@ function Corner_is_at_area_corner(corner)
     local diagonal_score = 0
 
     for _,S in pairs(corner.seeds) do
-      if S.top then diagonal_score = diagonal_score + 1 end
+      if S.top or S.bottom then diagonal_score = diagonal_score + 1 end
     end
 
     if diagonal_score == 1 then return true end
@@ -2161,8 +2286,8 @@ function Area_pick_facing_rooms(LEVEL, SEEDS)
 
   for _,A in pairs(scenics) do
     if A.zone then
-      A.ceil_h = A.zone.sky_h + 16
-      A.ceil_mat = "_SKY"
+      A:set_ceil( A.zone.sky_h + 16 )
+      A:set_ceil_mat("_SKY")
     end
 
     -- void up unset areas

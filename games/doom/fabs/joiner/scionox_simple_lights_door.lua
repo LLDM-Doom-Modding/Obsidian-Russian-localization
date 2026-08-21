@@ -748,10 +748,12 @@ PREFABS.Joiner_scionox_simple_lights_door_59 =
   over   = 16,
 
   x_fit  = "frame",
-  y_fit  = "frame",
+  y_fit  = {64,68 , 92,96},
 
   tag_1  = "?door_tag",
   door_action = "S1_OpenDoor",
+
+  tex_EXITDOOR = "WOODMET4"
 }
 
 PREFABS.Joiner_scionox_simple_lights_door_59_tech =
@@ -765,5 +767,7 @@ PREFABS.Joiner_scionox_simple_lights_door_59_tech =
     SPCDOOR2 = 1,
     SPCDOOR3 = 1,
     SPCDOOR4 = 1
-  }
+  },
+
+  tex_EXITDOOR = "EXITDOOR"
 }

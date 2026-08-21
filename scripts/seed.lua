@@ -1195,8 +1195,9 @@ function Edge_new_opposite(kind, S, dir, long, LEVEL, SEEDS)
       S.error = true
       gui.printf(table.tostr(S) .. "\n")
       gui.printf(table.tostr(S.area) .. "\n")
+      gui.printf(Seed_dump_rooms(SEEDS) .. "\n")
+      error("Edge_new_opposite -> Encountered unusual diagonal combination. Check log pl0x.")
     end
-    assert(N)
   end
 
   return Edge_new(kind, N, 10-dir, long, LEVEL, SEEDS)

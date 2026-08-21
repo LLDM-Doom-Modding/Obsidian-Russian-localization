@@ -117,4 +117,27 @@ PREFABS.Joiner_downtown_facade_flipped_commercial2 =
   y_fit = { 24,64 },
 }
 
+--
 
+PREFABS.Joiner_urban_double_door =
+{
+  file   = "joiner/gtd_downtown_facade_joiner.wad",
+  map    = "MAP03",
+
+  prob   = 5000,
+
+  theme  = "urban",
+
+  where  = "seeds",
+  shape  = "I",
+
+  seed_w = 3,
+  seed_h = 1,
+
+  deep   = 16,
+  over   = 16,
+
+  bound_z1 = 0,
+
+  x_fit = "frame",
+}

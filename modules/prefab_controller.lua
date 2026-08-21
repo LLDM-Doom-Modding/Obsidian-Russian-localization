@@ -149,11 +149,11 @@ function PREFAB_CONTROL.fine_tune_filters()
   }
   local new_fab_groups_multipliers =
   {
-    gtd_dh_comp = 1.5,
-    gtd_shopping_mall = 2,
-    gtd_black_mirror = 2.5,
-    gtd_storage_wood = 4,
-    gtd_silver_pillars_blue_computers = 5
+    gtd_wall_quakish_insets_horizon = 2,
+    gtd_wall_quakish_insets_horizon_mid = 2,
+    gtd_wall_quakish_insets_horizon_top = 2,
+    gtd_ribbed_lights_ribbed_steps = 3,
+    gtd_generic_artsy_corpo_art = 6
   }
   local new_themes_multipliers =
   {
@@ -338,7 +338,7 @@ OB_MODULES["prefab_control"] =
       valuator = "slider",
       units = "",
       min = 1,
-      max = 8,
+      max = 10, --8
       increment = 1,
       default = 1,
       tooltip = _("Determines the maximum number of distinct indoor room themes used per level. Default is 1."),
@@ -364,7 +364,7 @@ OB_MODULES["prefab_control"] =
       valuator = "slider",
       units = "",
       min = 1,
-      max = 8,
+      max = 10, --8
       increment = 1,
       default = 2,
       tooltip = _("Determines the maximum number of distinct indoor wall groups used per level. Default is 2."),
@@ -528,7 +528,6 @@ OB_MODULES["prefab_control"] =
       tooltip = _("Greatly increase probability for recent added content for testing purposes. " ..
       "Changes in content is expected and some assets will be gradually removed from this option's effects."),
       priority = 4,
-
     },
 
 

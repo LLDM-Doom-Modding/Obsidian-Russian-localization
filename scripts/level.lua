@@ -668,6 +668,8 @@ function Episode_plan_monsters()
   local function is_boss_usable(LEV, mon, info)
     if LEV.is_procedural_gotcha then return true end
 
+    if not LEV.is_secret and info.secret then return false end
+
     if info.prob <= 0 then return false end
     if info.boss_prob == 0 then return false end
 
@@ -806,6 +808,8 @@ function Episode_plan_monsters()
         elseif info.boss_type == "nasty" and OB_CONFIG.bossesnormal == "minor" then goto skip
         elseif info.boss_type == "tough" and OB_CONFIG.bossesnormal ~= "all" then goto skip end
       end
+
+      if not LEV.is_secret and info.secret then goto skip end
 
       if LEV.theme.monster_prefs and LEV.theme.monster_prefs[name] and LEV.theme.monster_prefs[name] == 0 then goto skip end
 
@@ -2740,12 +2744,12 @@ function Level_make_level(LEV)
 
   end
 
-  if LEVEL.is_dead then
-    print("LEVEL GENERATION FAILURE!\n")
+  if LEVEL.is_dead or res == "runt" then
+    gui.printf("--==| LEVEL GENERATION FAILURE! |==--\n")
   end
 
   if res == "runt"  then
-    print("STUNTED LEVEL!\nCOVERAGE: " .. (LEVEL.cur_coverage or "NIL")
+    gui.printf("STUNTED LEVEL!\nCOVERAGE: " .. (LEVEL.cur_coverage or "NIL")
     .. "\nMIN COVERAGE: " .. coverage_target .. "\nROOMS: "
     .. #LEVEL.rooms .. "\nMIN ROOMS: " .. LEVEL.min_rooms .. "\n")
   end
@@ -2762,7 +2766,7 @@ function Level_make_level(LEV)
       coverage_target = coverage_target * 0.75
       LEVEL = table.copy(LEV)
       SEEDS = Seed_init(LEVEL)
-      print("RETRYING MAP " .. LEVEL.name)
+      gui.printf("RETRYING MAP " .. LEVEL.name)
       gui.reseed_rng(gui.random_int())
       goto retryafterfailure
     end

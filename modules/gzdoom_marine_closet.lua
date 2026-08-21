@@ -23,6 +23,7 @@ MARINE_CLOSET_TUNE.TECH =
   "rng",    _("Mix It Up"),
   "prog",    _("Progressive"),
   "prog_no_bfg", _("Progressive, no BFG"),
+  "prog_no_bfg_no_pistol", _("Progressive, no Pistol nor BFG"),
   "bfg",    _("BFG Fiesta")
 }
 
@@ -1442,16 +1443,18 @@ function MARINE_CLOSET_TUNE.calc_closets(self, LEVEL)
     rngmin = math.min(PARAM.float_m_c_min,PARAM.float_m_c_max)
     rngmax = math.max(PARAM.float_m_c_min,PARAM.float_m_c_max)
 
+    -- slight jitter so marine and closet counts don't ever always fall exactly
+    -- on predictable level counts e.g. the difference between 1 or 2 marines always
+    -- landing on exactly MAP15 and so on
+    local game_along_jitter = LEVEL.game_along + rand.range(0.2, -0.2)
+    local ep_along_jitter = LEVEL.ep_along + rand.range(0.2, -0.2)
+    
     if PARAM.m_c_type == "default" then
       PARAM.marine_closets = rand.irange(rngmin,rngmax)
-    elseif PARAM.m_c_type == "prog" then
-      PARAM.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_type == "reg" then
-      PARAM.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_type == "epi" then
-      PARAM.marine_closets = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
-    elseif PARAM.m_c_type == "epi2" then
-      PARAM.marine_closets = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
+    elseif PARAM.m_c_type == "prog" or PARAM.m_c_type == "reg" then
+      PARAM.marine_closets = rngmin + math.round((rngmax - rngmin) * game_along_jitter)
+    elseif PARAM.m_c_type == "epi" or PARAM.m_c_type == "epi2" then
+      PARAM.marine_closets = rngmax - math.round((rngmax - rngmin) * ep_along_jitter)
     end
 
     rngmin = math.min(PARAM.float_m_c_m_min,PARAM.float_m_c_m_max)
@@ -1459,14 +1462,10 @@ function MARINE_CLOSET_TUNE.calc_closets(self, LEVEL)
 
     if PARAM.m_c_m_type == "default" then
       PARAM.marine_marines = rand.irange(rngmin,rngmax)
-    elseif PARAM.m_c_m_type == "prog" then
-      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_m_type == "reg" then
-      PARAM.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.game_along)
-    elseif PARAM.m_c_m_type == "epi" then
-      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * LEVEL.ep_along)
-    elseif PARAM.m_c_m_type == "epi2" then
-      PARAM.marine_marines = rngmax - math.round((rngmax - rngmin) * LEVEL.ep_along)
+    elseif PARAM.m_c_m_type == "prog" or PARAM.m_c_m_type == "reg" then
+      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * game_along_jitter)
+    elseif PARAM.m_c_m_type == "epi" or PARAM.m_c_m_type == "epi2" then
+      PARAM.marine_marines = rngmin + math.round((rngmax - rngmin) * ep_along_jitter)
     end
 
     if PARAM.m_c_tech == "vlow" then
@@ -1482,7 +1481,8 @@ function MARINE_CLOSET_TUNE.calc_closets(self, LEVEL)
     elseif PARAM.m_c_tech == "bfg" then
       PARAM.marine_tech = 66
     elseif PARAM.m_c_tech == "prog"
-    or PARAM.m_c_tech == "prog_no_bfg" then
+    or PARAM.m_c_tech == "prog_no_bfg"
+    or PARAM.m_c_tech == "prog_no_bfg_no_pistol" then
       if LEVEL.game_along < 1.0 then
         PARAM.marine_tech = math.ceil(LEVEL.game_along * 10)
       else
@@ -1515,9 +1515,19 @@ end
 
 function MARINE_CLOSET_TUNE.grab_type()
   local tech_level = table.copy(MARINE_CLOSET_TUNE.TECHWPN)
-  if PARAM.m_c_tech == "prog_no_bfg" then
+  if PARAM.m_c_tech == "prog_no_bfg" or PARAM.m_c_tech == "prog_no_bfg_no_pistol" then
     tech_level[9] = { 31005, 31005, 31005, 31005, 31006, 31006, 31006, 31004, 31002 }
     tech_level[10] = { 31002, 31003, 31004, 31005, 31006 }
+  end
+
+  if PARAM.m_c_tech == "prog_no_bfg_no_pistol" then
+    tech_level[1] = { 31002 }
+    tech_level[2] = { 31003, 31002, 31002 }
+    tech_level[3] = { 31003, 31002, 31003, 31002 }
+    tech_level[4] = { 31003, 31002 }
+    tech_level[5] = { 31003, 31002, 31002, 31003, 31002, 31003, 31002, 31004, 31003, 31005, 31006, 31004, 31003 }
+    tech_level[6] = { 31003, 31002, 31002, 31003, 31002, 31005, 31003, 31002, 31006, 31004, 31004, 31003, 31002 }
+    tech_level[7] = { 31003, 31002, 31003, 31004, 31002, 31005, 31006, 31004, 31003, 31003, 31002, 31002, 31002 }
   end
 
   return rand.pick(tech_level[PARAM.marine_tech])

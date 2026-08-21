@@ -150,7 +150,9 @@ bool wad_c::ReadDirectory()
     int num_entries = LE_U32(header.num_entries);
     int dir_start   = LE_U32(header.dir_start);
 
+#if AJPOLY_DEBUG_WAD
     LogPrint("Reading %d dir entries at 0x%X\n", num_entries, dir_start);
+#endif
 
     PHYSFS_seek(fp, dir_start);
 

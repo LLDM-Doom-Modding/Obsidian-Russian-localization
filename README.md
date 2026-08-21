@@ -234,28 +234,4 @@ The `--update` flag takes three arguments: section (`c` for config, `o` for opti
 
 This is a community continuation of the OBLIGE Level Maker, originally created by Andrew Apted.
 
-A brief summary of changes:
-
-Improved internationalization support, including fixes for accented characters in Windows filepaths and an updated translation template
-
-Russian translation file provided for the RU locale
-
-GUI Customization and Theming added
-
-Modified SLUMP level builder included for Vanilla Doom usage.
-
-ZDBSP as the internal nodebuilder, replacing GLBSP.
-
-UDMF map output for compatible engines.
-
-64-bit seeds and random numbers.
-
-Migrated from Lua to LuaJIT for improved build speeds.
-
-Patch by Simon-v for searching for .pk3 addons in both the install and user's home directories (https://github.com/dashodanger/Oblige/pull/1)
-
-Strings allowed for seed input (numbers with no other characters still processed as numbers).
-
-New random number generator based on the xoshiro256 algorithm from fastPRNG (https://github.com/BrutPitt/fastPRNG).
-
-Bugfixes as discovered.
+This is the current working repository for Obsidian Level Generator. While other engines and games are supported, most work is done on Doom 2 via U/GZDoom first. Full compatibility for other games and engines, even if listed, is not guaranteed as development is done.

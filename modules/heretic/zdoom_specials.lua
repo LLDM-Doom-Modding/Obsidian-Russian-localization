@@ -382,11 +382,11 @@ function ZDOOM_SPECIALS_HERETIC.do_special_stuff()
     if PARAM.fog_intensity_heretic == "subtle" then
       fog_intensity = "16"
     elseif PARAM.fog_intensity_heretic == "misty" then
-      fog_intensity = "48"
+      fog_intensity = "24"
     elseif PARAM.fog_intensity_heretic == "smoky" then
-      fog_intensity = "128"
+      fog_intensity = "64"
     elseif PARAM.fog_intensity_heretic == "foggy" then
-      fog_intensity = "255"
+      fog_intensity = "192"
     elseif PARAM.fog_intensity_heretic == "dense" then
       fog_intensity = "368"
     elseif PARAM.fog_intensity_heretic == "mixed" then

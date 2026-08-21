@@ -1,7 +1,7 @@
--- CONFIG FILE : OBSIDIAN 21"Unstable"
+-- CONFIG FILE : OBSIDIAN 22"Unstable"
 -- Build 2024.04.03
 -- Based on OBLIGE Level Maker (C) 2006-2017 Andrew Apted
--- https://obsidian-level-maker.github.io
+-- https://github.com/GTD-Carthage/Obsidian-Content
 
 -- Obsidian (C) 2018-2023
 -- MsrSgtShooterPerson

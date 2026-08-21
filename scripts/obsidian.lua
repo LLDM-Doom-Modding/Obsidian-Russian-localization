@@ -1858,7 +1858,7 @@ function ob_merge_table_list(tab_list)
       -- upper-case names should always be tables to copy
       if string.match(name, "^[A-Z]") then
         if type(tab) ~= "table" then
-          error("Game field not a table: " .. tostring(name))
+          gui.printf("Warning: Game field not a table: " .. name .. "\n")
         end
         ob_merge_tab(name, tab)
       end

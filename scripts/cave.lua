@@ -4665,6 +4665,12 @@ stderrf("  picked chain from blob %d --> %d\n", B.id, C.id)
     for _,CL in pairs(area.room.closets) do
       CL.floor_mat = area.room.floor_mats[CL.floor_h]
     end
+
+    for _,AC in pairs(area.room.areas) do
+      if AC.chunk and AC.chunk.kind then
+        AC.floor_mat = area.room.floor_mats[AC.floor_h]
+      end
+    end
   end
 
 

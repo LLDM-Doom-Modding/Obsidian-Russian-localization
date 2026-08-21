@@ -253,6 +253,9 @@ function Quest_create_initial_quest(LEVEL)
 
       cur_score = cur_score * closet_mult * openness_mult
 
+      -- nay rooms
+      if R.is_hallway then cur_score = -1000 end
+
       R.start_score = math.round_to(cur_score,2)
 
       if cur_score > best_score then
@@ -2467,7 +2470,7 @@ function Quest_nice_items(LEVEL)
     if R.is_secret then return end
 
     -- chance of using *any* closets in this room
-    local any_prob = style_sel("secrets", 0, 30, 60, 90)
+    local any_prob = style_sel("secrets", 0, 20, 40, 60)
     if not rand.odds(any_prob) then
       return
     end

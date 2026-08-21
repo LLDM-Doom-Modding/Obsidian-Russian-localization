@@ -41,5 +41,7 @@ PREFABS.Exit_generic_immersive_start_gothic =
 
   theme = "!tech",
 
+  over = 0,
+
   start_fab_peer = "Start_generic_immersive_start_gothic"
 }

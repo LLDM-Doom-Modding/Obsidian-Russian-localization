@@ -2731,7 +2731,7 @@ msgid "OBSIDIAN Level Maker"
 msgstr ""
 
 #: source/main.cc:1271
-msgid "Tabs of Terror"
+msgid "Ad Mortem, Ad Infernum"
 msgstr ""
 
 #: source/main.cc:1361

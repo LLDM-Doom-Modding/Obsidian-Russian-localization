@@ -928,19 +928,23 @@ function Monster_fill_room(LEVEL, R, SEEDS)
     if tonumber(qty) then qty = tonumber(qty) end
 
     --Mix It Up
-    --if qty == gui.gettext("Mix It Up") then
     if PARAM.mons_mode == "mixed" then
       if l_range == u_range then
         qty = l_range
       end
       qty = rand.range(l_range, u_range)
     --Progressive
-    --elseif qty == gui.gettext("Progressive") then
     elseif PARAM.mons_mode == "prog" then
       if l_range > u_range then
         qty = u_range + (l_range * LEVEL.game_along)
       else
         qty = l_range + (u_range * LEVEL.game_along)
+      end
+    elseif PARAM.mons_mode == "epi" then
+      if l_range > u_range then
+        qty = u_range + (l_range * LEVEL.ep_along)
+      else
+        qty = l_range + (u_range * LEVEL.ep_along)
       end
     end
 

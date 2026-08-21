@@ -88,7 +88,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Zombiemen."), 
+      tooltip = _("Control the amount of Zombiemen."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -101,7 +101,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Shotgunners."), 
+      tooltip = _("Control the amount of Shotgunners."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -114,7 +114,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Chaingunners."),  
+      tooltip = _("Control the amount of Chaingunners."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -127,7 +127,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of SS troops."),  
+      tooltip = _("Control the amount of SS troops."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -140,7 +140,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Imps."),  
+      tooltip = _("Control the amount of Imps."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -153,7 +153,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Lost Souls."),  
+      tooltip = _("Control the amount of Lost Souls."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -166,7 +166,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Pinkies."),  
+      tooltip = _("Control the amount of Pinkies."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -179,7 +179,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Spectres."),  
+      tooltip = _("Control the amount of Spectres."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -192,7 +192,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Pain Elementals."),  
+      tooltip = _("Control the amount of Pain Elementals."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -205,7 +205,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Cacodemons."),  
+      tooltip = _("Control the amount of Cacodemons."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -218,7 +218,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Hell Knights."),  
+      tooltip = _("Control the amount of Hell Knights."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -231,7 +231,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Revenants."),  
+      tooltip = _("Control the amount of Revenants."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -244,7 +244,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Mancubi."),  
+      tooltip = _("Control the amount of Mancubi."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -257,7 +257,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Arachnotrons."),  
+      tooltip = _("Control the amount of Arachnotrons."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -270,7 +270,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Arch-Viles."),  
+      tooltip = _("Control the amount of Arch-Viles."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -283,7 +283,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Barons of Hell."),  
+      tooltip = _("Control the amount of Barons of Hell."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -296,7 +296,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Cyberdemons."),  
+      tooltip = _("Control the amount of Cyberdemons."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      },
@@ -309,7 +309,7 @@ OB_MODULES["doom_mon_control"] =
       max = 20,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Spider Masterminds."),  
+      tooltip = _("Control the amount of Spider Masterminds."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="monsters",
      }
@@ -332,18 +332,18 @@ function CTL_DOOM.weapon_setup(self)
 
   for _,opt in pairs(self.options) do
 
-    if opt.name == "float_saw" then 
+    if opt.name == "float_saw" then
       if PARAM["float_saw"] and PARAM["float_saw"] ~= 1 then
         local info = GAME.NICE_ITEMS.saw
         local mult = PARAM["float_saw"] or 0
-  
+
         if info.add_prob then info.add_prob = info.add_prob * mult end
         if info.start_prob then info.start_prob = info.start_prob * mult end
         if info.crazy_prob then info.crazy_prob = info.crazy_prob * mult end
         if info.closet_prob then info.closet_prob = info.closet_prob * mult end
         if info.secret_prob then info.secret_prob = info.secret_prob * mult end
         if info.storage_prob then info.storage_prob = info.storage_prob * mult end
-      end    
+      end
       goto skip
     end
 
@@ -354,7 +354,9 @@ function CTL_DOOM.weapon_setup(self)
       W.pref     = W.add_prob * 0.28 + 1 -- Complete guesswork right now - Dasho
 
       -- loosen some of the normal restrictions
-      W.level = 1
+      if PARAM.bool_disable_weapon_level == 1 then
+        W.level = 1
+      end
     end
 
     ::skip::
@@ -410,7 +412,7 @@ OB_MODULES["doom_weapon_control"] =
      max = 10,
      increment = .02,
      default = 1,
-     tooltip = _("Control the likelihood of finding a Chainsaw."),  
+     tooltip = _("Control the likelihood of finding a Chainsaw."),
      presets = CTL_DOOM.SLIDER_PRESETS,
      randomize_group="pickups",
     },
@@ -423,7 +425,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Shotguns."),  
+      tooltip = _("Control the amount of Shotguns."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -436,7 +438,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Super Shotguns."), 
+      tooltip = _("Control the amount of Super Shotguns."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -449,7 +451,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Chainguns."),  
+      tooltip = _("Control the amount of Chainguns."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -462,7 +464,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Rocket Launchers."),  
+      tooltip = _("Control the amount of Rocket Launchers."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -475,7 +477,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Plasma Rifles."),  
+      tooltip = _("Control the amount of Plasma Rifles."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -488,7 +490,7 @@ OB_MODULES["doom_weapon_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of BFG 9000s."), 
+      tooltip = _("Control the amount of BFG 9000s."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -500,6 +502,17 @@ OB_MODULES["doom_weapon_control"] =
       tooltip=_("Alters selection of weapons that are prefered to show up depending on enemy palette for a chosen map.\n\nNormal: Monsters have weapon preferences. Stronger weapons and ammo are more likely to appear directly with stronger enemies.\n\nVanilla: Vanilla Oblige-style preferences. Reduces rocket launchers if the map has more pain elementals, lost souls, demons/specters while increases BFG's for cyberdemons and spider masterminds. No other weapon preferences.\n\nNONE: No preferences at all. For those who like to live life dangerously with lost souls and only rockets."),
       default="normal",
     },
+
+     {
+      name = "bool_disable_weapon_level",
+      label = _("Change Disables Item Level"),
+      valuator = "button",
+      default = 1,
+      tooltip = _("Affects whether sliders with non-1.0 values disables weapon level restrictions. " ..
+        "Keeping level restrictions means weapons will still follow their progression appearance-over-time but quantity of munitions will be at selected preference values. " ..
+        "For example, keeping a BFG at 10.0 with this option checked means BFG's will still appear later in the game, but at massive quantities."),
+      priority = 67,
+     }
   },
 }
 
@@ -561,12 +574,12 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Health Potions."),  
+      tooltip = _("Control the amount of Health Potions."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 100,
       randomize_group="pickups",
      },
-     
+
      {
       name = "float_stimpack",
       label = _("Stimpack"),
@@ -575,12 +588,12 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Stimpacks."),  
+      tooltip = _("Control the amount of Stimpacks."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 99,
       randomize_group="pickups",
      },
-     
+
      {
       name = "float_medikit",
       label = _("Medikit"),
@@ -589,13 +602,13 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Medikits."),  
+      tooltip = _("Control the amount of Medikits."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 98,
       gap = 1,
       randomize_group="pickups",
      },
-     
+
      {
       name = "float_helmet",
       label = _("Armor Bonus"),
@@ -604,14 +617,14 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Helmets."),  
+      tooltip = _("Control the amount of Helmets."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 95,
       randomize_group="pickups",
-     },    
+     },
 
     -- nice items
-    
+
      {
       name = "float_green_armor",
       label = _("Green Armor"),
@@ -620,7 +633,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Green Armor."),  
+      tooltip = _("Control the amount of Green Armor."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 94,
       randomize_group="pickups",
@@ -634,7 +647,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Blue Armor."),  
+      tooltip = _("Control the amount of Blue Armor."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 93,
       gap = 1,
@@ -649,7 +662,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Soulspheres."),  
+      tooltip = _("Control the amount of Soulspheres."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -662,7 +675,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Backpacks."),  
+      tooltip = _("Control the amount of Backpacks."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -675,7 +688,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Berserk Packs."),  
+      tooltip = _("Control the amount of Berserk Packs."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -688,11 +701,11 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Invisibility Spheres."), 
+      tooltip = _("Control the amount of Invisibility Spheres."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
-     
+
      {
       name = "float_invul",
       label = _("Invulnerability"),
@@ -701,7 +714,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Invulnerability Spheres."), 
+      tooltip = _("Control the amount of Invulnerability Spheres."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -714,7 +727,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Map Computers."),  
+      tooltip = _("Control the amount of Map Computers."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -727,7 +740,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Light Goggles."),  
+      tooltip = _("Control the amount of Light Goggles."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
@@ -740,13 +753,13 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Megaspheres."),  
+      tooltip = _("Control the amount of Megaspheres."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
      },
 
     -- ammo
-    
+
      {
       name = "float_bullets",
       label = _("Clips"),
@@ -755,7 +768,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Clips."),  
+      tooltip = _("Control the amount of Clips."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 75,
@@ -769,7 +782,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Bullet Boxes."),  
+      tooltip = _("Control the amount of Bullet Boxes."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 74,
@@ -783,7 +796,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Shells."),  
+      tooltip = _("Control the amount of Shells."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 73,
@@ -797,7 +810,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Shell Boxes."),  
+      tooltip = _("Control the amount of Shell Boxes."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 72,
@@ -811,7 +824,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Rockets."),  
+      tooltip = _("Control the amount of Rockets."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 71,
@@ -825,7 +838,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Rocket Boxes."),  
+      tooltip = _("Control the amount of Rocket Boxes."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 70,
@@ -839,7 +852,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Cells."),  
+      tooltip = _("Control the amount of Cells."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       randomize_group="pickups",
       priority = 69,
@@ -853,7 +866,7 @@ OB_MODULES["doom_item_control"] =
       max = 10,
       increment = .02,
       default = 1,
-      tooltip = _("Control the amount of Cell Packs."),  
+      tooltip = _("Control the amount of Cell Packs."),
       presets = CTL_DOOM.SLIDER_PRESETS,
       priority = 68,
       randomize_group="pickups",

@@ -25,7 +25,7 @@
 
 ULTDOOM = { }
 
-ULTDOOM.VANILLA_MATS = 
+ULTDOOM.VANILLA_MATS =
 {
   replace_all = true,
     -- There are always added by Obsidian regardless of Engine selected
@@ -794,7 +794,7 @@ ULTDOOM.MATERIALS =
   ["473618"] = { t="473618", f="473618" },
 }
 
-ULTDOOM.MUSIC_LUMPS = 
+ULTDOOM.MUSIC_LUMPS =
 {
   "D_E1M1",
   "D_E1M2",
@@ -1106,6 +1106,10 @@ ULTDOOM.THEMES =
       gtd_wall_quakish_insets = 25,
       gtd_wall_quakish_insets_2 = 25,
       --
+      gtd_wall_quakish_insets_horizon = 15,
+      gtd_wall_quakish_insets_horizon_mid = 15,
+      gtd_wall_quakish_insets_horizon_top = 15,
+      --
       gtd_ribbed_lights = 18,
       gtd_ribbed_lights_no3d = 18,
       gtd_ribbed_lights_slump = 18,
@@ -1113,6 +1117,7 @@ ULTDOOM.THEMES =
       gtd_ribbed_lights_tekmachine = 9,
       gtd_ribbed_lights_tekmachine_alt = 9,
       gtd_ribbed_lights_very_blue = 18,
+      gtd_ribbed_lights_ribbed_steps = 18,
       --
       gtd_wall_high_gap_set = 12,
       gtd_wall_high_gap_alt_set = 12,
@@ -1159,6 +1164,7 @@ ULTDOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -1481,6 +1487,10 @@ ULTDOOM.THEMES =
 
       gtd_wall_marbface = 50,
       gtd_wall_quakish_insets = 50,
+      gtd_wall_quakish_insets_horizon = 40,
+      gtd_wall_quakish_insets_horizon_mid = 40,
+      gtd_wall_quakish_insets_horizon_top = 40,
+
       gtd_wall_hell_ossuary = 50,
 
       gtd_wall_high_gap_set = 12,
@@ -1536,6 +1546,7 @@ ULTDOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
 
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -1591,7 +1602,15 @@ ULTDOOM.THEMES =
       gtd_wall_octagon_insets = 25,
       gtd_wall_grated_machines = 20,
 
-      gtd_ribbed_lights = 15,
+      gtd_ribbed_lights = 18,
+      gtd_ribbed_lights_no3d = 18,
+      gtd_ribbed_lights_slump = 18,
+      gtd_ribbed_lights_slump_two_color = 18,
+      gtd_ribbed_lights_tekmachine = 9,
+      gtd_ribbed_lights_tekmachine_alt = 9,
+      gtd_ribbed_lights_very_blue = 18,
+      gtd_ribbed_lights_ribbed_steps = 18,
+
       gtd_wall_urban_cement_frame = 10,
     },
 
@@ -1915,6 +1934,10 @@ ULTDOOM.THEMES =
       --
       gtd_wall_marbface = 50,
       gtd_wall_quakish_insets = 50,
+      gtd_wall_quakish_insets_horizon = 15,
+      gtd_wall_quakish_insets_horizon_mid = 15,
+      gtd_wall_quakish_insets_horizon_top = 15,
+      --
       gtd_wall_hell_ossuary = 50,
       --
       gtd_wall_high_gap_set = 12,
@@ -1970,6 +1993,7 @@ ULTDOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -2362,6 +2386,10 @@ ULTDOOM.THEMES =
       --
       gtd_wall_marbface = 50,
       gtd_wall_quakish_insets = 50,
+      gtd_wall_quakish_insets_horizon = 15,
+      gtd_wall_quakish_insets_horizon_mid = 15,
+      gtd_wall_quakish_insets_horizon_top = 15,
+      --
       gtd_wall_hell_ossuary = 50,
       --
       gtd_wall_high_gap_set = 12,
@@ -2417,6 +2445,7 @@ ULTDOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -4274,7 +4303,7 @@ function ULTDOOM.get_levels()
 
   -- create level info...
 
-  current_map = 1
+  local current_map = 1
 
   for ep_index = 1,EP_NUM do
     local EPI = GAME.episodes[ep_index]
@@ -4330,7 +4359,7 @@ function ULTDOOM.get_levels()
             if current_map == 35 then LEV.is_procedural_gotcha = true end
           end
         end
-  
+
         if PARAM.gotcha_frequency == "epi" then
           if current_map == ep_index * 9 - 1 then
             LEV.is_procedural_gotcha = true
@@ -4351,27 +4380,27 @@ function ULTDOOM.get_levels()
             LEV.is_procedural_gotcha = true
           end
         end
-  
+
         --5% of maps after map 4,
         if PARAM.gotcha_frequency == "5p" then
           if current_map > 4 and current_map % 9 ~= 0 then
             if rand.odds(5) then LEV.is_procedural_gotcha = true end
           end
         end
-  
+
         -- 10% of maps after map 4,
         if PARAM.gotcha_frequency == "10p" then
           if current_map > 4 and current_map % 9 ~= 0 then
             if rand.odds(10) then LEV.is_procedural_gotcha = true end
           end
         end
-  
+
         -- for masochists... or debug testing
         if PARAM.gotcha_frequency == "all" then
           LEV.is_procedural_gotcha = true
         end
       end
-  
+
       -- handling for street mode
       -- actual handling for urban percentages are done
       if PARAM.float_streets_mode then
@@ -4381,7 +4410,7 @@ function ULTDOOM.get_levels()
           end
         end
       end
-  
+
       if not LEV.prebuilt then
         -- nature mode
         if PARAM.float_nature_mode then
@@ -4396,7 +4425,7 @@ function ULTDOOM.get_levels()
             end
           end
         end
-  
+
       end
 
       if MAP_NUM == 1 or map == 3 then

@@ -239,11 +239,6 @@ function Render_edge(LEVEL, E, SEEDS)
       reqs.height = 2
     end
 
-    if A.chunk and A.chunk.kind == "stair" then
-      reqs.height = A.ceil_h - math.max(A.chunk.dest_area.floor_h,
-        A.chunk.from_area.floor_h)
-    end
-
     if geom.is_corner(dir) then
       reqs.where = "diagonal"
       reqs.seed_h = reqs.seed_w
@@ -2631,7 +2626,8 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
   -- FIX-ME: transfer dynamic lighting code from ceiling lights to here
   -- this just disables dynamic light entities if they are used directly
   -- when Dynamic Lights is off
-  if not PARAM.bool_dynamic_lights then
+  if not PARAM.bool_dynamic_lights
+  or PARAM.bool_dynamic_lights and PARAM.bool_dynamic_lights == false then
     def.thing_14998 = 0
     def.thing_14997 = 0
     def.thing_14996 = 0
@@ -2676,8 +2672,8 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
     -- ensure a sky ceiling is made for this
     chunk.occupy = "floor"
 
-    A.ceil_h = assert(A.zone.sky_h)
-    A.ceil_mat = "_SKY"
+    A:set_ceil( assert(A.zone.sky_h) )
+    A:set_ceil_mat("_SKY")
 
     -- disable walls around/inside this chunk
     for _,N in pairs(A.neighbors) do
@@ -2744,16 +2740,6 @@ chunk.goal.action = "S1_OpenDoor"  -- FIXME IT SHOULD BE SET WHEN JOINER IS REND
 
   if def.mirror_x and rand.odds(50) then
     T.mirror_x = chunk.sw * SEED_SIZE / 2
-  end
-
-  -- fix outdoor lighting
-  if reqs.kind == "picture" or reqs.kind == "item"
-  and reqs.env == "outdoor" or reqs.env == "park" then
-    if not chunk.from_area.lighting then
-      gui.printf(table.tostr(chunk.from_area,2))
-    end
-    assert(chunk.from_area.lighting)
-    A.lighting = chunk.from_area.lighting
   end
 
   Ambient_push(A.lighting)
@@ -3601,9 +3587,9 @@ function Render_properties_for_area(LEVEL, A)
   if A.mode == "nature" or A.mode == "scenic" then
     if not A.lighting then
       if R and R.is_cave then
-        A.lighting = A.base_light
+        A:set_lighting(A.base_light)
       else
-        A.lighting = LEVEL.sky_light
+        A:set_lighting(LEVEL.sky_light)
       end
     end
 
@@ -3612,27 +3598,26 @@ function Render_properties_for_area(LEVEL, A)
 
   -- nothing needed for void areas
   if A.mode == "void" then
-    A.lighting = 144
+    A:set_lighting(144)
     return
   end
 
 
   if not A.lighting then
     if A.is_outdoor then
-      A.lighting = LEVEL.sky_light
+      A:set_lighting(LEVEL.sky_light)
 
       -- porchy worchy -- MSSP
       if A.is_porch then
-        A.lighting = A.lighting - LEVEL.sky_shadow
+        A:set_lighting(A.lighting - LEVEL.sky_shadow)
       end
 
-    elseif A.room and A.room.is_outdoor then
+    elseif A.room and A.room.is_outdoor or A.room.is_park then
       -- this for outdoor closets
-      A.lighting = LEVEL.sky_light - LEVEL.sky_shadow
+      A:set_lighting(LEVEL.sky_light--[[ - LEVEL.sky_shadow]])
 
     else
-      A.lighting = A.base_light or 144
-      A.lighting = A.lighting + (A.bump_light or 0)
+      A:set_lighting((A.base_light or 144) + (A.bump_light or 0))
     end
   end
 
@@ -3646,20 +3631,35 @@ function Render_properties_for_area(LEVEL, A)
 ---##  A.wall_mat = assert(R.main_tex)
 
   else
-    A.floor_mat = "_ERROR"
+    A:set_floor_mat("_ERROR")
   end
 
   if A.mode == "liquid" then
-    A.floor_mat = "_LIQUID"
+    A:set_floor_mat("_LIQUID")
   end
 
   if A.is_outdoor and not A.is_porch then
-    A.ceil_mat = "_SKY"
+    A:set_ceil_mat("_SKY")
   end
 
+  if A.chunk and A.chunk.kind == "stair" then
+    if A.room:get_env() == "building" then
+      A:set_ceil(A.ceil_group.h)
+    elseif A.room.is_outdoor then
+      if R.ceil_mats[A.ceil_h] then
+        A:set_ceil_mat(R.ceil_mats[A.ceil_h])
+      elseif A.chunk.dest_area.ceil_mat ~= "_SKY" then
+        A:set_ceil_mat(A.chunk.dest_area.ceil_mat)
+      elseif A.chunk.from_area.ceil_mat ~= "_SKY" then
+        A:set_ceil_mat(A.chunk.from_area.ceil_mat)
+      end
+    end
+  end
 
-  A.floor_mat = A.floor_mat or R.main_tex
-  A.ceil_mat  = A.ceil_mat  or R.main_tex
+  if not A.is_outdoor and A.mode == "floor" then
+    A:set_floor_mat(R.floor_mats[A.floor_h] or R.main_tex)
+    A:set_ceil_mat(R.ceil_mats[A.ceil_h] or R.main_tex)
+  end
 end
 
 

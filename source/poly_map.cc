@@ -1085,7 +1085,9 @@ void DetermineMapLimits()
         limit_y2 = OBSIDIAN_MAX(limit_y2, OBSIDIAN_MAX(y1, y2));
     }
 
+#if AJPOLY_DEBUG_LOAD
     LogPrint("Map goes from (%d,%d) to (%d,%d)\n", limit_x1, limit_y1, limit_x2, limit_y2);
+#endif
 }
 
 void CheckSectorIsDummy(sector_c *sec)
@@ -1820,8 +1822,10 @@ bool OpenMap(const char *level_name)
         }
     }
 
+#if AJPOLY_DEBUG_LOAD
     LogPrint("Loaded %d vertices, %d sectors, %d sides, %d lines, %d things\n", num_vertices, num_sectors, num_sidedefs,
              num_linedefs, num_things);
+#endif
 
     FindDummySectors();
 

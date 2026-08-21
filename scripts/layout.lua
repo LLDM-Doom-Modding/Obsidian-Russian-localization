@@ -2157,6 +2157,11 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
         tab[sink_name] = nil
       end
 
+      -- remove open sky ceilings
+      if not filter.tallest_ceiling and sink.mat == "_SKY" then
+        tab[sink_name] = nil
+      end
+
       if where == "ceiling" then
         -- remove light sinks based on light_color
         if sink.light_color and LEVEL.light_group then
@@ -2184,7 +2189,7 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
       -- remove sinks that are taller than the zone sky height
       if R.is_outdoor then
         if group and group.h then
-          local h_diff = R.max_ceil_h - group.h
+          local h_diff = (R.max_ceil_h or R.zone.sky_h) - group.h
           if h_diff > 0 then
             if sink.dz or sink.trim_dz > h_diff then
               tab[sink_name] = nil
@@ -2212,8 +2217,14 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
 
     local ceil_light_prob = R.theme.ceil_light_prob or THEME.ceil_light_prob or 50
     local filter = {}
+
+    ceil_light_prob = math.clamp(0, ceil_light_prob + 25, 100)
     if rand.odds(100 - ceil_light_prob) then
       filter.no_light_ceilings = true
+    end
+
+    if group and group.tallest then
+      filter.tallest_ceiling = true
     end
 
     -- PLAIN setting is now ignored for a universal prob, see individual code below
@@ -2234,10 +2245,27 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
   end
 
 
+  local function prepare_sinks(R)
+    local highest_CG = -EXTREME_H
+    local best_CG
+    for _,cg in pairs(R.ceil_groups) do
+      if cg.h > highest_CG then
+        highest_CG = cg.h
+      end
+    end
+
+    for _,cg in pairs(R.ceil_groups) do
+      if cg.h == highest_CG then
+        cg.tallest = true
+      end
+    end
+  end
+
+
   local function pick_floor_sinks(R, LEVEL)
 
     local function pick_sink(floor_group, room, LEVEL)
-      if floor_group.openness < 0.4 then return end
+      if floor_group.openness < 0.2 then return end
 
       local tab = grab_usable_sinks(room, floor_group, "floor")
       if tab == nil then return end
@@ -2287,9 +2315,9 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     if R.is_cave then return end
 
     for _,cg in pairs(R.ceil_groups) do
-      --[[if cg.openness < 0.4 then goto skip end
+      if cg.openness < 0.2 then goto skip end
 
-      local height = cg.h - cg.max_floor_h
+      --[[local height = cg.h - cg.max_floor_h
       if height < 128 then goto skip end]]
 
       local tab = grab_usable_sinks(R, cg, "ceiling")
@@ -2307,6 +2335,7 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
 
       if name ~= "PLAIN" then
         cg.sink = GAME.SINKS[name]
+        cg.sink.name = name
         assert(cg.sink)
 
         -- inhibit ceiling lights and pillars
@@ -2316,6 +2345,8 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
           end
         end
       end
+
+      ::skip::
     end
 
 
@@ -2338,10 +2369,10 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
 
       for _,A in pairs(R.areas) do
         if not A.mode == "liquid" then goto skip end
-        if A.openness < 0.4 then goto skip end
+        if A.openness < 0.2 then goto skip end
 
-        local height = A.ceil_h - A.floor_h
-        if height < 128 then goto skip end
+        --local height = A.ceil_h - A.floor_h
+        --if height < 128 then goto skip end
 
         if name ~= "PLAIN" then
           A.ceil_sink = R.liquid_ceiling_sink
@@ -2478,6 +2509,7 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     local groups = {}
 
     local prob = R.theme.ceil_light_prob or THEME.ceil_light_prob or 50
+    prob = prob + 25
     prob = prob + math.remap_range(R.openness, 0.6, 0.2, 0, 30, "clamp_it")
     prob = math.clamp(prob, 0, 100)
 
@@ -2492,7 +2524,8 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
       if not def then goto skip end
 
       for _,chunk in pairs(R.ceil_chunks) do
-        if chunk.area.ceil_group ~= cg then goto skip end
+        --if chunk.area.ceil_group ~= cg then goto skip end
+        if chunk.area.ceil_group and chunk.area.ceil_group.sink then goto skip end
         if chunk.content then goto skip end
         if chunk.floor_below and chunk.floor_below.content then goto skip end
         if def.height > (chunk.area.ceil_h - chunk.area.floor_h) then
@@ -2559,16 +2592,23 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
     end
 
     for _,chunk in pairs(R.ceil_chunks) do
-      if chunk.area.lamp_def then
+      if chunk.area.lamp_def or R.liquid_area_lamp_def then
         if chunk.content then goto skip end
         if chunk.floor_below and chunk.floor_below.content then goto skip end
 
-        if chunk.area.lamp_def.height > (chunk.area.ceil_h - chunk.area.floor_h) then
-          goto skip end
+        local h
+        if chunk.area.lamp_def and chunk.area.lamp_def.height then
+          h = chunk.area.lamp_def.height
+        elseif R.liquid_area_lamp_def.height and R.liquid_area_lamp_def.height then
+          h = R.liquid_area_lamp_def.height
+        end
+
+        if h > (chunk.area.ceil_h - chunk.area.floor_h) then
+        goto skip end
 
         chunk.content = "DECORATION"
         chunk.kind = "ceil"
-        chunk.prefab_def = chunk.area.room.liquid_area_lamp_def
+        chunk.prefab_def = chunk.area.lamp_def or chunk.area.room.liquid_area_lamp_def
         chunk.prefab_dir = 2
 
         chunk.area.bump_light = 16
@@ -2643,6 +2683,8 @@ stderrf("Cages in %s [%s pressure] --> any_prob=%d  per_prob=%d\n",
   local function tizzy_up_normal_room(R, LEVEL)
     pick_posts(R)
     pick_wall_detail(R)
+
+    prepare_sinks(R)
 
     pick_floor_sinks(R, LEVEL)
     pick_ceiling_sinks(R)

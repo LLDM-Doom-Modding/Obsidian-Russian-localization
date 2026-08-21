@@ -742,13 +742,13 @@ OTEX_RESOURCE_DB = {
         flats = {},
         textures = {'OCHANC01', 'OCHANB01', 'OCHANA01', 'OCHANA02', 'OCHANA12', 'OCHANA11'}
     },
-    ["SKY5"] = {
+    --[[["SKY5"] = {
         has_flats = false,
         has_textures = true,
         has_all = false,
         flats = {},
         textures = {'OSKY51', 'OSKY50'}
-    },
+    },]]
     ["DIAG"] = {
         has_flats = true,
         has_textures = false,
@@ -770,7 +770,7 @@ OTEX_RESOURCE_DB = {
         flats = {'OPAVEA04', 'OPAVEA02', 'OPAVEA03', 'OPAVEA01'},
         textures = {}
     },
-    ["GATE"] = {
+    --[[["GATE"] = {
         has_flats = false,
         has_textures = true,
         has_all = false,
@@ -790,5 +790,5 @@ OTEX_RESOURCE_DB = {
         has_all = false,
         flats = {},
         textures = {'OEFCTA01'}
-    },
+    },]]
 }

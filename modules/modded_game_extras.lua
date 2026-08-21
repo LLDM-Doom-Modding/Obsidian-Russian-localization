@@ -1842,7 +1842,15 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       shapes_string = " ROOM_" .. R.id .. " "
     end
 
-    if R.symmetry and R.symmetry.kind then
+    local is_grown = ""
+    if R.is_grown then
+      is_grown = "(GRWN) "
+    elseif R.is_last_grown then
+      is_grown = "(GRWN!) "
+    end
+    shapes_string = shapes_string .. is_grown
+
+    --[[if R.symmetry and R.symmetry.kind then
       shapes_string = shapes_string .. "[" .. R.symmetry.kind
       if R.symmetry.dir then
         shapes_string = shapes_string .. ":" .. R.symmetry.dir
@@ -1852,7 +1860,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       shapes_string = shapes_string .. "[no symm] "
     end
 
-    --[[if R.exit_score then
+    if R.exit_score then
       shapes_string = shapes_string .. "(Exit Score: " .. math.round_to(R.exit_score, 2) .. ") "
     end
 
@@ -1900,21 +1908,21 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       shapes_string = shapes_string .. "BASE " .. R.base_set_increase .. ") "
     else
       shapes_string = shapes_string .. "BASE 0) "
-    end]]
+    end
 
     shapes_string = shapes_string .. "(STAT " ..
       LEVEL.size_multiplier .. "x, " ..
       LEVEL.area_multiplier .. "x, " ..
-      LEVEL.size_consistency .. ") "
+      LEVEL.size_consistency .. ") "]]
 
     if LEVEL.is_absurd then
-      shapes_string = shapes_string .. "(ARUL: "
+      shapes_string = shapes_string .. "(ARUL:"
       if R.absurd_shapes and not table.empty(R.absurd_shapes) then
         for _,shape in pairs(R.absurd_shapes) do
           if shape.state == "tried" then
-            shapes_string = shapes_string .. "[N]" .. shape.name .. " "
+            shapes_string = shapes_string .. " [N]" .. shape.name
           elseif shape.state == "applied" then
-            shapes_string = shapes_string .. "[Y]" .. shape.name .. " "
+            shapes_string = shapes_string .. " [Y]" .. shape.name
           end
         end
       else
@@ -1935,7 +1943,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
 
     if R.is_flourished then
       shapes_string = shapes_string .. "(FLR) "
-    end]]
+    end
 
     shapes_string = shapes_string .. "(SPR: "
     if R.sprout_rule then
@@ -1944,13 +1952,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     if R.emergency_sprouted then
       shapes_string = shapes_string .. "[!]"
     end
-    shapes_string = shapes_string .. ") "
-
-    if R.is_grown then
-      shapes_string = shapes_string .. "(GRWN) "
-    else
-      shapes_string = shapes_string .. "(!GRWN) "
-    end
+    shapes_string = shapes_string .. ") "]]
 
     return shapes_string
   end
@@ -1970,6 +1972,55 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
     local info = {}
     info.editor_num = PARAM.hn_thing_start_offset
 
+    for _,A in pairs(R.areas) do
+      if A.mode == "floor" and A.room:get_env() == "outdoor" and not A.is_outdoor then
+        info.name = "AREA_" .. A.id
+        if A.ch_history then
+          info.name = " (" .. A.ch_history .. ")"
+        end
+        if A.cg_history then
+          info.name = info.name .. " (" .. A.cg_history .. ")"
+        end
+        if A.is_porch then
+          info.name = info.name .. " is_porch"
+        elseif A.is_porch_neighbor then
+          info.name = info.name .. " is_porch_neighbor"
+        else
+          info.name = info.name .. " unknown"
+        end
+        info.editor_num = PARAM.hn_thing_start_offset
+
+        if SCRIPTS.hn_id_table[info.name] then
+          info.editor_num = SCRIPTS.hn_id_table[info.name].id
+        elseif not SCRIPTS.hn_id_table[info.name] then
+          SCRIPTS.hn_id_table[info.name] = {}
+          SCRIPTS.hn_id_table[info.name].id = info.editor_num
+          SCRIPTS.hn_id_table[info.name].name = info.name
+          info.editor_num = PARAM.hn_thing_start_offset
+          PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+        end
+
+        local S = A.seeds[1]
+        for _,S2 in pairs(A.seeds) do
+          if A.mode and A.mode == "floor" then
+            S = S2
+            break;
+          end
+        end
+        hn_add_entity(info, S.mid_x, S.mid_y, A.floor_h + 1)
+
+        local e = {}
+        e.id = 9029
+        e.x = S.mid_x
+        e.y = S.mid_y
+        e.z = A.floor_h + 1
+
+        gui.printf("AREA tracker placed in: " .. S.mid_x .. ", " .. S.mid_y .. "\n")
+        raw_add_entity(e)
+      end
+    end
+
+    -- floor chunks
     for _,chunk in pairs(R.floor_chunks) do
       if chunk.prefab_def then
         info.name = "Point: " .. chunk.prefab_def.name
@@ -2019,8 +2070,54 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
         hn_add_entity(info, x + offset - 24, y, z + 1)
       end
     end
-    --for _,chunk in pairs(R.ceil_chunks ) do visit_chunk(chunk) end
 
+    -- stairs
+    for _,chunk in pairs(R.stairs) do
+      if chunk.prefab_def then
+        local C = chunk
+        info.name = ""
+        --info.name = "Stairs: " .. C.prefab_def.name .. " "
+        info.editor_num = PARAM.hn_thing_start_offset
+
+        --[[if C.area.ceil_group.sink then
+          info.name = info.name .. "(" .. C.area.ceil_group.sink.name .. ") "
+        end]]
+
+        if C.area.ceil_group then
+          info.name = info.name .. "CG_" .. C.area.ceil_group.id .. " "
+        end
+
+        if C.area.cg_history then
+          info.name = info.name .. "(cg: " .. C.area.cg_history .. ") "
+        end
+
+        if C.area.ch_history then
+          info.name = info.name .. "(ceil_h: " .. C.area.ch_history .. ") "
+        end
+
+        if R.stair_ceil_mode then
+          info.name = info.name .. "[" .. R.stair_ceil_mode .. "]"
+        end
+
+        if SCRIPTS.hn_id_table[info.name] then
+          info.editor_num = SCRIPTS.hn_id_table[info.name].id
+        elseif not SCRIPTS.hn_id_table[info.name] then
+          SCRIPTS.hn_id_table[info.name] = {}
+          SCRIPTS.hn_id_table[info.name].id = info.editor_num
+          SCRIPTS.hn_id_table[info.name].name = info.name
+          info.editor_num = PARAM.hn_thing_start_offset
+          PARAM.hn_thing_start_offset = PARAM.hn_thing_start_offset + 1
+        end
+
+        local x = chunk.mx
+        local y = chunk.my
+        local z = math.max(chunk.from_area.floor_h, chunk.dest_area.floor_h)
+
+        hn_add_entity(info, x, y, z + 1)
+      end
+    end
+
+    -- closets
     info.editor_num = PARAM.hn_thing_start_offset
     for _,chunk in pairs(R.closets) do
       if chunk.prefab_def then
@@ -2032,7 +2129,12 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
             chunk.from_area.floor_group.wall_group .. ")"
         end
 
-        if chunk.area then
+        if chunk.area.lighting and chunk.from_area.lighting then
+          info.name = info.name ..
+            " (LH: " .. chunk.area.l_history .. " from " .. chunk.from_area.lighting .. ")"
+        end
+
+        --[[if chunk.area then
           if chunk.area.room and chunk.area.room.is_outdoor
           and chunk.area.room.outdoor_wall_group then
             info.name = info.name ..
@@ -2042,7 +2144,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
             info.name = info.name .. " (Room Theme: " ..
               chunk.area.room.theme.name .. ")"
           end
-        end
+        end]]
 
         local x = chunk.mx
         local y = chunk.my
@@ -2072,6 +2174,7 @@ function MODDED_GAME_EXTRAS.create_hn_info(self, LEVEL)
       end
     end
 
+    -- joiners
     info.editor_num = PARAM.hn_thing_start_offset
     for _,chunk in pairs(R.joiners) do
       info.name = "Joiner: " .. chunk.prefab_def.name
@@ -2477,6 +2580,7 @@ class bossNameHandler : EventHandler
             || obit.IndexOf("female", 0) > -1
             || obit.IndexOf("security", 0) > -1
             || obit.IndexOf("zsec", 0) > -1
+            || obit.IndexOf("pb_zs", 0) > -1
             || obit.IndexOf("razer", 0) > -1)
             {
               mon_name = getHumanTag();

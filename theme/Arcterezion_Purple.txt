@@ -1,7 +1,7 @@
--- THEME FILE : OBSIDIAN 21 "Tabs of Terror"
+-- THEME FILE : OBSIDIAN 22 "Ad Mortem, Ad Infernum"
 -- Build 2025.10.31
 -- Based on OBLIGE Level Maker (C) 2006-2017 Andrew Apted
--- https://obsidian-level-maker.github.io
+-- https://github.com/GTD-Carthage/Obsidian-Content
 
 window_scaling      = 0
 font_scaling      = 18

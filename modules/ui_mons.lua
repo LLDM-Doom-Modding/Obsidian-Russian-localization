@@ -78,9 +78,10 @@ UI_MONS.BOSSREGULARS =
 
 UI_MONS.QTY_MODE =
 {
-  "num",   _("Static"),
+  "num", _("Static"),
   "mixed", _("Mix It Up"),
-  "prog",  _("Progressive")
+  "prog", _("Progressive"),
+  "epi", _("Episodic")
 }
 
 function UI_MONS.setup(self)

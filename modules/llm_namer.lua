@@ -133,6 +133,7 @@ LLM_NAME.semantics_grouping =
   gtd_gothic_ceilwall_inner_framed_arch = "gtd_gothic_ceilwall",
 
   gtd_wall_quakish_insets = "gtd_modquake_set",
+  gtd_wall_quakish_insets_horizon = "gtd_modquake_set",
 
   gtd_wall_hell_mindscrew_skywall = "gtd_wall_hell_mindscrew",
 
@@ -185,6 +186,7 @@ LLM_NAME.semantics_grouping =
   gtd_generic_small_lite = "liminal_space",
   gtd_generic_artsy_lite_box = "liminal_space",
   gtd_generic_artsy_chequered = "liminal_space",
+  gtd_generic_artsy_corpo_art = "liminal_space",
   gtd_generic_ceilwall = "liminal_space",
   gtd_generic_ceilwall_2 = "liminal_space",
   gtd_generic_ceilwall_3 = "liminal_space",
@@ -513,6 +515,12 @@ LLM_NAME.semantics =
     "administrative workspaces"
   },
 
+  gtd_black_mirror =
+  {
+    "power cycling halls",
+    "manual power generation facility",
+    "mandatory advertisement viewing centers"
+  },
 
 
   -- URBAN
@@ -1497,9 +1505,12 @@ LLM_NAME.name_theme =
     "- 2 words, in the format 'The <Non-Diciontary Adjective> <Name>'. Do not combine more than 2 dictionary words into one",
     "- 2 words, involve a non-real coined place name or 2 non-dictionary words",
     "- 3 words, involve a non-real coined place name",
+    "- 3 words, in the format '<Entity/Character>'s <Place Name> of <Adjective>', involve a non-real coined place name and non-dictionary words",
+    "- 3 words, in the format '<Adjective> <Place Name> of <Entity/Character>', involve a non-real coined place name and non-dictionary words",
+    "- 3 words, involve a non-real coined place name",
     "- 4 words, involve a non-real coined place name",
     "- 5 words, not more than 18 characters long including spaces, involve a non-real coined place name",
-    "- 6 words, not more than 18 characters long including spaces, involve a non-real coined place name",
+    "- 6 words, not more than 18 characters long including spaces, involve a non-real coined place name"
   }
 }
 
@@ -1574,16 +1585,16 @@ LLM_NAME.prompt_flavors =
   -- these are substituted to the "Generate a Doom map name that " part of the instructional line
   dn3d = "Generate a Doom map name that leans towards an extremely euphemistic and badly suggestive 80's comedic porn parody title that's rather blue and practically lewd if not laughable. The name ",
   black_metal = "Generate a Doom map name that sounds like a hardcore black metal band song title. _REPLACER_ The name ",
-  ecchi = "Generate a Doom map name that sounds like a fully English-translated Japanese ecchi hentai anime, game, or light novel title. The name ",
+  ecchi = "Generate a Doom map name that sounds like a fully English-translated Japanese ecchi hentai anime, game, or light novel title. _REPLACER_ The name ",
   action = "Generate a Doom map name that sounds like a classic and explosively thrilling action movie title, quote, or one-liner. _REPLACER_ The name ",
   meguca = "Generate a Doom map name that sounds like an classic cute and fluffy lighthearted soft slice-of-life magical girl and romantic shoujo anime or episode. _REPLACER_" ..
-    "Dark-themed instructions are only for flavoring, do not make the name dark. The name ",
+    "Dark-themed instructions are only for flavoring, do not make the name dark. The name must be preferably English-translated and ",
   meguca_suffering = "Generate a Doom map name that sounds like a heavy-handed and dark, serious-themed shonen-oriented magical girl anime or episode with themes of despair, loss, and existential realizations. The name "
 }
 
 LLM_NAME.prompt_sub_flavors =
 {
-  action = 
+  action =
   {
     source =
     {
@@ -1593,11 +1604,13 @@ LLM_NAME.prompt_sub_flavors =
     replacers =
     {
       "",
-      "Use an intimidating and provoactive action movie quote."
+      "Use an intimidating and provocative action movie quote.",
+      "Involve using a military operation code name.",
+      "Use an insulting phrase as part of the name."
     }
   },
 
-  black_metal = 
+  black_metal =
   {
     source =
     {
@@ -1613,6 +1626,20 @@ LLM_NAME.prompt_sub_flavors =
     }
   },
 
+  ecchi =
+  {
+    source =
+    {
+      "_REPLACER_",
+    },
+
+    replacers =
+    {
+      "",
+      "Involve tentacles or tentacle monster in the name."
+    }
+  },
+
   meguca =
   {
     source =
@@ -1623,9 +1650,12 @@ LLM_NAME.prompt_sub_flavors =
     replacers =
     {
       "",
-      "Use and create your own cute Japanese manga onomatopoeia similar to 'fuwa fuwa' as non-dictionary name.",
+      "Use and create your own cute Japanese manga onomatopoeia similar to 'fuwa fuwa' or 'doki doki' as non-dictionary name.",
       "Use sweet romantic shoujo manga verbiage in the name.",
-      "Use flowery and lighthearted-feeling name."
+      "Use flowery and lighthearted-feeling name.",
+      "Use lighthearted-feeling name alongside a real, beautiful flower species.",
+      "Use fluffy-feeling cafe menu name based on a sweet dessert.",
+      "Use a character's youthful love declaration or confession speech or dialogue as part of the name."
     }
   }
 }
@@ -1706,241 +1736,239 @@ LLM_NAME.story_components =
   },
 
   objectives = {
-    -- Destruction/Force Objectives
-    "Detonate the core; bury the nest.",
-    "Collapse the bridge; halt reinforcements.",
-    "Obliterate the teleport staging bay.",
-    "Overload sentries; shred the horde.",
-    "Destroy the comms spire.",
-    "Purge the infested sector.",
-    "Collapse the lower service tunnels.",
-    "Demolish the weapon caches.",
-    "Disable the rift engines.",
-    "Burn out the bio-vats.",
-    "Crush the demon war machines.",
-    "Eliminate corrupted security squads.",
-    "Breach the containment vault.",
-    "Raze the altar chamber.",
-    "Shatter the skull relay.",
-    "Flood the pit with plasma fire.",
-    "Crack the fortress gate.",
-    "Destroy the possessed armor bay.",
-    "Blast open the blood refinery.",
-    "Sever the corpse-chain winches.",
-    "Rupture the hellgrowth roots.",
-    "Smash the bone control pylons.",
-    "Incinerate the larval brood pens.",
-    "Break the siege cannon array.",
-    "Detonate the ammo foundry.",
-    "Tear down the summoning tower.",
-    "Destroy the gore pump controls.",
-    "Collapse the demon barracks.",
-    "Overload the furnace heart.",
-    "Cripple the invasion convoy.",
-
-    -- Power/Infrastructure Objectives
-    "Destroy corrupted toxic scrubbers.",
-    "Destroy the hellified plasma foundry.",
-    "Restart the abandoned defense grid.",
-    "Prime the facility backup generators.",
-    "Destroy the UAC mainframe and data.",
-    "Destroy reactor through vent closure.",
-    "Start the lava-flow turbines.",
-    "Gain access and loot UAC armory.",
-    "Raze the security junction.",
-    "Restart the drainage machinery.",
-    "Power-up the Hell portal suppressors.",
-
-    -- Acquisition/MacGuffin Objectives
-    "Acquire the blue access key.",
-    "Recover the red skull key.",
-    "Seize the yellow security card.",
-    "Retrieve the invasion schematics.",
-    "Capture the demon sample.",
-    "Seize the prototype cannon.",
-    "Acquire the fuel cells.",
-    "Secure the relay station.",
-    "Harvest the Argent crystals.",
-    "Locate the rogue cult leader.",
-    "Find the lost UAC blueprints.",
-    "Recover the Hell-binding artifact.",
-    "Steal the commander's access chip.",
-    "Claim the sealed armory code.",
-    "Retrieve the black archive drive.",
-    "Find the missing marine tags.",
-    "Recover the corrupted data core.",
-    "Seize the portal calibration lens.",
-    "Take the priest's rune tablet.",
-    "Grab the reactor override key.",
-    "Extract the demonic tissue sample.",
-    "Secure the emergency beacon.",
-    "Recover the broken automap module.",
-    "Claim the forbidden soul battery.",
-    "Find the hidden exit marker.",
-    "Steal the cult transmission logs.",
-    "Retrieve the med-lab antidote.",
-    "Acquire the purge authorization disk.",
-    "Recover the bunker access token.",
-    "Find the lost command sigil.",
-
-    -- Stabilization/Countermeasure Objectives
-    "Stabilize the rift membrane.",
-    "Neutralize the Argent leak.",
-    "Decontaminate the spore chamber.",
-    "Bypass the military lockdown.",
-    "Realign the power conduits.",
-    "Reinforce the cracked tunnels.",
-    "Dampen the Hell residue.",
-    "Resequence the warp emitters.",
-    "Seal the leaking summoning pit.",
-    "Scrub demonic code from systems.",
-    "Contain the flesh-wall spread.",
-    "Suppress the soul-energy surge.",
-    "Purge the corrupted mainframe.",
-    "Reset the teleporter coordinates.",
-    "Cool the melting reactor shell.",
-    "Cleanse the altar circuit.",
-    "Stabilize the collapsing mine.",
-    "Flush toxins from the cistern.",
-    "Lock down the demon hatchery.",
-    "Recalibrate the portal dampeners.",
-    "Contain the necrotic outbreak.",
-    "Freeze the unstable lava pumps.",
-    "Stop the blood-flood valves.",
-    "Scramble the cult beacon.",
-    "Seal the ruptured vault doors.",
-    "Disrupt the summoning rhythm.",
-    "Neutralize the possessed machinery.",
-    "Bleed pressure from the core.",
-    "Anchor the shifting corridors.",
-    "Silence the psychic shriek field.",
-
-    -- Location/Intelligence Objectives
-    "Locate the breach source.",
-    "Find proof of UAC betrayal.",
-    "Map the escape route.",
-    "Identify the siege weakness.",
-    "Find the survivor logs.",
-    "Pinpoint the network junction.",
-    "Track the missing test subject.",
-    "Locate the hidden armory.",
-    "Find the cult command post.",
-    "Trace the portal signal.",
-    "Locate the abandoned munitions cache.",
-    "Find the demon commander.",
-    "Discover the red-key chamber.",
-    "Track the corrupted scientist.",
-    "Locate the collapsed bunker.",
-    "Find the lost recon team.",
-    "Trace the blood pipeline.",
-    "Locate the active summoning altar.",
-    "Find the reactor override room.",
-    "Discover the secret teleporter.",
-    "Pinpoint the Hellgrowth source.",
-    "Locate the old mining shaft.",
-    "Find the hidden control booth.",
-    "Trace the emergency beacon.",
-    "Locate the corpse processing line.",
-    "Find the breach control altar.",
-    "Identify the possessed relay node.",
-    "Locate the skull-switch chamber.",
-    "Find the evacuation tram.",
-    "Discover the final gate mechanism.",
-
-    -- Control/Manipulation Objectives
-    "Redirect the Argent surge.",
-    "Trigger controlled cave-ins.",
-    "Manipulate the gravity anchors.",
-    "Pulse the distortion field.",
-    "Blind the automated turrets.",
-    "Control the time-shear field.",
-    "Redirect lava into the pit.",
-    "Route demons into the crushers.",
-    "Open fire lanes for turrets.",
-    "Flood the hatchery with coolant.",
-    "Turn the gates against Hell.",
-    "Redirect power to the cannon.",
-    "Trigger the bone-wall collapse.",
-    "Reverse the portal intake.",
-    "Divert toxic sludge flow.",
-    "Lock demons inside containment.",
-    "Crush the siege platform.",
-    "Open the furnace bypass.",
-    "Vent plasma into the nest.",
-    "Lower the fortress drawbridge.",
-    "Rotate the bridge maze.",
-    "Trap the horde in quarantine.",
-    "Force open the escape tunnel.",
-    "Cycle the crusher traps.",
-    "Shunt power through the altar.",
-    "Redirect the tram rails.",
-    "Drain the flooded crypt.",
-    "Release the security drones.",
-    "Open the final kill corridor.",
-
-    -- Escape/Exfiltration Objectives
-    "Reach the extraction pad.",
-    "Cross the poisoned wasteland.",
-    "Escape by armored convoy.",
-    "Pass the blast doors.",
-    "Reach the evacuation tram.",
-    "Flee the melting reactor.",
-    "Escape the sinking refinery.",
-    "Reach the surface bunker.",
-    "Cross the collapsing causeway.",
-    "Reach the rescue beacon.",
-    "Escape the burning foundry.",
-    "Run the gauntlet corridor.",
-    "Reach the last teleporter.",
-    "Exit through the mining shaft.",
-    "Escape the demon lockdown.",
-    "Cross the lava trench.",
-    "Reach the emergency airlock.",
-    "Break through the siege line.",
-    "Escape the corpse grinder.",
-    "Reach the command shuttle.",
-    "Exit before purge ignition.",
-    "Survive the final elevator ride.",
-    "Escape the blood-flood tunnels.",
-    "Reach the outer blast zone.",
-    "Break through the Hell gate.",
-    "Reach the old service road.",
-    "Escape the collapsing tower.",
-    "Reach the extraction bunker.",
-    "Run before the core detonates.",
-    "Exit through the secret portal.",
-
-    -- Large Scale Objectives
-    "Destroy the command tower.",
-    "Open the forbidden vault.",
-    "Break the alien hive-mind.",
-    "Neutralize the demon general.",
-    "Restore the Argent balance.",
-    "Seal the primary Hell gate.",
-    "Cripple the invasion network.",
-    "Shatter the cult hierarchy.",
-    "Collapse the fortress district.",
-    "Destroy the Hellforge engine.",
-    "Ruin the demon war ritual.",
-    "Cut Earth off from Hell.",
-    "Break the moonbase siege.",
-    "Silence the global death signal.",
-    "Burn the invasion root.",
-    "End the portal cascade.",
-    "Destroy the soul-harvester array.",
-    "Seal the city breach.",
-    "Kill the arch-demon commander.",
-    "Collapse the blood cathedral.",
-    "Stop the Argent meltdown.",
-    "Break the planetary lockdown.",
-    "Destroy the Hellseed reactor.",
-    "Cleanse the corrupted megastructure.",
-    "End the UAC cult uprising.",
-    "Shatter the final summoning ring.",
-    "Close the sky-rift.",
-    "Crush the demon occupation.",
-    "Reclaim the last human bastion.",
-    "Turn Hell's gate into rubble."
+    "Secure the demonic breach",
+    "Destroy the Hell portal",
+    "Eliminate hostile presence",
+    "Neutralize infernal artillery",
+    "Purge corrupted stronghold",
+    "Reclaim abandoned outpost",
+    "Restore facility power",
+    "Activate emergency generator",
+    "Disable Hell beacon",
+    "Destroy corruption nexus",
+    "Seal dimensional fracture",
+    "Collapse unstable gateway",
+    "Recover stolen Argent cells",
+    "Locate missing expedition",
+    "Escort surviving personnel",
+    "Rescue trapped marines",
+    "Defend evacuation route",
+    "Hold defensive perimeter",
+    "Clear reactor chamber",
+    "Secure command center",
+    "Capture communications hub",
+    "Protect research archives",
+    "Lock down containment",
+    "Restore automated defense network",
+    "Activate orbital uplink",
+    "Restart cooling systems",
+    "Stabilize fusion reactor",
+    "Disable enemy transmitter",
+    "Silence demonic signal",
+    "Recover security credentials",
+    "Retrieve command codes",
+    "Access restricted terminal",
+    "Download classified intelligence",
+    "Upload containment protocols",
+    "Purge corrupted database",
+    "Destroy cursed relic",
+    "Recover ancient artifact",
+    "Locate UAC shrine",
+    "Protect UAC archives",
+    "Recover UAC standard",
+    "Defend sacred chamber",
+    "Destroy corrupted altar",
+    "Purify ritual grounds",
+    "Interrupt summoning ritual",
+    "Prevent Hell incursion",
+    "Disrupt enemy logistics",
+    "Sabotage Hell foundry",
+    "Destroy ammunition reserves",
+    "Disable production lines",
+    "Capture supply depot",
+    "Destroy fuel reserves",
+    "Recover prototype weapon",
+    "Test experimental arsenal",
+    "Secure weapons cache",
+    "Destroy toxic reserves",
+    "Eliminate cult leadership",
+    "Neutralize heavy resistance",
+    "Destroy armored convoy",
+    "Intercept enemy patrol",
+    "Eliminate elite demons",
+    "Purge infested tunnels",
+    "Sweep maintenance corridors",
+    "Sweep industrial district",
+    "Sweep habitation block",
+    "Sweep cargo terminal",
+    "Sweep reactor levels",
+    "Sweep lower catacombs",
+    "Sweep surface installations",
+    "Sweep excavation site",
+    "Sweep docking bay",
+    "Sweep refinery complex",
+    "Sweep mining tunnels",
+    "Sweep processing plant",
+    "Sweep quarantine sector",
+    "Sweep laboratory wing",
+    "Sweep security offices",
+    "Sweep engineering deck",
+    "Sweep ventilation shafts",
+    "Sweep waste facility",
+    "Sweep storage warehouse",
+    "Investigate distress signal",
+    "Investigate radio silence",
+    "Investigate containment breach",
+    "Investigate seismic anomaly",
+    "Investigate energy surge",
+    "Investigate corrupted zone",
+    "Track hostile commander",
+    "Locate enemy commander",
+    "Locate hidden bunker",
+    "Locate secret laboratory",
+    "Locate ancient vault",
+    "Locate dimensional anchor",
+    "Locate Hell forge",
+    "Locate escape route",
+    "Locate extraction point",
+    "Reach extraction zone",
+    "Reach communications tower",
+    "Reach surface elevator",
+    "Reach transport hub",
+    "Reach orbital platform",
+    "Reach UAC fortress",
+    "Reach command bunker",
+    "Reach evacuation shuttle",
+    "Reach reactor core",
+    "Reach corrupted cathedral",
+    "Secure landing zone",
+    "Establish forward outpost",
+    "Expand defensive perimeter",
+    "Destroy defensive emplacements",
+    "Disable shield generator",
+    "Destroy shield emitter",
+    "Neutralize Hellsurge cannons",
+    "Destroy artillery battery",
+    "Silence anti-air batteries",
+    "Disable orbital defenses",
+    "Destroy observation towers",
+    "Secure bridge crossing",
+    "Repair damaged bridge",
+    "Restore rail transport",
+    "Activate cargo elevator",
+    "Unlock blast doors",
+    "Bypass security lockdown",
+    "Override access controls",
+    "Open maintenance tunnels",
+    "Recover access keycard",
+    "Recover master key",
+    "Acquire security clearance",
+    "Acquire command authorization",
+    "Protect civilian survivors",
+    "Defend refugee convoy",
+    "Escort engineering team",
+    "Protect medical personnel",
+    "Secure medical station",
+    "Recover medical supplies",
+    "Deliver emergency supplies",
+    "Restore life support",
+    "Stabilize oxygen systems",
+    "Repair communications relay",
+    "Repair defense grid",
+    "Restore navigation systems",
+    "Activate emergency broadcast",
+    "Transmit evacuation signal",
+    "Call orbital support",
+    "Await reinforcement arrival",
+    "Prepare defensive positions",
+    "Fortify command post",
+    "Defend reactor core",
+    "Defend communications array",
+    "Defend research facility",
+    "Defend power station",
+    "Defend supply depot",
+    "Defend landing zone",
+    "Defend transport convoy",
+    "Destroy Hell growth",
+    "Destroy corruption spores",
+    "Burn infected biomass",
+    "Incinerate corrupted remains",
+    "Cleanse blood sanctum",
+    "Purge sacrificial chamber",
+    "Destroy cursed obelisk",
+    "Destroy infernal monument",
+    "Collapse demon tunnels",
+    "Collapse unstable caverns",
+    "Destroy excavation equipment",
+    "Disable mining operations",
+    "Destroy extraction machinery",
+    "Sabotage processing facility",
+    "Sabotage energy conduits",
+    "Destroy warp anchors",
+    "Deactivate rune pylons",
+    "Disable soul harvesters",
+    "Destroy soul engines",
+    "Destroy flesh machinery",
+    "Neutralize bio-mechanical horrors",
+    "Destroy infernal generators",
+    "Overload Hell reactor",
+    "Overload energy conduits",
+    "Drain Argent reserves",
+    "Contain Argent leak",
+    "Seal toxic reservoirs",
+    "Destroy corrupted pipeline",
+    "Secure industrial sector",
+    "Secure research laboratories",
+    "Secure orbital station",
+    "Secure transit hub",
+    "Secure excavation complex",
+    "Secure cargo platforms",
+    "Secure command bunker",
+    "Secure perimeter defenses",
+    "Secure quarantine zone",
+    "Secure ritual chamber",
+    "Secure ancient crypt",
+    "Secure forgotten temple",
+    "Capture enemy outpost",
+    "Capture control tower",
+    "Capture power station",
+    "Capture command relay",
+    "Capture strategic position",
+    "Capture fortified checkpoint",
+    "Destroy command node",
+    "Destroy surveillance network",
+    "Disable tracking systems",
+    "Blind enemy sensors",
+    "Jam hostile communications",
+    "Intercept enemy transmissions",
+    "Decrypt captured data",
+    "Recover navigation maps",
+    "Recover mission logs",
+    "Recover research samples",
+    "Recover corrupted archives",
+    "Extract valuable intelligence",
+    "Verify target elimination",
+    "Confirm area secure",
+    "Confirm reactor stability",
+    "Confirm civilian evacuation",
+    "Await mission completion",
+    "Proceed to extraction",
+    "Advance toward objective",
+    "Advance through catacombs",
+    "Advance into Hell",
+    "Advance without hesitation",
+    "Push enemy lines",
+    "Break enemy defenses",
+    "Destroy final guardian",
+    "Face the champion",
+    "Confront Hell priest",
+    "Slay infernal commander",
+    "Execute terminal purge",
+    "Complete cleansing operation",
+    "End the invasion",
+    "Finish the mission",
+    "Leave nothing standing",
+    "Rip and tear"
   },
 
   naming_styles =
@@ -2174,15 +2202,15 @@ LLM_NAME.story_components =
     "Father Michael Patton, a priest sheltering refugees while questioning his faith",
     "The Carpenter, an engineer rebuilding infrastructure across ruined city sectors",
     "Gideon Reyes, a smuggler trading supplies and information between isolated settlements",
-    "Sister Alrene, a field medic using experimental methods to slow demonic corruption",
+    "Sister Arelynne, a field medic using experimental methods to slow demonic corruption",
     "Marshal Conrad Rhyne, a law officer enforcing martial rule in collapsing settlements",
     "Selene Ward, a former UAC dispatcher maintaining fragmented emergency communication networks",
     "Dr. Hector Wynn, a biochemist studying controlled exposure to Hell contaminants",
     "Vera Holt, a convoy leader negotiating fragile ceasefires between survivor groups",
     "The Quartermaster, a black-market supplier distributing salvaged military hardware",
-    "Major Lucien Draik, a former ARC officer coordinating unofficial operations beyond military oversight",
+    "Major Lucien Drake, a former ARC officer coordinating unofficial operations beyond military oversight",
     "Iris Vale, an evacuation coordinator accused of abandoning entire population sectors",
-    "Brother Gideon Shaw, a battlefield chaplain documenting possession outbreaks among refugees",
+    "Brother Gibson Shaw, a battlefield chaplain documenting possession outbreaks among refugees",
 
     -- antagonists
     "The Matron, a cybernetic arachnid created during failed UAC weapons experiments",
@@ -2237,9 +2265,18 @@ LLM_NAME.story_components =
     "The Exodus Labs, breakaway UAC researchers operating outside military oversight",
     "The Red Vipers, an aggressive isolationist militant group fighting against hell, distrustful of outsiders",
     "The Collective, a loose network former UAC scientists turned mystics and occultists dedicated to unleashing Hell",
-    "The Defectors, former UAC scientists and occultists aiding Hell incursions",
+    "The Defectors, former UAC scientists and occultists aiding Hell incursions through secretive blood sacrifices",
     "The Apostates, ex-research personnel devoted to spreading demonic influence",
     "The Outer Circle, rogue researchers attempting to unleash Hell across human colonies",
+    "Hell's Hammers, former Sentinels from Argent D'Nur, their escapades have brought them to Earth in their continued conquest against Hell",
+    "The Holdouts, former UAC employees and soldiers who have escaped corporate control before they too were to be corrupted",
+    "The Emancipators, radical and anarchic militia preying on humans and demons alike for pleasure first and survival second",
+    "The Reforgers, a group of dedicated survivalists perusing abandoned UAC technology in the hopes of rebuilding humanity",
+    "The Warpath, cybernetic and magically-enhanced horned warriors from another dimension long ago conquered and possessed by Hell",
+    "The Aerators, an elite corporate-aligned assassin unit with an unclear allegiance and a mission to steal or reposses UAC technology",
+    "The Fishers, stranded survivors who have a keen eye for assistance, but absolutely only upon joining their cause",
+    "The Firing Squad, disgruntled former UAC soldiers executing any known corporate collaborators and hellspawn alike",
+    "The Aquila, a highly aggressive and distrustful paramilitary group believing that diverting from the old ways is the reason behind Hell's invasion",
 
     -- us?!
     "The Obsidian Developers, a nigh-invincible and enigmatic group from another dimension always only observing and never interfering"
@@ -2250,49 +2287,55 @@ LLM_NAME.story_components =
     epi =
 [[Make it as engaging as possible.
 
+The text in each tag section must at be around _WORD_COUNT_ words, separated into paragraphs with proper spacing.
+Abide by our word count rule as much as possible, each section content must be around _WORD_COUNT_ words.
+Ensure that the tag section is properly surrounded by the proper HTML tags e.g. <S1> and enclosed with </S1>, <S2> and </S2> for the next, and etc.
+Refer to the example provided below.
+
 SYSTEM: Please use exactly the following tagged structure and do not use any Markdown.
 Please do not add other blocks than is found in the example:
 
-<S1> 
+<S1>
 story intro here 
 </S1>
 
-<S2> 
+<S2>
 story ending here 
-</S2>
-
-The text in each tag section must at least be _WORD_COUNT_ words, separated into paragraphs with proper spacing.]],
+</S2>]],
 
     game =
 [[There are three chapters and the story is an intro and end for each,
 making six intermissions overall. Each chapter has new twists and revalations.
-The text in each tag section must at least be _WORD_COUNT_ words, separated into paragraphs with proper spacing.
+The text in each tag section must be around _WORD_COUNT_ words, separated into paragraphs with proper spacing.
+Abide by our word count rule as much as possible, each section must be around _WORD_COUNT_ words.
+Ensure that the tag section is properly surrounded by the proper HTML tags e.g. <S1> and </S1>, <S2> and </S2> for the next, and etc.
+Refer to the example provided below.
 
-SYSTEM: Use the following tagged structure and do not use any Markdown formatting.
+SYSTEM: Use the following tagged structure in the example below.
 Please do not add other blocks than is found in the example.
-The following example must absolutely be followed:
+The following example must absolutely be followed as there is no input validation:
 
-<S1> 
+<S1>
 chapter 1 intro here
 </S1>
 
-<S2> 
+<S2>
 chapter 1 ending here
 </S2>
 
-<S3> 
+<S3>
 chapter 2 intro here
 </S3>
 
-<S4> 
+<S4>
 chapter 2 ending here
 </S4>
 
-<S5> 
+<S5>
 chapter 3 intro here
 </S5>
 
-<S6> 
+<S6>
 chapter 3 ending here
 </S6>]]
   },
@@ -2397,13 +2440,13 @@ chapter 3 ending here
     "Command Already Knew",
     "Evacuation Never Came",
     "The Signal Was False",
-    "The Survivors Are Infected",
-    "The Portal Cannot Close",
-    "The AI Turned Hostile",
+    "The Survivors Bear the Mark",
+    "The Gate Was Never Closed",
+    "The AI Serves Hell",
     "The Blacksite Lied",
     "The Reactor Was Sabotaged",
-    "The Rescue Was a Coverup",
-    "The Enemy Is Inside",
+    "The Rescue Was Never Meant to Arrive",
+    "Hell Is Already Inside",
     "The Artifact Is Active",
     "The Colony Was Abandoned",
     "The Quarantine Failed",
@@ -2418,15 +2461,15 @@ chapter 3 ending here
     "The Facility Was Compromised",
     "The Weapon Made It Worse",
     "The Outbreak Was Intentional",
-    "The Marines Were Sacrificed",
+    "The Marines Were the Offering",
     "The Breach Is Spreading",
     "The AI Is Hiding Something",
     "The Survivors Turned on Each Other",
     "The Experiment Never Ended",
-    "The Infection Is Airborne",
-    "The Enemy Controls the Network",
+    "The Corruption Spreads",
+    "Hell Controls the Network",
     "The Reactor Is Alive",
-    "The Lower Levels Opened",
+    "The Lower Levels Were Never Empty",
     "The Fleet Has Fallen",
     "The Archives Were Erased",
     "The Invasion Already Happened",
@@ -2444,11 +2487,11 @@ chapter 3 ending here
     "The Water Is Corrupted",
     "The Colony Is Still Active",
     "The Rift Is Stabilizing",
-    "The Infection Thinks",
+    "The Corruption Learned",
     "The Portals Are Linked",
     "The Dead Retain Memory",
     "The Reactor Cannot Shut Down",
-    "The Enemy Mimics Humans",
+    "Hell Wears Human Faces",
     "The Signal Comes From Hell",
     "The Cult Controls Evacuation",
     "The Blacksite Never Closed",
@@ -2462,11 +2505,11 @@ chapter 3 ending here
     "The Demons Want the Reactor",
     "The Hell Structures Are Growing",
     "The Transit Network Is Compromised",
-    "The Infection Crossed Offworld",
+    "Hell Has Crossed the Stars",
     "The Quarantine Zone Expanded",
     "The Marines Lost Contact",
     "The Reactor Core Mutated",
-    "The Portal Reacts to Violence",
+    "The Gate Feeds on Violence",
     "The Blacksite Has Multiple Breaches",
     "The Distress Call Is Ancient",
     "The Evacuation Route Is Gone",
@@ -2475,7 +2518,196 @@ chapter 3 ending here
     "The Teleporters Remain Active",
     "The Facility Is Still Operational",
     "The Breach Reached Orbit",
-    "The End Already Started"
+    "The End Already Started",
+
+    "The Gate Was Never Closed",
+    "The Reactor Powers Hell",
+    "The Facility Is the Ritual",
+    "The Ritual Already Began",
+    "The Ritual Cannot Stop",
+    "The Priests Never Left",
+    "The Cathedral Is Alive",
+    "The Walls Are Breathing",
+    "The Blood Is Fuel",
+    "The Sky Has Opened",
+    "The Earth Is Bleeding",
+    "The Core Is Possessed",
+    "The Machines Began Praying",
+    "The Corpses Keep Working",
+    "The Flesh Covers the Machinery",
+    "The Fortress Is Growing",
+    "The Gate Learned the Way Back",
+    "The Stars Went Dark",
+    "The Last Safe Room Fell",
+    "The Lights Attract Them",
+
+    "The Catacombs Awakened",
+    "The Ancient Vault Opened",
+    "Something Was Buried Below",
+    "Below Was Never Empty",
+    "The Old Temple Opened",
+    "There Is No Surface",
+    "There Never Was a Colony",
+    "Every Exit Leads Below",
+    "The Moon Is Hollow",
+    "Hell Is Older Than Earth",
+    "Command Fed Them to Hell",
+    "Command Chose Containment",
+    "Command Opened the Gate",
+    "High Command Made the Bargain",
+    "Someone Signed the Pact",
+    "Hell Knows Your Name",
+    "Hell Speaks Through the Speakers",
+    "Hell Learned Our Voices",
+    "Hell Answers Blood",
+    "Blood Strengthens the Gate",
+
+    "Every Kill Widens the Rift",
+    "The Rift Hungers",
+    "The Gate Reacts to Violence",
+    "The Flesh Is Changing",
+    "Corruption Has Taken Root",
+    "Hell Walks Among the Living",
+    "The Mark Is Spreading",
+    "The Factory Manufactures Demons",
+    "The Forge Never Cooled",
+    "The Flesh Has Replaced Steel",
+    "The Heart Beneath the Facility Beats",
+    "The Foundation Is Flesh",
+    "The Cathedral Was Built Tomorrow",
+    "The Planet Is Becoming Hell",
+    "The Harvest Has Begun",
+    "The Titan Is Waking",
+    "The Prison Was Empty",
+    "The Prison Was Holding Hell",
+    "The Abyss Is Looking Back",
+    "The Noise Is a Prayer",
+
+    "The Choir Is Not Human",
+    "The Portal Learned Your Name",
+    "The Blood Is Calling",
+    "The Sun Never Rose",
+    "The Air Smells Like Sulfur",
+    "The Chant Never Stopped",
+    "The Dead Guard the Gate",
+    "The Sky Is Breaking",
+    "Reality Is Tearing",
+    "More Gates Are Opening",
+    "They Keep Returning",
+    "It Keeps Growing",
+    "Nobody Escaped",
+    "They Opened the Gate",
+    "Containment Was the Ritual",
+    "The Ritual Was the Experiment",
+    "The Experiment Was the Summoning",
+    "The Summoning Was Successful",
+    "The First Breach Was Deliberate",
+    "Hell Was Invited",
+
+    "The Gate Is Growing",
+    "The Gate Is Learning",
+    "The Gate Is Hungry",
+    "The Reactor Is Its Heart",
+    "The Facility Is Its Body",
+    "The Network Is Its Nervous System",
+    "The Dead Are Its Workers",
+    "The Demons Are Being Manufactured",
+    "The Hellspawn Are Multiplying",
+    "The Citadel Is Moving",
+    "The Fortress Has Awakened",
+    "The Planet Is Screaming",
+    "The Ocean Is Boiling",
+    "The Ground Is Opening",
+    "The Heavens Are Burning",
+    "The Moon Has Gone Dark",
+    "The Stars Are Disappearing",
+    "The Horizon Is Gone",
+    "The War Has Reached Earth",
+    "Hell Has Come to Stay",
+
+    "The Last Transmission Was a Warning",
+    "The Last Transmission Was a Prayer",
+    "The Last Transmission Came From Below",
+    "The Last Transmission Came From the Future",
+    "The Distress Signal Was Ours",
+    "The Distress Signal Was the Bait",
+    "The Rescue Ship Was Already Compromised",
+    "The Reinforcements Serve Hell",
+    "The Fleet Was Never Coming",
+    "The Fleet Is Coming From Hell",
+    "The Evacuation Ships Are Empty",
+    "The Evacuation Ships Are Full of Dead",
+    "The Safe Zone Has Fallen",
+    "The Safe Zone Was Never Safe",
+    "The Bunker Has Been Opened",
+    "The Bunker Is Full",
+    "The Bunker Is Feeding Them",
+    "The Door Was Locked From the Inside",
+    "The Door Was Built to Keep Something Out",
+    "Something Is Knocking",
+
+    "The Ancient Gods Were Not Dead",
+    "The Tomb Was a Prison",
+    "The Temple Was a Machine",
+    "The Relic Was a Key",
+    "The Key Was Already Turned",
+    "The Seal Was a Warning",
+    "The Seal Was Broken Long Ago",
+    "The Prophecy Was an Instruction",
+    "The Prophecy Was a Countdown",
+    "The Gods Were Waiting",
+    "The Priests Were Right",
+    "The Priests Were Wrong",
+    "The Sacrifice Was Not Human",
+    "The Sacrifice Was the Planet",
+    "The Altar Is Still Warm",
+    "The Ritual Needs One More Soul",
+    "The Ritual Needs You",
+    "The Gate Needs a Champion",
+    "The Champion Has Already Arrived",
+    "The Slayer Was Not the First",
+
+    "The Machine Found Hell",
+    "Hell Found the Machine",
+    "The Machine Opened the Gate",
+    "The Machine Is Still Running",
+    "The Machine Is Feeding Hell",
+    "The Network Became a Temple",
+    "The Factory Became a Shrine",
+    "The Reactor Became an Altar",
+    "The Station Became a Cathedral",
+    "The Colony Became a Graveyard",
+    "The City Became a Battlefield",
+    "The Planet Became a Gate",
+    "The Sky Became the Breach",
+    "The Ground Became the Enemy",
+    "The Walls Became Flesh",
+    "The Machinery Became Alive",
+    "The Dead Became Soldiers",
+    "The Soldiers Became Demons",
+    "The Demons Became the Army",
+    "The Army Is Already Here",
+
+    "Hell Has Already Won",
+    "Hell Has Not Finished",
+    "Hell Is Only Beginning",
+    "The War Has Just Begun",
+    "The First Wave Was a Test",
+    "The Second Wave Is Coming",
+    "The Horde Was Only the Advance Force",
+    "The Invasion Was a Distraction",
+    "The Real Invasion Is Below",
+    "The Real Invasion Is Above",
+    "The Breach Was the Objective",
+    "The Reactor Was the Objective",
+    "The Artifact Was the Objective",
+    "The Facility Was the Objective",
+    "You Were the Objective",
+    "They Wanted You Alive",
+    "They Wanted You Angry",
+    "They Wanted You Here",
+    "They Were Waiting for You",
+    "The Hunt Has Begun"
   },
 
   -- common proper nouns from the LLM that constantly get re-used (annoyingly)
@@ -3092,6 +3324,23 @@ function LLM_NAME.get_some_info(self, lev)
   ----------------------------------------------------------------------
 
   table.insert(lines, get_semantic(lev.theme_name) .. "\n")
+
+  -- extra mentions of the level's nature as procedural
+  if lev.is_procedural_gotcha then
+    local gotcha_line = rand.pick(
+      {
+        "A significant hostile presence has been detected in this level. Resistance will be challenging.",
+        "A major host of the demonic horde lies waiting this level. Survival will be difficult.",
+        "The leader of the Hell's invasion resides and commands from this level.",
+        "This area hosts a significant brunt of the demonic invasion force. Be prepared.",
+        "A high-ranking demon general has made this level their home. They will not take kindly to intrusion",
+        "An significant entrapping ambush from the forces of Hell await in this level.",
+        "This is the site of a major encounter with the core of demonic forces. Their invasion must stop here.",
+        "This area is critically possessed and controlled by Hell as its staging ground. Its significant hostile forces await."
+      }
+    )
+    table.insert(lines, gotcha_line .. "\n")
+  end
 
   ----------------------------------------------------------------------
   -- ROOM DISTRIBUTION
@@ -3742,9 +3991,10 @@ function LLM_NAME.do_it()
 Rules:
 _NAME_LENGTH_
 - 1 name only
-- do not add any comment or explanation, give only the name
+- absolutely no comments, explanation, or follow-up
+- give only the name, do not add any explanation
 - no quotation marks, no camelcase, no snakecase
-- avoid words with hard starting consonants like "Kh", "Kr", "Ky"
+- avoid using of any nouns that begin with "Kh", "Kr", "Ky", "Ely"
 
 ]]..
 level_data
@@ -3767,8 +4017,8 @@ level_data
 
     -- LLM temperature variation, later maps have crazier names
     local pick_tmp
-    if #GAME.levels > 4 and epi_lev.along then
-      pick_tmp = map_value(epi_lev.along, 0, 1, 0.25, 1.2)
+    if epi_lev.game_along then
+      pick_tmp = map_value(epi_lev.game_along, 0, 1, 1, 2.5)
     end
 
     -- name length
@@ -3788,12 +4038,15 @@ level_data
       end
     end
 
-    return ask(prompt,
+    local lname = ask(prompt,
     {
-      temperature = pick_tmp or 0.85,
+      temperature = pick_tmp or 1.0,
       num_predict = 20
     },
     "name")
+
+    gui.printf("Replaced name of " .. epi_lev.id .. ": " .. lname .. "\n")
+    return lname
   end
 
 
@@ -3845,16 +4098,16 @@ I need the story to be properly formatted. Do not provide any explanation.
 Rules:
 - narrate in second person
 - visceral Doom-style military-industrial horror action
-- engaging story with a slightly grounded, military-style, viscerally action-packed plot
+- engaging story with a non-mythic, military-style, viscerally action-packed plot
 - pure fictional non real-world location
 - absolutely avoid any use of italics, bold, or any Markdown formatting
 - no explanations, no commentary, no follow-up questions
 - Hell is always the ultimate enemy and its demons are the immediate mission threat but be a person, faction, archive, ritual, weapon shipment, infestation, command post, collaborator, or cover-up may interfere
 - the selected Story Plot controls the actual objective and resolution
 - if the acronym UAC is used, it means "Union Aerospace Corporation"
-- please do not mention the smell of ozone, nexus points, junction points, or sub-levels
+- please do not mention: the smell of ozone, nexus points, junctions, or sub-levels, structural integrity
 - avoid inventing a larger hidden crisis to make the ending feel more important
-- do not invent a larger hidden portal, reactor, core, energy-source, breach, or anomaly plot.
+- do not invent a larger hidden portal, reactor, core, energy-source, breach, or anomaly plot
 - do not mention Earth, it is only for locational context
 
 The silent marine protagonist is the Doomslayer and needs no introduction, forever fighting an eternal war with hell and answers to no one. 
@@ -3871,6 +4124,7 @@ Plot Discipline:
 
 Protagonist Notes:
 - the protagonist will never choose to work with Hell
+- the protagonist prefers to never harm humans, only demons or possessed humans
 - the protagonist will only work with anyone if it coincides with the Doomslayer's goal of Hell's destruction
 - do not explain anything about the protagonist's identity or motivations in the story
 
@@ -3880,11 +4134,14 @@ _FORMAT_
 ]]
     -- flavor injection
     local story_flavor = rand.pick(LLM_NAME.story_components.flavors) .. "\n"
-    story_flavor = story_flavor .. "The Objective: " .. rand.pick(LLM_NAME.story_components.objectives) .. "\n"
+    local story_obj = rand.pick(LLM_NAME.story_components.objectives)
+    story_flavor = story_flavor .. "The Objective: " .. story_obj .. "\n"
 
     -- sometimes add a twist
+    local story_twist
     if rand.odds(75) then
-      story_flavor = story_flavor .. "The Twist: " .. rand.pick(LLM_NAME.story_components.story_twists) .. "\n"
+      story_twist = rand.pick(LLM_NAME.story_components.story_twists)
+      story_flavor = story_flavor .. "The Twist: " .. story_twist .. "\n"
     end
     prompt = string.gsub(prompt,
     "_FLAVOR_",
@@ -3990,9 +4247,8 @@ _FORMAT_
     -- temperature
     local temp = rand.pick
     {
-      0.90,
-      1.0,
-      1.1
+      3.0,
+      3.0
     }
 
     -- prompt structure
@@ -4024,7 +4280,16 @@ _FORMAT_
         chunk_name = "STORYEND"
       end
 
+
       table.insert(PARAM.language_lump, chunk_name .. math.ceil(s_pos/2) .. " =\n")
+      -- debug
+      if PARAM.bool_llm_namer_debug == 1 then
+        if s_pos == 1 then
+          table.insert(PARAM.language_lump,
+            '"' .. story_obj .. " / " .. (story_twist or "No Twist") .. '\\n"\n\n'
+          )
+        end
+      end
       table.insert(PARAM.language_lump,
         format_story_string(
           escape_string(
@@ -4183,6 +4448,15 @@ OB_MODULES["llm_namer"] =
       tooltip = _("Enables or disables Ollama instance check before level generation begins for speed. " ..
       "When turning this off, be absolutely sure Ollama is running or you may get end errors, wasting your generated level."),
       priority = 95,
+    },
+
+    {
+      name = "bool_llm_namer_debug",
+      label = _("Debug Mode"),
+      valuator = "button",
+      default = 0,
+      tooltip = _("Adds some prompt information to generated text for debugging."),
+      priority = 94,
     }
   }
 }

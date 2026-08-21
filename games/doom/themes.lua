@@ -1471,6 +1471,9 @@ DOOM.THEMES =
       --
       gtd_wall_quakish_insets = 25,
       gtd_wall_quakish_insets_2 = 25,
+      gtd_wall_quakish_insets_horizon = 15,
+      gtd_wall_quakish_insets_horizon_mid = 15,
+      gtd_wall_quakish_insets_horizon_top = 15,
       --
       gtd_ribbed_lights = 18,
       gtd_ribbed_lights_no3d = 18,
@@ -1479,6 +1482,7 @@ DOOM.THEMES =
       gtd_ribbed_lights_tekmachine = 9,
       gtd_ribbed_lights_tekmachine_alt = 9,
       gtd_ribbed_lights_very_blue = 18,
+      gtd_ribbed_lights_ribbed_steps = 18,
       --
       gtd_wall_high_gap_set = 12,
       gtd_wall_high_gap_alt_set = 12,
@@ -1525,6 +1529,7 @@ DOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -1999,6 +2004,9 @@ DOOM.THEMES =
       --
       gtd_wall_quakish_insets = 25,
       gtd_wall_quakish_insets_2 = 25,
+      gtd_wall_quakish_insets_horizon = 20,
+      gtd_wall_quakish_insets_horizon_mid = 20,
+      gtd_wall_quakish_insets_horizon_top = 20,
       --
       gtd_ribbed_lights = 17,
       gtd_ribbed_lights_no3d = 17,
@@ -2007,6 +2015,7 @@ DOOM.THEMES =
       gtd_ribbed_lights_tekmachine = 9,
       gtd_ribbed_lights_tekmachine_alt = 9,
       gtd_ribbed_lights_very_blue = 17,
+      gtd_ribbed_lights_ribbed_steps = 17,
       --
       gtd_wall_high_gap_set = 12,
       gtd_wall_high_gap_alt_set = 12,
@@ -2059,6 +2068,7 @@ DOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,
@@ -2568,7 +2578,12 @@ DOOM.THEMES =
       gtd_furnace_water = 20,
       --
       gtd_wall_marbface = 50,
+      --
       gtd_wall_quakish_insets = 50,
+      gtd_wall_quakish_insets_horizon = 25,
+      gtd_wall_quakish_insets_horizon_mid = 25,
+      gtd_wall_quakish_insets_horizon_top = 25,
+      --
       gtd_wall_hell_ossuary = 50,
       --
       gtd_wall_high_gap_set = 12,
@@ -2624,6 +2639,7 @@ DOOM.THEMES =
       gtd_generic_small_lite = 20,
       gtd_generic_artsy_lite_box = 20,
       gtd_generic_artsy_chequered = 20,
+      gtd_generic_artsy_corpo_art = 20,
       --
       gtd_ind_modwall_1 = 20,
       gtd_ind_modwall_2 = 20,

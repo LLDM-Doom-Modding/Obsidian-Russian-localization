@@ -198,3 +198,46 @@ PREFABS.Wall_gtd_ribbed_lights_blue_diag =
   height = 96,
   bound_z2 = 96
 }
+
+--
+
+PREFABS.Wall_gtd_ribbed_lights_ribbed_steps =
+{
+  template = "Wall_gtd_ribbed_lights",
+  map = "MAP14",
+
+  group = "gtd_ribbed_lights_ribbed_steps",
+
+  height = 96,
+  bound_z2 = 96,
+
+  z_fit = { 79,81 }
+}
+
+PREFABS.Wall_gtd_ribbed_lights_ribbed_steps_break =
+{
+  template = "Wall_gtd_ribbed_lights",
+  map = "MAP15",
+
+  prob = 7,
+  group = "gtd_ribbed_lights_ribbed_steps",
+
+  height = 96,
+  bound_z2 = 96,
+
+  z_fit = { 79,81 }
+}
+
+PREFABS.Wall_gtd_ribbed_lights_ribbed_steps_diag =
+{
+  template = "Wall_gtd_ribbed_lights",
+  map = "MAP16",
+
+  where = "diagonal",
+  group = "gtd_ribbed_lights_ribbed_steps",
+
+  height = 96,
+  bound_z2 = 96,
+
+  z_fit = { 79,81 }
+}

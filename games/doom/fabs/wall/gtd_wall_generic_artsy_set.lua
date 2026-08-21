@@ -498,3 +498,34 @@ PREFABS.Wall_generic_artsy_chequered_diag =
 
   z_fit = "stretch"
 }
+
+--
+
+PREFABS.Wall_artsy_corpo_art =
+{
+  template = "Wall_generic_artsy_bedazzled",
+  map = "MAP40",
+
+  group = "gtd_generic_artsy_corpo_art",
+
+  height = 96,
+
+  bound_z2 = 96,
+
+  z_fit = "top"
+}
+
+PREFABS.Wall_artsy_corpo_art_diag =
+{
+  template = "Wall_generic_artsy_bedazzled",
+  map = "MAP41",
+
+  group = "gtd_generic_artsy_corpo_art",
+
+  height = 96,
+  where = "diagonal",
+
+  bound_z2 = 96,
+
+  z_fit = "top"
+}

@@ -61,7 +61,7 @@ UI_PICKUPS.SECRET_ROOM_BONUS =
 }
 
 function UI_PICKUPS.setup(self)
-  
+
   module_param_up(self)
 
 end
@@ -81,33 +81,33 @@ OB_MODULES["ui_pickups"] =
 
   options =
   {
-    { name="health",     
-    label=_("Health"),    
-    choices=UI_PICKUPS.HEALTH_CHOICES, randomize_group="pickups", 
-    tooltip = _("Control the number of health items.") 
+    { name="health",
+    label=_("Health"),
+    choices=UI_PICKUPS.HEALTH_CHOICES, randomize_group="pickups",
+    tooltip = _("Control the number of health items.")
     },
 
-    { name="ammo",       
-      label=_("Ammo"),      
-      choices=UI_PICKUPS.HEALTH_CHOICES,  gap=1, randomize_group="pickups", 
-      tooltip = _("Control the amount of ammunition.") 
+    { name="ammo",
+      label=_("Ammo"),
+      choices=UI_PICKUPS.HEALTH_CHOICES,  gap=1, randomize_group="pickups",
+      tooltip = _("Control the amount of ammunition.")
     },
 
-    { name="weapons",    
-      label=_("Weapons"),   
-      choices=UI_PICKUPS.WEAPON_CHOICES, randomize_group="pickups", 
-      tooltip = _("Control the number of weapons.") 
+    { name="weapons",
+      label=_("Weapons"),
+      choices=UI_PICKUPS.WEAPON_CHOICES, randomize_group="pickups",
+      tooltip = _("Control the sequence of weapon appearances.")
     },
 
-    { name="items",      
-      label=_("Items"),     
-      choices=UI_PICKUPS.ITEM_CHOICES, randomize_group="pickups", 
+    { name="items",
+      label=_("Items"),
+      choices=UI_PICKUPS.ITEM_CHOICES, randomize_group="pickups",
       tooltip = _("Control the number of armor and miscellaneous items.")
     },
 
-    { name="secrets",    
-      label=_("Secrets"),   
-      choices=STYLE_CHOICES, randomize_group="pickups", 
+    { name="secrets",
+      label=_("Secrets"),
+      choices=STYLE_CHOICES, randomize_group="pickups",
       tooltip = _("Control the number of secrets.")
     },
 
@@ -117,7 +117,7 @@ OB_MODULES["ui_pickups"] =
       tooltip=_("Adds extra content to secret rooms. Larger rooms offer more content. Default is NONE."),
       default="none",
       randomize_group="pickups",
-      
+
     },
   },
 }

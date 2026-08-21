@@ -8,13 +8,12 @@ PREFABS.Switch_gtd_epic_sdai_1 =
 
   where  = "seeds",
 
-  height = 128,
+  height = 136,
 
-  seed_w = 1,
+  seed_w = 2,
   seed_h = 1,
 
   deep   =  16,
-  over   = -16,
 
   texture_pack = "armaetus",
 

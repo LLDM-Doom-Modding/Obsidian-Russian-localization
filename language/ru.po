@@ -7734,8 +7734,8 @@ msgstr ""
 "Obsidian сейчас перезапустится."
 
 #: source/main.cc:1295
-msgid "Tabs of Terror"
-msgstr "Tabs of Terror"
+msgid "Ad Mortem, Ad Infernum"
+msgstr "Ad Mortem, Ad Infernum"
 
 #: source/g_doom.cc:1241
 msgid "Error (create ZIP)"

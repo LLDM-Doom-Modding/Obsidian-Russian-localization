@@ -72,10 +72,12 @@ PREFABS.Wall_generic_beamed_green_inset_diag =
 
 --
 
-PREFABS.Wall_generic_beamed_brown_inset =
+PREFABS.Wall_generic_beamed_brown_inset_hell =
 {
   template = "Wall_generic_beamed_inset",
   map = "MAP03",
+
+  theme = "hell",
 
   group = "gtd_generic_beamed_brown_inset",
 
@@ -83,11 +85,12 @@ PREFABS.Wall_generic_beamed_brown_inset =
   tex_DOORSTOP = "METAL"
 }
 
-PREFABS.Wall_generic_beamed_brown_inset_diag =
+PREFABS.Wall_generic_beamed_brown_inset_diag_hell =
 {
   template = "Wall_generic_beamed_inset",
   map = "MAP04",
 
+  theme = "hell",
   where = "diagonal",
 
   group = "gtd_generic_beamed_brown_inset",

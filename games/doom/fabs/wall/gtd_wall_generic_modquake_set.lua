@@ -43,8 +43,6 @@ PREFABS.Wall_modquake_set_industrial_boom =
 {
   template = "Wall_modquake_set_industrial",
 
-  
-
   rank = 2,
 
   line_342 = 0
@@ -56,7 +54,6 @@ PREFABS.Wall_modquake_set_hell_boom =
 
   theme = "hell",
 
-  
   rank = 1,
 
   line_342 = 0,
@@ -86,8 +83,6 @@ PREFABS.Wall_modquake_set_jawlike_boom =
   template = "Wall_modquake_set_industrial",
   map = "MAP02",
 
-  
-
   theme = "any",
   rank = 1,
 
@@ -105,6 +100,8 @@ PREFABS.Wall_modquake_top_heavy_brace_set =
   template = "Wall_modquake_set_industrial",
   map = "MAP03",
 
+  theme = "any",
+
   rank = 2,
 
   group = "gtd_modquake_top_heavy_brace",
@@ -119,7 +116,7 @@ PREFABS.Wall_modquake_top_heavy_brace_set_limit =
   template = "Wall_modquake_set_industrial",
   map = "MAP03",
 
-  
+  theme = "any",
 
   rank = 1,
 
@@ -152,8 +149,6 @@ PREFABS.Wall_modquake_tek_slope_brace_limit =
   template = "Wall_modquake_set_industrial",
   map = "MAP04",
 
-  
-
   rank = 1,
 
   deep = 32,
@@ -184,8 +179,6 @@ PREFABS.Wall_modquake_ex_light_slope_brace_limit =
 {
   template = "Wall_modquake_set_industrial",
   map = "MAP05",
-
-  
 
   rank = 1,
 
